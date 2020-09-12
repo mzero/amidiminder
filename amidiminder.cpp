@@ -9,7 +9,15 @@ using namespace std;
 
 /** TODO
 
-  [] enumerate exisiting connections
+  [] remember subscription options
+
+  [] verbosity controls
+  [] persistent file of connections, read on startup
+  [] auto connection file
+    [] allow and disallow like amidiauto?
+    [] patterns? regex?
+    [] support for matching port types?
+    [] support for subscription options (like aconnect?)
 
  **/
 
@@ -192,6 +200,8 @@ class MidiMinder {
 	    serr = snd_seq_connect_from(seq, evtPort,
 	      SND_SEQ_CLIENT_SYSTEM, SND_SEQ_PORT_SYSTEM_ANNOUNCE);
       if (errFatal(serr, "connect to system annouce port")) return;
+
+      scanExistingConnections();
     }
 
     void end() {
@@ -314,6 +324,48 @@ class MidiMinder {
 
       connections.remove_if(
         [&](auto c){ return c.matches(conn); });
+    }
+
+
+    void scanExistingConnections() {
+      snd_seq_client_info_t *client;
+      snd_seq_client_info_alloca(&client);
+
+      snd_seq_port_info_t *port;
+      snd_seq_port_info_alloca(&port);
+
+      snd_seq_query_subscribe_t *query;
+      snd_seq_query_subscribe_alloca(&query);
+
+      snd_seq_port_subscribe_t *subs;
+      snd_seq_port_subscribe_alloca(&subs);
+
+
+      snd_seq_client_info_set_client(client, -1);
+      while (snd_seq_query_next_client(seq, client) >= 0) {
+
+        auto clientId = snd_seq_client_info_get_client(client);
+
+        snd_seq_port_info_set_client(port, clientId);
+        snd_seq_port_info_set_port(port, -1);
+        while (snd_seq_query_next_port(seq, port) >= 0) {
+
+          auto p0 = snd_seq_port_info_get_addr(port);
+
+          int index;
+          snd_seq_query_subscribe_set_root(query, p0);
+          snd_seq_query_subscribe_set_type(query, SND_SEQ_QUERY_SUBS_READ);
+          snd_seq_query_subscribe_set_index(query, index = 0);
+          while (snd_seq_query_port_subscribers(seq, query) >= 0) {
+            auto p1 = snd_seq_query_subscribe_get_addr(query);
+
+            snd_seq_connect_t conn = { *p0, *p1 };
+            addConnection(conn);
+
+            snd_seq_query_subscribe_set_index(query, ++index);
+          }
+        }
+      }
     }
 
     bool errCheck(int serr, const char* op) {

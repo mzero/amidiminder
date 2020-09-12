@@ -2,7 +2,6 @@
 #include <alsa/asoundlib.h>
 #include <iostream>
 #include <list>
-#include <optional>
 
 
 using namespace std;
@@ -11,34 +10,63 @@ using namespace std;
 /** TODO
 
   [] enumerate exisiting connections
-  [] track connections via subscribe and unsubscribe events
-  [] print connections by name
-  [] ignore connections to....
-    [] snd_seq_client_type_t  SND_SEQ_KERNEL  ?? (or is this used for HW ports?)
-        ? SND_SEQ_PORT_TYPE_???
-        ? SND_SEQ_PORT_CAP_NO_EXPORT
-        ! client id ==  SND_SEQ_CLIENT_SYSTEM
 
  **/
 
 namespace {
+
+  inline ostream& operator<<(ostream& s, const snd_seq_addr_t& addr) {
+    s << dec << static_cast<unsigned>(addr.client)
+      << ":" << static_cast<unsigned>(addr.port);
+    return s;
+  }
+
+  inline ostream& operator<<(ostream& s, const snd_seq_connect_t& conn) {
+    s << conn.sender << " --> " << conn.dest;
+    return s;
+  }
+
+
   struct Address {
+    Address() { }
     Address(const string& c, const string& p) : client(c), port(p) { }
     Address(const char* c, const char* p) : client(c), port(p) { }
 
     const string client;
     const string port;
 
+    operator bool() const { return !client.empty(); }
+
+    bool isAddrValid() const { return addrValid; }
+    const snd_seq_addr_t& getAddr() const { return addr; }
+
     void invalidateAddr() { addrValid = false; }
     void setAddr(const snd_seq_addr_t& addr_) {
       addrValid = true;
       addr = addr_;
     }
-    bool matches(const snd_seq_addr_t& addr_) {
+
+    bool matches(const snd_seq_addr_t& addr_) const {
       return addrValid
         && addr.client == addr_.client
         && addr.port == addr_.port;
     }
+    bool matches(const Address& a) const {
+      return client == a.client && port == a.port;
+    }
+
+    void outputOn(ostream& s) const {
+      if (!*this) {
+        s << "--:--";
+        return;
+      }
+      s << client << ":" << port;
+      if (addrValid)
+        s << " [" << addr << "]";
+      else
+        s << " [--]";
+    }
+
   private:
     bool addrValid = false;
     snd_seq_addr_t addr;
@@ -48,21 +76,25 @@ namespace {
     Address sender;
     Address dest;
 
-    bool matches(const snd_seq_connect_t& conn) {
+    Connection(const Address& s, const Address& d) : sender(s), dest(d) { }
+
+    bool matches(const snd_seq_connect_t& conn) const {
       return sender.matches(conn.sender) && dest.matches(conn.dest);
     }
   };
-}
 
-inline ostream& operator<<(ostream& s, const snd_seq_addr_t& addr) {
-  s << dec << static_cast<unsigned>(addr.client)
-    << ":" << static_cast<unsigned>(addr.port);
-  return s;
-}
 
-inline ostream& operator<<(ostream& s, const snd_seq_connect_t& conn) {
-  s << conn.sender << " --> " << conn.dest;
-  return s;
+  inline ostream& operator<<(ostream& s, const Address& a) {
+    a.outputOn(s);
+    return s;
+  }
+
+  inline ostream& operator<<(ostream& s, const Connection& c) {
+    s << c.sender << " ==>> " << c.dest;
+    return s;
+  }
+
+
 }
 
 
@@ -86,53 +118,54 @@ class MidiMinder {
           continue;
 
         switch (ev->type) {
-#if 0
           case SND_SEQ_EVENT_CLIENT_START: {
-            cout << "client start " << ev->data.addr << endl;
+            // cout << "client start " << ev->data.addr << endl;
             break;
           }
 
           case SND_SEQ_EVENT_CLIENT_EXIT: {
-            cout << "client exit " << ev->data.addr << endl;
+            // cout << "client exit " << ev->data.addr << endl;
             break;
           }
 
           case SND_SEQ_EVENT_CLIENT_CHANGE: {
-            cout << "client change " << ev->data.addr << endl;
+            // cout << "client change " << ev->data.addr << endl;
             break;
           }
-#endif
+
           case SND_SEQ_EVENT_PORT_START: {
-            cout << "port start " << ev->data.addr << endl;
+            // cout << "port start " << ev->data.addr << endl;
             addPort(ev->data.addr);
             break;
           }
 
           case SND_SEQ_EVENT_PORT_EXIT: {
-            cout << "port exit " << ev->data.addr << endl;
+            // cout << "port exit " << ev->data.addr << endl;
             delPort(ev->data.addr);
             break;
           }
-#if 0
+
           case SND_SEQ_EVENT_PORT_CHANGE: {
-            cout << "port change " << ev->data.addr << endl;
+            // cout << "port change " << ev->data.addr << endl;
+            // FIXME: treat this as a add/remove?
             break;
           }
-#endif
+
           case SND_SEQ_EVENT_PORT_SUBSCRIBED: {
-            cout << "port subscribed " << ev->data.connect << endl;
+            // cout << "port subscribed " << ev->data.connect << endl;
             addConnection(ev->data.connect);
             break;
           }
 
           case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: {
-            cout << "port unsubscribed " << ev->data.connect << endl;
+            // cout << "port unsubscribed " << ev->data.connect << endl;
             delConnection(ev->data.connect);
             break;
           }
 
           default: {
-            cout << "some other event (" << dec << ev->type << ")" << endl;
+            cout << "some other event ("
+               << dec << static_cast<int>(ev->type) << ")" << endl;
           }
         }
       }
@@ -170,20 +203,20 @@ class MidiMinder {
     }
 
 
-    optional<Address> getAddress(const snd_seq_addr_t& addr) {
-      if (addr.client == SND_SEQ_CLIENT_SYSTEM) return nullopt;
+    Address getAddress(const snd_seq_addr_t& addr) {
+      if (addr.client == SND_SEQ_CLIENT_SYSTEM) return {};
 
       int serr;
 
       snd_seq_client_info_t *client;
       snd_seq_client_info_alloca(&client);
       serr = snd_seq_get_any_client_info(seq, addr.client, client);
-      if (errCheck(serr, "get client info")) return nullopt;
+      if (errCheck(serr, "get client info")) return {};
 
       snd_seq_port_info_t *port;
       snd_seq_port_info_alloca(&port);
-      serr = snd_seq_get_any_port_info(seq, addr.client, addr.port, &port);
-      if (errCheck(serr, "get port info")) return nullopt;
+      serr = snd_seq_get_any_port_info(seq, addr.client, addr.port, port);
+      if (errCheck(serr, "get port info")) return {};
 
       // TODO: reject SND_SEQ_PORT_CAP_NO_EXPORT here?
 
@@ -199,25 +232,59 @@ class MidiMinder {
     Connections connections;
 
     void addPort(const snd_seq_addr_t& addr) {
-      // get port and client names
-      // reject add if port it is not to be considered
-      for (auto c : connections) {
-        // for each of sender and dest
-          // if names match this addr's names
-          // and it's inactive
-            // make this side active
-            // if the other side is active
-              // make the subscription
-              // add to connections? (unless we get events about our own adds?
+      Address a = getAddress(addr);
+      if (!a) return;
+
+      for (auto&& c : connections) {
+        bool activated = false;
+
+        if (c.sender.matches(a)) {
+          c.sender.setAddr(addr);
+          activated = true;
+        }
+
+        if (c.dest.matches(a)) {
+          c.dest.setAddr(addr);
+          activated = true;
+        }
+
+        if (activated && c.sender.isAddrValid() && c.dest.isAddrValid()) {
+          cout << "connection re-activated: " << c << endl;
+
+          snd_seq_port_subscribe_t *subs;
+          snd_seq_port_subscribe_alloca(&subs);
+          snd_seq_port_subscribe_set_sender(subs, &c.sender.getAddr());
+          snd_seq_port_subscribe_set_dest(subs, &c.dest.getAddr());
+
+          // FIXME: these should be saved with the Connection & restored
+          snd_seq_port_subscribe_set_queue(subs, 0);
+          snd_seq_port_subscribe_set_exclusive(subs, 0);
+          snd_seq_port_subscribe_set_time_update(subs, 0);
+          snd_seq_port_subscribe_set_time_real(subs, 0);
+
+          int serr;
+          serr = snd_seq_subscribe_port(seq, subs);
+          errCheck(serr, "subscribe");
+        }
       }
     }
 
     void delPort(const snd_seq_addr_t& addr) {
-      // get port and client anmes
-      for (auto c : connections) {
-        // for each of sender and dest
-          // if names match this addr's names
-            // make inactive
+      for (auto&& c : connections) {
+        bool deactivated = false;
+
+        if (c.sender.matches(addr)) {
+          c.sender.invalidateAddr();
+          deactivated = true;
+        }
+
+        if (c.dest.matches(addr)) {
+          c.dest.invalidateAddr();
+          deactivated = true;
+        }
+
+        if (deactivated)
+          cout << "connection deactivated: " << c << endl;
       }
     }
 
@@ -230,13 +297,21 @@ class MidiMinder {
       if (i != connections.end())
           return; // already have it
 
-      // get port and client names
-      // reject if either is not to be considered
-      // build Connection
-      // add to list
+      Address sender = getAddress(conn.sender);
+      Address dest = getAddress(conn.dest);
+
+      if (sender && dest) {
+        Connection c(sender, dest);
+        connections.push_back(c);
+        cout << "adding connection " << c << endl;
+      }
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
+      for (const auto& c : connections)
+        if (c.matches(conn))
+          cout << "removing connection " << c << endl;
+
       connections.remove_if(
         [&](auto c){ return c.matches(conn); });
     }

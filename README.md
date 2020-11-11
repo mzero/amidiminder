@@ -41,5 +41,13 @@ Pretty straight forward...
 
 ### Building
 
-Get this repo and run `make`.  That's it.  build executable is in `build/amidiminder`.
+Get this repo and run `make`.
+
+That's it.
+
+ - build executable is in `build/amidiminder`.
+ - deb package is in `build.amidiminder.deb`.
+
+If you install the deb package, it'll install a systemd sevice as well, and start it.
+
 

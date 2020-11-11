@@ -1,0 +1,9 @@
+Package: amidiminder
+Version: 0.50
+Section: sound
+Priority: optional
+Architecture: armhf
+Depends: libc6 (>= 2.19), libgcc1 (>= 1:4.9.2-10), libasound2 (>= 1.1)
+Maintainer: Mark Lentczner <mark@glyphic.com>
+Description: ALSA MIDI connection minder.
+ Handles reconnecting up ports if hardware or software drops and reconnects.

@@ -3,6 +3,10 @@ TARGET ?= amidiminder
 
 BUILD_DIR ?= ./build
 
+all: bin deb
+bin: $(BUILD_DIR)/$(TARGET)
+deb: $(BUILD_DIR)/$(TARGET).deb
+
 SRCS := amidiminder.cpp
 INCS :=
 LIBS := stdc++ asound
@@ -37,4 +41,16 @@ clean:
 DEPS := $(OBJS:.o=.d)
 
 -include $(DEPS)
+
+$(BUILD_DIR)/$(TARGET).deb: $(BUILD_DIR)/$(TARGET) $(TARGET).service debian/*
+	rm -rf $(BUILD_DIR)/root
+	mkdir -p $(BUILD_DIR)/root
+	mkdir -p $(BUILD_DIR)/root/usr/bin
+	cp -p $(BUILD_DIR)/$(TARGET) $(BUILD_DIR)/root/usr/bin
+	mkdir -p $(BUILD_DIR)/root/usr/lib/systemd/system
+	cp -p $(TARGET).service $(BUILD_DIR)/root/usr/lib/systemd/system
+	cp -pr debian $(BUILD_DIR)/root/DEBIAN
+	fakeroot dpkg --build $(BUILD_DIR)/root
+	mv $(BUILD_DIR)/root.deb $(BUILD_DIR)/$(TARGET).deb
+
 

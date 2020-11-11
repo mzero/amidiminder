@@ -12,6 +12,7 @@ using namespace std;
   [] remember subscription options
 
   [] verbosity controls
+  [] connection list on ^t
   [] persistent file of connections, read on startup
   [] auto connection file
     [] allow and disallow like amidiauto?

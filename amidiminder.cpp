@@ -37,6 +37,7 @@ namespace {
     bool valid;
     snd_seq_addr_t addr;
 
+    AddressRef () : valid(false) { }
     AddressRef(Address a) : valid(a.valid), addr(a.addr) { }
 
     void set(const snd_seq_addr& a) { valid = true; addr = a; }
@@ -45,7 +46,7 @@ namespace {
     operator bool() const { return valid; }
 
     bool matches(const snd_seq_addr_t& a) const
-      { return valid && addr.client == a.client && addr.port == a.port; }
+      { return valid && addr == a; }
   };
 
   struct Connection {

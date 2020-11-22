@@ -76,3 +76,6 @@ inline std::ostream& operator<<(std::ostream& s, const snd_seq_connect_t& c)
   { Seq::outputConnect(s, c); return s; }
 
 
+inline bool operator==(const snd_seq_addr_t& a, const snd_seq_addr_t& b) {
+  return a.client == b.client && a.port == b.port;
+}

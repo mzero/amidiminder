@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 
+#include "rule.h"
 #include "seq.h"
 
 
@@ -23,16 +24,6 @@
 
 namespace {
 
-  struct AddressSpec {
-    std::string client;
-    std::string port;
-
-    AddressSpec(Address a) : client(a.client), port(a.port) { }
-
-    bool matches(const Address& a)
-      { return client == a.client && port == a.port; }
-  };
-
   struct OptionalAddress {
     bool valid;
     snd_seq_addr_t addr;
@@ -47,17 +38,25 @@ namespace {
 
     bool matches(const snd_seq_addr_t& a) const
       { return valid && addr == a; }
+
+    void output(std::ostream& s) const {
+      if (valid)  s << addr;
+      else        s << "--:--";
+    }
   };
 
+  inline std::ostream& operator<<(std::ostream& s, const OptionalAddress& a)
+    { a.output(s); return s; }
+
+
   struct Connection {
-    AddressSpec senderSpec;
-    AddressSpec destSpec;
+    ConnectionRule rule;
 
     OptionalAddress senderAddr;
     OptionalAddress destAddr;
 
     Connection(const Address& s, const Address& d)
-      : senderSpec(s), destSpec(d),
+      : rule(ConnectionRule::exact(s, d)),
         senderAddr(s), destAddr(d)
       { }
 
@@ -65,12 +64,16 @@ namespace {
       return senderAddr.matches(conn.sender)
         && destAddr.matches(conn.dest);
     }
+
+    void output(std::ostream& s) const {
+      s << rule;
+      if (senderAddr || destAddr)
+        s << " (" << senderAddr << " --> " << destAddr << ")";
+    }
   };
 
-  inline std::ostream& operator<<(std::ostream& s, const Connection& c) {
-    s << c.senderAddr << " ==>> " << c.destAddr;
-    return s;
-  }
+  inline std::ostream& operator<<(std::ostream& s, const Connection& c)
+    { c.output(s); return s; }
 
 }
 
@@ -162,12 +165,12 @@ class MidiMinder {
       for (auto&& c : connections) {
         bool activated = false;
 
-        if (c.senderSpec.matches(a)) {
+        if (c.rule.senderMatch(a)) {
           c.senderAddr.set(a.addr);
           activated = true;
         }
 
-        if (c.destSpec.matches(a)) {
+        if (c.rule.destMatch(a)) {
           c.destAddr.set(a.addr);
           activated = true;
         }

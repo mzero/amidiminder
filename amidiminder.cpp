@@ -33,12 +33,12 @@ namespace {
       { return client == a.client && port == a.port; }
   };
 
-  struct AddressRef {
+  struct OptionalAddress {
     bool valid;
     snd_seq_addr_t addr;
 
-    AddressRef () : valid(false) { }
-    AddressRef(Address a) : valid(a.valid), addr(a.addr) { }
+    OptionalAddress () : valid(false) { }
+    OptionalAddress(Address a) : valid(a.valid), addr(a.addr) { }
 
     void set(const snd_seq_addr& a) { valid = true; addr = a; }
     void clear()                    { valid = false; }
@@ -53,8 +53,8 @@ namespace {
     AddressSpec senderSpec;
     AddressSpec destSpec;
 
-    AddressRef senderAddr;
-    AddressRef destAddr;
+    OptionalAddress senderAddr;
+    OptionalAddress destAddr;
 
     Connection(const Address& s, const Address& d)
       : senderSpec(s), destSpec(d),

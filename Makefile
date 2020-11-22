@@ -7,7 +7,7 @@ all: bin deb
 bin: $(BUILD_DIR)/$(TARGET)
 deb: $(BUILD_DIR)/$(TARGET).deb
 
-SRCS := amidiminder.cpp
+SRCS := amidiminder.cpp seq.cpp
 INCS :=
 LIBS := stdc++ asound
 

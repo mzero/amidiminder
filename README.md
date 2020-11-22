@@ -15,7 +15,7 @@ Just leave this program running:
 $ ./build/amidiminder &  # just leave it in the background...
 
 # make some connections
-$ aconnect nanoKEY2:0 Circuit:0###
+$ aconnect nanoKEY2:0 Circuit:0
 $ aconnect nanoKONTROL:0 Circuit:0
 $ aconect Circuit:0 pisound:0
 adding connection nanoKEY2:nanoKEY2 MIDI 1 [32:0] ==>> Circuit:Circuit MIDI 1 [24:0]

@@ -80,3 +80,15 @@ inline std::ostream& operator<<(std::ostream& s, const snd_seq_connect_t& c)
 inline bool operator==(const snd_seq_addr_t& a, const snd_seq_addr_t& b) {
   return a.client == b.client && a.port == b.port;
 }
+
+inline bool operator<(const snd_seq_addr_t& a, const snd_seq_addr_t& b) {
+  return a.client == b.client ? a.port < b.port : a.client < b.client;
+}
+
+inline bool operator==(const snd_seq_connect_t& a, const snd_seq_connect_t& b) {
+  return a.sender == b.sender && a.dest == b.dest;
+}
+
+inline bool operator<(const snd_seq_connect_t& a, const snd_seq_connect_t& b) {
+  return a.sender == b.sender ? a.dest < b.dest : a.sender < b.sender;
+}

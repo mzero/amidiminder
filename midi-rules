@@ -1,0 +1,42 @@
+# this is a rules file
+
+nanoKEY2 --> bicycle
+nanoKONTROL --> bicycle
+bicycle <-- Launchpad Pro MK3
+bicycle <-- Launchpad Pro MK3:2
+bicycle:synths --> Circuit
+
+
+# Parsing Tests
+    # hi there                      # PASS indented comment
+
+* --> test                          # PASS
+*x --> test                         # FAIL something after the *
+"test client" --> test              # PASS
+"test client --> test               # FAIL no closing quote
+test two --> test                   # PASS
+  test three --> test               # PASS indented
+test:* --> thing                    # PASS
+test:*3 --> thing                   # FAIL something after the *
+test:"time port" --> thing          # PASS
+test:"time port --> thing           # FAIL no closing quote
+test:time --> thing                 # PASS
+test:time two --> thing             # PASS
+:: --> thing                        # FAIL too many colons
+::: --> thing                       # FAIL too many colons
+:34 --> thing                       # FAIL no client
+this-->that                         # FAIL missing spaces
+this--> that                        # FAIL missing spaces
+this -->that                        # FAIL missing spaces
+this -> that                        # PASS
+this <-> that                       # PASS
+this <- that                        # PASS
+this <-- that                       # PASS
+this <--- that                      # FAIL too many dashes
+this <<-- that                      # FAIL too many angles
+this ---> that                      # FAIL too many dashes
+this -->> that                      # FAIL too many angles
+this < that                         # FAIL no arrow
+this > that                         # FAIL no arrow
+# this > that                       # PASS because in a comment
+

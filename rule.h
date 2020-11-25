@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "seq.h"
 
@@ -64,8 +65,8 @@ class AddressSpec {
     void output(std::ostream&) const;
 
   private:
-    const ClientSpec client;
-    const PortSpec port;
+    ClientSpec client;
+    PortSpec port;
 };
 
 
@@ -87,6 +88,10 @@ class ConnectionRule {
     AddressSpec source;
     AddressSpec dest;
 };
+
+using ConnectionRules = std::vector<ConnectionRule>;
+
+bool parseRulesFile(std::istream& input, ConnectionRules& rules);
 
 
 inline std::ostream& operator<<(std::ostream& s, const ClientSpec& c)

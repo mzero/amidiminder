@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <alsa/asoundlib.h>
+#include <fstream>
 #include <iostream>
 #include <list>
 
@@ -51,17 +52,24 @@ namespace {
 
   struct Connection {
     ConnectionRule rule;
+    bool observed;
 
     OptionalAddress senderAddr;
     OptionalAddress destAddr;
 
     Connection(const Address& s, const Address& d)
       : rule(ConnectionRule::exact(s, d)),
+        observed(true),
         senderAddr(s), destAddr(d)
       { }
 
+    Connection(const ConnectionRule& r)
+      : rule(r), observed(false)
+      { }
+
     bool matches(const snd_seq_connect_t& conn) const {
-      return senderAddr.matches(conn.sender)
+      return observed
+        && senderAddr.matches(conn.sender)
         && destAddr.matches(conn.dest);
     }
 
@@ -86,11 +94,16 @@ class MidiMinder {
   public:
     MidiMinder() {
       seq.begin();
-      seq.scanConnections([&](auto c){ this->addConnection(c); });
     }
 
     ~MidiMinder() {
       seq.end();
+    }
+
+    void setup() {
+      readRules();
+      seq.scanPorts([&](auto p){ this->addPort(p); });
+      seq.scanConnections([&](auto c){ this->addConnection(c); });
     }
 
     void run() {
@@ -229,12 +242,33 @@ class MidiMinder {
         [&](auto c){ return c.matches(conn); });
     }
 
+    void readRules() {
+      const auto rulesPath = "midi-rules";
+
+      std::ifstream rulesFile(rulesPath);
+      if (!rulesFile) {
+        std::cout << "rules file " << rulesPath << " not found" << std::endl;
+        return;
+      }
+
+      ConnectionRules rules;
+      if (!parseRulesFile(rulesFile, rules)) {
+        std::cout <<  "rules file " << rulesPath
+          << " had errors; proceeding anyway" << std::endl;
+      }
+
+      for (auto&& r : rules) {
+        connections.push_back(Connection(r));
+        std::cout << "adding connection rule " << r << std::endl;
+      }
+    }
 };
 
 
 
 int main() {
   MidiMinder mm;
+  mm.setup();
   mm.run();
   return 0;
 }

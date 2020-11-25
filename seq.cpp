@@ -71,6 +71,28 @@ snd_seq_event_t* Seq::eventInput() {
   return ev;
 }
 
+void Seq::scanPorts(std::function<void(const snd_seq_addr_t&)> func) {
+  snd_seq_client_info_t *client;
+  snd_seq_client_info_alloca(&client);
+
+  snd_seq_port_info_t *port;
+  snd_seq_port_info_alloca(&port);
+
+  snd_seq_client_info_set_client(client, -1);
+  while (snd_seq_query_next_client(seq, client) >= 0) {
+    auto clientId = snd_seq_client_info_get_client(client);
+
+    snd_seq_port_info_set_client(port, clientId);
+    snd_seq_port_info_set_port(port, -1);
+    while (snd_seq_query_next_port(seq, port) >= 0) {
+
+      snd_seq_addr_t addr = *snd_seq_port_info_get_addr(port);
+      func(addr);
+    }
+  }
+}
+
+
 void Seq::scanConnections(std::function<void(const snd_seq_connect_t&)> func) {
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
@@ -126,6 +148,7 @@ void Seq::connect(const snd_seq_addr_t& sender, const snd_seq_addr_t& dest) {
 
   int serr;
   serr = snd_seq_subscribe_port(seq, subs);
+  if (serr == -EBUSY) return;  // connection is already made
   errCheck(serr, "subscribe");
 }
 

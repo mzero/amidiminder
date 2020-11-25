@@ -50,6 +50,7 @@ class Seq {
     snd_seq_event_t * eventInput();
       // if nullptr is returned, sleep and call again...
 
+    void scanPorts(std::function<void(const snd_seq_addr_t&)>);
     void scanConnections(std::function<void(const snd_seq_connect_t&)>);
     void connect(const snd_seq_addr_t& sender, const snd_seq_addr_t& dest);
 

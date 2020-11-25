@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <list>
+#include <map>
+#include <set>
 
 #include "rule.h"
 #include "seq.h"
@@ -25,64 +27,20 @@
 
 namespace {
 
-  struct OptionalAddress {
-    bool valid;
-    snd_seq_addr_t addr;
-
-    OptionalAddress () : valid(false) { }
-    OptionalAddress(Address a) : valid(a.valid), addr(a.addr) { }
-
-    void set(const snd_seq_addr& a) { valid = true; addr = a; }
-    void clear()                    { valid = false; }
-
-    operator bool() const { return valid; }
-
-    bool matches(const snd_seq_addr_t& a) const
-      { return valid && addr == a; }
-
-    void output(std::ostream& s) const {
-      if (valid)  s << addr;
-      else        s << "--:--";
-    }
+  enum class Reason {
+    byRule,
+    observed,
   };
 
-  inline std::ostream& operator<<(std::ostream& s, const OptionalAddress& a)
-    { a.output(s); return s; }
-
-
-  struct Connection {
-    ConnectionRule rule;
-    bool observed;
-
-    OptionalAddress senderAddr;
-    OptionalAddress destAddr;
-
-    Connection(const Address& s, const Address& d)
-      : rule(ConnectionRule::exact(s, d)),
-        observed(true),
-        senderAddr(s), destAddr(d)
-      { }
-
-    Connection(const ConnectionRule& r)
-      : rule(r), observed(false)
-      { }
-
-    bool matches(const snd_seq_connect_t& conn) const {
-      return observed
-        && senderAddr.matches(conn.sender)
-        && destAddr.matches(conn.dest);
+  void output(std::ostream&s, Reason r) {
+    switch (r) {
+      case Reason:: byRule:     s << "by rule";  break;
+      case Reason:: observed:   s << "observed"; break;
     }
+  }
 
-    void output(std::ostream& s) const {
-      s << rule;
-      if (senderAddr || destAddr)
-        s << " (" << senderAddr << " --> " << destAddr << ")";
-    }
-  };
-
-  inline std::ostream& operator<<(std::ostream& s, const Connection& c)
-    { c.output(s); return s; }
-
+  inline std::ostream& operator<<(std::ostream& s, Reason r)
+    { output(s, r); return s; }
 }
 
 
@@ -168,78 +126,137 @@ class MidiMinder {
       }
     }
 
-    typedef std::list<Connection> Connections;
-    Connections connections;
+    ConnectionRules configRules;
+    ConnectionRules observedRules;
+    std::map<snd_seq_addr_t, Address> activePorts;
+    std::map<snd_seq_connect_t, Reason> activeConnections;
+
+    void makeConnection(
+      const Address& a, const Address& b,
+      const ConnectionRule& rule, Reason r)
+    {
+      snd_seq_connect_t conn;
+      conn.sender = a.addr;
+      conn.dest = b.addr;
+      if (activeConnections.find(conn) == activeConnections.end()) {
+        seq.connect(conn.sender, conn.dest);
+        activeConnections[conn] = r;
+        switch (r) {
+          case Reason::byRule:
+            std::cout << "making connection by rule: " << rule << std::endl;
+            break;
+
+          case Reason::observed:
+            std::cout << "reactiving observed connection: " << rule << std::endl;
+            break;
+        }
+      }
+    }
+
+    void connectEachActiveSender(
+        const Address& a, const ConnectionRule& rule, Reason r)
+    {
+      for (auto& p : activePorts) {
+        auto& b = p.second;
+        if (rule.senderMatch(b))
+          makeConnection(b, a, rule, r);
+      }
+    }
+
+    void connectEachActiveDest(
+        const Address& a, const ConnectionRule& rule, Reason r)
+    {
+      for (auto& p : activePorts) {
+        auto& b = p.second;
+        if (rule.destMatch(b))
+          makeConnection(a, b, rule, r);
+      }
+    }
+
+    void connectByRule(const Address& a, ConnectionRules& rules, Reason r) {
+      for (auto& rule : rules) {
+        if (rule.senderMatch(a))   connectEachActiveDest(a, rule, r);
+        if (rule.destMatch(a))     connectEachActiveSender(a, rule, r);
+      }
+    }
 
     void addPort(const snd_seq_addr_t& addr) {
       Address a = seq.address(addr);
       if (!a) return;
+      activePorts[addr] = a;
 
-      for (auto&& c : connections) {
-        bool activated = false;
-
-        if (c.rule.senderMatch(a)) {
-          c.senderAddr.set(a.addr);
-          activated = true;
-        }
-
-        if (c.rule.destMatch(a)) {
-          c.destAddr.set(a.addr);
-          activated = true;
-        }
-
-        if (activated && c.senderAddr && c.destAddr) {
-          std::cout << "connection re-activated: " << c << std::endl;
-          seq.connect(c.senderAddr.addr, c.destAddr.addr);
-        }
-      }
+      connectByRule(a, observedRules, Reason::observed);
+      connectByRule(a, configRules, Reason::byRule);
     }
 
     void delPort(const snd_seq_addr_t& addr) {
-      for (auto&& c : connections) {
-        bool deactivated = false;
+      activePorts.erase(addr);
 
-        if (c.senderAddr.matches(addr)) {
-          c.senderAddr.clear();
-          deactivated = true;
+      std::vector<snd_seq_connect_t> doomed;
+
+      for (auto& c : activeConnections) {
+        if (c.first.sender == addr || c.first.dest == addr) {
+          doomed.push_back(c.first);
+          std::cout << c.second << " connection deactivated: " << c.first << std::endl;
         }
-
-        if (c.destAddr.matches(addr)) {
-          c.destAddr.clear();
-          deactivated = true;
-        }
-
-        if (deactivated)
-          std::cout << "connection deactivated: " << c << std::endl;
       }
+
+      for (auto& d : doomed)
+        activeConnections.erase(d);
     }
 
 
     void addConnection(const snd_seq_connect_t& conn) {
-      auto i =
-        find_if(connections.begin(), connections.end(),
-          [&](auto c){ return c.matches(conn); });
+      auto i = activeConnections.find(conn);
+      if (i != activeConnections.end()) {
+        // already know about this connection
+        switch (i->second) {
+          case Reason::byRule:
+            // was added by config rule above and this is just the notification
+            break;
 
-      if (i != connections.end())
-          return; // already have it
+          case Reason::observed:
+            std::cout << "unexpected connect, already observed " << conn << std::endl;
+            break;
+        }
+        return;
+      }
+
+      activeConnections[conn] = Reason::observed;
 
       Address sender = seq.address(conn.sender);
       Address dest = seq.address(conn.dest);
 
       if (sender && dest) {
-        Connection c(sender, dest);
-        connections.push_back(c);
-        std::cout << "adding connection " << c << std::endl;
+        ConnectionRule c = ConnectionRule::exact(sender, dest);
+        observedRules.push_back(c);
+        std::cout << "adding observed connection " << c << std::endl;
       }
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
-      for (const auto& c : connections)
-        if (c.matches(conn))
-          std::cout << "removing connection " << c << std::endl;
+      auto i = activeConnections.find(conn);
+      if (i == activeConnections.end()) {
+        std::cout <<"unexpected disconnect " << conn << std::endl;
+        return;
+      }
 
-      connections.remove_if(
-        [&](auto c){ return c.matches(conn); });
+      Address sender = seq.address(conn.sender);
+      Address dest = seq.address(conn.dest);
+
+      switch (i->second) {
+        case Reason::byRule:
+          std::cout << "rule connection explicitly disconnected " << conn << std::endl;
+          break;
+
+        case Reason::observed:
+          std::remove_if(observedRules.begin(), observedRules.end(),
+            [&](auto r){ return r.match(sender, dest); });
+          std::cout << "removing observed connection " << conn << std::endl;
+          break;
+      }
+
+      activeConnections.erase(i);
     }
 
     void readRules() {
@@ -251,16 +268,13 @@ class MidiMinder {
         return;
       }
 
-      ConnectionRules rules;
-      if (!parseRulesFile(rulesFile, rules)) {
+      if (!parseRulesFile(rulesFile, configRules)) {
         std::cout <<  "rules file " << rulesPath
           << " had errors; proceeding anyway" << std::endl;
       }
 
-      for (auto&& r : rules) {
-        connections.push_back(Connection(r));
+      for (auto& r : configRules)
         std::cout << "adding connection rule " << r << std::endl;
-      }
     }
 };
 

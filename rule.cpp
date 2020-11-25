@@ -132,14 +132,14 @@ void AddressSpec::output(std::ostream& s) const
 
 
 ConnectionRule::ConnectionRule(const AddressSpec& s, const AddressSpec& d)
-  : source(s), dest(d)
+  : sender(s), dest(d)
   { }
 
 ConnectionRule ConnectionRule::exact(const Address& s, const Address& d)
   { return ConnectionRule(AddressSpec::exact(s), AddressSpec::exact(d)); }
 
 void ConnectionRule::output(std::ostream& s) const
-  { s << source << " --> " << dest; }
+  { s << sender << " --> " << dest; }
 
 
 

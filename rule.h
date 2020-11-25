@@ -76,8 +76,10 @@ class ConnectionRule {
 
     static ConnectionRule exact(const Address&, const Address&);
 
-    bool senderMatch(const Address& a)  { return source.match(a); }
-    bool destMatch(const Address& a)    { return dest.match(a); }
+    bool senderMatch(const Address& a) const   { return sender.match(a); }
+    bool destMatch(const Address& a) const     { return dest.match(a); }
+    bool match(const Address& s, const Address& d) const
+      { return sender.match(s) && dest.match(d); }
 
     ConnectionRule(const ConnectionRule&) = default;
     ConnectionRule& operator=(const ConnectionRule&) = default;
@@ -85,7 +87,7 @@ class ConnectionRule {
     void output(std::ostream&) const;
 
   private:
-    AddressSpec source;
+    AddressSpec sender;
     AddressSpec dest;
 };
 

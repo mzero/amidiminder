@@ -1,0 +1,20 @@
+# This is starter rules file for amidiminder
+
+# These rules are all commented out. Remove the leading # symbol enable them,
+# or just use them as a guide and write your own.
+
+# nanoKEY2 --> Circuit
+  # Will connect from the first port on nanoKEY2 to the first port on Circuit
+  # once both devices have been connected.
+
+# Circuit <-- nanoKEY2
+  # Same thing. Use which ever direction makes sense for you.
+
+# Circuit <-> nanoKEY2
+  # Creates *two* connections, one in each direction
+
+# Launchpad Pro:1 --> PreenFM
+# bicycle:synths --> PreenFM
+  # If a device (or software) has more than one port, you can specify the
+  # port by number or by name
+

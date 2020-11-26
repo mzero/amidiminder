@@ -262,6 +262,7 @@ namespace {
 
     if (expect_failure)
       throw Parse(Error() << "was not expected to parse");
+    return r;
   }
 
 }

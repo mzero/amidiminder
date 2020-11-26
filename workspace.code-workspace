@@ -55,7 +55,13 @@
 			"bitset": "cpp",
 			"cstring": "cpp",
 			"ctime": "cpp",
-			"regex": "cpp"
+			"regex": "cpp",
+			"chrono": "cpp",
+			"codecvt": "cpp",
+			"filesystem": "cpp",
+			"ratio": "cpp",
+			"string_view": "cpp",
+			"iomanip": "cpp"
 		}
 	}
 }

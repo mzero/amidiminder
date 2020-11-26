@@ -7,6 +7,8 @@ namespace Args {
   extern std::string rulesFilePath;
   extern bool rulesCheckOnly;
 
+  extern bool outputPortDetails;
+
   extern int exitCode;
   bool parse(int argc, char* argv[]);
 }

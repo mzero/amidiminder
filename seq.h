@@ -64,6 +64,8 @@ class Seq {
   public:
     static void outputAddr(std::ostream&, const snd_seq_addr_t&);
     static void outputConnect(std::ostream&, const snd_seq_connect_t&);
+
+    void outputAddrDetails(std::ostream&, const snd_seq_addr_t&);
 };
 
 

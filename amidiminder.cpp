@@ -46,7 +46,11 @@ class MidiMinder {
     }
 
     void run() {
-      seq.scanPorts([&](auto p){ this->addPort(p); });
+      seq.scanPorts([&](auto p){
+        if (Args::outputPortDetails)
+          seq.outputAddrDetails(std::cout, p);
+        this->addPort(p);
+    });
       seq.scanConnections([&](auto c){ this->addConnection(c); });
 
       while (seq) {
@@ -73,19 +77,27 @@ class MidiMinder {
           }
 
           case SND_SEQ_EVENT_PORT_START: {
-            // std::cout << "port start " << ev->data.addr << std::endl;
+            if (Args::outputPortDetails) {
+              std::cout << "port start " << ev->data.addr << std::endl;
+              seq.outputAddrDetails(std::cout, ev->data.addr);
+            }
             addPort(ev->data.addr);
             break;
           }
 
           case SND_SEQ_EVENT_PORT_EXIT: {
-            // std::cout << "port exit " << ev->data.addr << std::endl;
+            if (Args::outputPortDetails) {
+              std::cout << "port exit " << ev->data.addr << std::endl;
+            }
             delPort(ev->data.addr);
             break;
           }
 
           case SND_SEQ_EVENT_PORT_CHANGE: {
-            // std::cout << "port change " << ev->data.addr << std::endl;
+            if (Args::outputPortDetails) {
+              std::cout << "port change " << ev->data.addr << std::endl;
+              seq.outputAddrDetails(std::cout, ev->data.addr);
+            }
             // FIXME: treat this as a add/remove?
             break;
           }

@@ -231,27 +231,29 @@ namespace {
     return rules;
   }
 
-  ConnectionRules parseLine(std::string line) {
+  ConnectionRules parseLine(const std::string& line) {
     std::smatch m;
 
+    std::string ruleUntrimmed = line;
     bool expect_failure = false;
 
     static const std::regex decomment("([^#]*)#(.*)");
     if (std::regex_match(line, m, decomment)) {
-      line = m.str(1); // replace line with non-comment part
+      ruleUntrimmed = m.str(1);
       expect_failure = m.str(2).find("FAIL") != std::string::npos;
     }
 
+    std::string rule = ruleUntrimmed;
+
     static const std::regex trimWhitespace("\\s*(.*?)\\s*");
-    if (std::regex_match(line, m, trimWhitespace))
-      line = m.str(1);  // remove leading and trailing whitespace
+    if (std::regex_match(ruleUntrimmed, m, trimWhitespace))
+      rule = m.str(1);
 
     ConnectionRules r;
-
-    if (line.empty()) return r;
+    if (rule.empty()) return r;
 
     try {
-      r = parseConnectionRule(line);
+      r = parseConnectionRule(rule);
     }
     catch (Parse& p) {
       if (expect_failure) return r;

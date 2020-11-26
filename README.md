@@ -3,67 +3,98 @@ ALSA utility to keep your MIDI devices connected
 
 ### The problem
 
-* You connect some USB based MIDI devices to your computer, and then use `aconnect` or other software to connect the ports between devices, and from devices to software. It all plays great.
-
-* If a USB device disconnects (you trip over the cord, you need to power cycle it, you decide to tidy the wiring and pull the wrong thing....) - when you reconnect the device, you'll need to make the connections again. This is awkward if you are in the middle of a live set.
+  * Using `aconnect` to reconnect your devices and your software gets old quick.
+  * If you power cycle a synth... you've got to `aconnect` it again.
+  * Bandmate "helps" by unplugging a USB cord to untanlge and plugs it in again:
+    Now you're controller is disconnected.
 
 ### The solution
 
-Just leave this program running:
+`amidiminder` is a program that runs as a service. It will:
+
+  1. Reads a rules file of connections you'd like made.
+
+  2. When the MIDI devices & software - `amidimider` will
+     automatically connect them according to the rules.
+
+  3. It also Watches any connections you make with `aconnect` or that your
+     software makes, and remembers them too.
+
+  4. If any MIDI port goes away (power cycle, pulled USB cord, etc..), ALSA
+     will silentlly remove the connections...
+     ... But when the MIDI port comes back - `amidimider`'s got your back and
+     will connect them right back up again just as they were.
+
+
+## Building
+
+Prerequisites:
+  * g++, 6 or later
+  * make
+  * libasound2-dev
 
 ```sh
-$ ./build/amidiminder &  # just leave it in the background...
-
-# make some connections
-$ aconnect nanoKEY2:0 Circuit:0
-$ aconnect nanoKONTROL:0 Circuit:0
-$ aconect Circuit:0 pisound:0
-adding connection nanoKEY2:nanoKEY2 MIDI 1 [32:0] ==>> Circuit:Circuit MIDI 1 [24:0]
-adding connection nanoKONTROL:nanoKONTROL MIDI 1 [28:0] ==>> Circuit:Circuit MIDI 1 [24:0]
-adding connection Circuit:Circuit MIDI 1 [24:0] ==>> pisound:pisound MIDI PS-3DJNWEF [20:0]
-
-# oops, unplugged the Circuit...
-connection deactivated: nanoKEY2:nanoKEY2 MIDI 1 [32:0] ==>> Circuit:Circuit MIDI 1 [--]
-connection deactivated: nanoKONTROL:nanoKONTROL MIDI 1 [28:0] ==>> Circuit:Circuit MIDI 1 [--]
-connection deactivated: Circuit:Circuit MIDI 1 [--] ==>> pisound:pisound MIDI PS-3DJNWEF [20:0]
-
-# plugged it back in again!
-connection re-activated: nanoKEY2:nanoKEY2 MIDI 1 [32:0] ==>> Circuit:Circuit MIDI 1 [24:0]
-connection re-activated: nanoKONTROL:nanoKONTROL MIDI 1 [28:0] ==>> Circuit:Circuit MIDI 1 [24:0]
-connection re-activated: Circuit:Circuit MIDI 1 [24:0] ==>> pisound:pisound MIDI PS-3DJNWEF [20:0]
+sudo apt install g++ make libasound2-dev
 ```
 
-### Details
+Clone this repo and run `make`:
 
-Pretty straight forward...
-* Scans connections that exist as it starts up, so you can launch it after you make the connections or before
-* Remembers devices and ports by name, so if you plug things back in a different order (so they get different client numbers), it'll still work as you'd expect.
+```sh
+git clone https://github.com/mzero/amidiminder.git
+cd amidiminder
+make
+```
 
-### Building
-
-Get this repo and run `make`.
-
-That's it.
+Outputs:
 
  - build executable is in `build/amidiminder`.
  - deb package is in `build/amidiminder.deb`.
 
-If you install the deb package, it'll install a systemd sevice as well, and start it.
 
-### Install
+## Install
 
-Run
+Installing the built deb package will install a systemd service that runs
+`amidiminder` at startup.
 
-  sudo dpkg -i build/amidiminder.deb
+```sh
+sudo dpkg -i build/amidiminder.deb
+```
 
-That's it.
-It's installed.
-It's running.
-You're done!
+That's it. — It's installed. — It's running — You're done!
+
+## Configuration
+
+`amidiminder` reads a rules file from `/etc/amidiminder.rules`. If you edit
+that file, you can first check it is legal:
+
+```sh
+amidiminder -C  # checks the rules and then quits
+```
+
+Then, restart the service:
+
+```sh
+sudo systemctl restart amidiminder
+```
+
+### Rules Format
+
+Example:
+```
+nanoKEY2 --> Circuit
+  # connects the first port for each device as shown
+
+bicycle <-- Launchpad Pro MK3
+bicycle <-- Launchpad Pro MK3:2
+bicycle:synths --> Circuit
+  # the port direction can go which ever way is convienent for you
+  # ports can be specified by number or by name
+```
+
+---
 
 
-
-# Credits & Thanks
+## Credits & Thanks
 
 ### Related work
 

@@ -1,13 +1,7 @@
-# this is a rules file
-
-nanoKEY2 --> bicycle
-nanoKONTROL --> bicycle
-bicycle <-- Launchpad Pro MK3
-bicycle <-- Launchpad Pro MK3:2
-bicycle:synths --> Circuit
-
-
 # Parsing Tests
+# Run this with:
+#     amidiminder -C -f test.rules
+
     # hi there                      # PASS indented comment
 
 * --> test                          # PASS

@@ -6,24 +6,11 @@
 #include <map>
 #include <set>
 
+#include "args.h"
 #include "rule.h"
 #include "seq.h"
 
 
-/** TODO
-
-  [] remember subscription options
-
-  [] verbosity controls
-  [] connection list on ^t
-  [] persistent file of connections, read on startup
-  [] auto connection file
-    [] allow and disallow like amidiauto?
-    [] patterns? regex?
-    [] support for matching port types?
-    [] support for subscription options (like aconnect?)
-
- **/
 
 namespace {
 
@@ -58,13 +45,10 @@ class MidiMinder {
       seq.end();
     }
 
-    void setup() {
-      readRules();
+    void run() {
       seq.scanPorts([&](auto p){ this->addPort(p); });
       seq.scanConnections([&](auto c){ this->addConnection(c); });
-    }
 
-    void run() {
       while (seq) {
         snd_seq_event_t *ev = seq.eventInput();
         if (!ev) {
@@ -259,30 +243,33 @@ class MidiMinder {
       activeConnections.erase(i);
     }
 
-    void readRules() {
-      const auto rulesPath = "midi-rules";
-
-      std::ifstream rulesFile(rulesPath);
+    bool readRules() {
+      std::ifstream rulesFile(Args::rulesFilePath);
       if (!rulesFile) {
-        std::cout << "rules file " << rulesPath << " not found" << std::endl;
-        return;
+        std::cout << "could not read " << Args::rulesFilePath << std::endl;
+        return false;
       }
-
-      if (!parseRulesFile(rulesFile, configRules)) {
-        std::cout <<  "rules file " << rulesPath
-          << " had errors; proceeding anyway" << std::endl;
-      }
+      std::cout << "reading rules from " << Args::rulesFilePath << std::endl;
+      bool rulesReadOkay = parseRulesFile(rulesFile, configRules);
 
       for (auto& r : configRules)
-        std::cout << "adding connection rule " << r << std::endl;
+      std::cout << "adding connection rule " << r << std::endl;
+
+      return rulesReadOkay;
     }
 };
 
 
+int main(int argc, char *argv[]) {
+  if (!Args::parse(argc, argv))
+    return Args::exitCode;
 
-int main() {
   MidiMinder mm;
-  mm.setup();
+
+  bool rulesReadOkay = mm.readRules();
+  if (Args::rulesCheckOnly)
+    return rulesReadOkay ? 0 : 1;
+
   mm.run();
   return 0;
 }

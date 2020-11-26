@@ -63,3 +63,14 @@ You're done!
 
 
 
+# Credits & Thanks
+
+### Related work
+
+[amidiauto](https://github.com/BlokasLabs/amidiauto) by Blokas Labs.
+
+### Open source code used
+
+https://github.com/CLIUtils/CLI11
+CLI11 1.8 Copyright (c) 2017-2019 University of Cincinnati, developed by Henry
+Schreiner under NSF AWARD 1414736. All rights reserved.

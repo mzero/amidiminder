@@ -1,0 +1,9 @@
+# Rules for connecting up controllers to bicycle
+
+nanoKEY2 --> bicycle
+nanoKONTROL --> bicycle
+
+bicycle <-- Launchpad Pro MK3
+bicycle <-- Launchpad Pro MK3:2
+
+bicycle:synths --> Circuit

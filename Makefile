@@ -7,7 +7,7 @@ all: bin deb
 bin: $(BUILD_DIR)/$(TARGET)
 deb: $(BUILD_DIR)/$(TARGET).deb
 
-SRCS := amidiminder.cpp rule.cpp seq.cpp
+SRCS := amidiminder.cpp args.cpp rule.cpp seq.cpp
 INCS :=
 LIBS := stdc++ asound
 
@@ -19,6 +19,9 @@ MKDIR_P ?= mkdir -p
 INC_FLAGS := $(addprefix -I,$(INCS))
 CPPFLAGS := $(INC_FLAGS)
 CPPFLAGS += -MMD -MP
+CPPFLAGS += -fdata-sections -ffunction-sections
+CPPFLAGS += -O2
+//CPPFLAGS += -ggdb
 
 LDFLAGS := -Wl,--gc-sections $(addprefix -l,$(LIBS))
 
@@ -32,10 +35,13 @@ $(BUILD_DIR)/$(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS) 2>&1 | tee $(BUILD_DIR)/link_out
 
 
-.PHONY: clean
+.PHONY: clean test
 
 clean:
 	$(RM) -r $(BUILD_DIR)
+
+test: $(BUILD_DIR)/$(TARGET)
+	$(BUILD_DIR)/$(TARGET) -C -f test.rules && echo PASS || echo FAIL
 
 
 DEPS := $(OBJS:.o=.d)

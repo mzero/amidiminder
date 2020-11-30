@@ -2,8 +2,6 @@
 
 #include <vector>
 
-const Address Address::null;
-
 
 void Seq::begin() {
   if (seq) return;
@@ -53,9 +51,11 @@ Address Seq::address(const snd_seq_addr_t& addr) {
 
   auto caps = snd_seq_port_info_get_capability(port);
   if (caps & SND_SEQ_PORT_CAP_NO_EXPORT) return {};
+  if (!(caps & (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE)))
+    return {};
 
   return
-    Address(addr,
+    Address(addr, caps,
             snd_seq_client_info_get_name(client),
             snd_seq_port_info_get_name(port));
 }

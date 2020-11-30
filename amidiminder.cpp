@@ -154,7 +154,7 @@ class MidiMinder {
     {
       for (auto& p : activePorts) {
         auto& b = p.second;
-        if (rule.senderMatch(b))
+        if (b.canBeSender() && rule.senderMatch(b))
           makeConnection(b, a, rule, r);
       }
     }
@@ -164,15 +164,15 @@ class MidiMinder {
     {
       for (auto& p : activePorts) {
         auto& b = p.second;
-        if (rule.destMatch(b))
+        if (b.canBeDest() && rule.destMatch(b))
           makeConnection(a, b, rule, r);
       }
     }
 
     void connectByRule(const Address& a, ConnectionRules& rules, Reason r) {
       for (auto& rule : rules) {
-        if (rule.senderMatch(a))   connectEachActiveDest(a, rule, r);
-        if (rule.destMatch(a))     connectEachActiveSender(a, rule, r);
+        if (a.canBeSender() && rule.senderMatch(a))   connectEachActiveDest(a, rule, r);
+        if (a.canBeDest()   && rule.destMatch(a))     connectEachActiveSender(a, rule, r);
       }
     }
 

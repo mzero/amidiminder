@@ -13,8 +13,9 @@ class Address {
     Address()
       : valid(false), addr{0, 0}
       { }
-    Address(const snd_seq_addr_t& a, const std::string& c, const std::string& p)
-      : valid(true), addr(a), client(c), port(p)
+    Address(const snd_seq_addr_t& a, unsigned int f,
+        const std::string& c, const std::string& p)
+      : valid(true), addr(a), caps(f), client(c), port(p)
       { }
 
     // allow copying
@@ -25,6 +26,9 @@ class Address {
 
     operator bool() const { return valid; }
 
+    bool canBeSender() const { return valid && caps & SND_SEQ_PORT_CAP_SUBS_READ; }
+    bool canBeDest() const   { return valid && caps & SND_SEQ_PORT_CAP_SUBS_WRITE; }
+
     bool matches(const snd_seq_addr_t& a) const
       { return valid && addr.client == a.client && addr.port == a.port; }
 
@@ -32,6 +36,7 @@ class Address {
 
     bool valid;
     snd_seq_addr_t addr;
+    unsigned int caps;
     std::string client;
     std::string port;
 };

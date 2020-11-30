@@ -204,38 +204,26 @@ class MidiMinder {
 
     void addConnection(const snd_seq_connect_t& conn) {
       auto i = activeConnections.find(conn);
-      if (i != activeConnections.end()) {
+      if (i != activeConnections.end())
         // already know about this connection
-        switch (i->second) {
-          case Reason::byRule:
-            // was added by config rule above and this is just the notification
-            break;
-
-          case Reason::observed:
-            std::cout << "unexpected connect, already observed " << conn << std::endl;
-            break;
-        }
         return;
-      }
-
-      activeConnections[conn] = Reason::observed;
 
       Address sender = seq.address(conn.sender);
       Address dest = seq.address(conn.dest);
+      if (!sender || !dest) // if either is an ignored port, ignore this
+        return;
 
-      if (sender && dest) {
-        ConnectionRule c = ConnectionRule::exact(sender, dest);
-        observedRules.push_back(c);
-        std::cout << "adding observed connection " << c << std::endl;
-      }
+      activeConnections[conn] = Reason::observed;
+      ConnectionRule c = ConnectionRule::exact(sender, dest);
+      observedRules.push_back(c);
+      std::cout << "adding observed connection " << c << std::endl;
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
       auto i = activeConnections.find(conn);
-      if (i == activeConnections.end()) {
-        std::cout <<"unexpected disconnect " << conn << std::endl;
+      if (i == activeConnections.end())
+        // don't know anything about this connection
         return;
-      }
 
       Address sender = seq.address(conn.sender);
       Address dest = seq.address(conn.dest);

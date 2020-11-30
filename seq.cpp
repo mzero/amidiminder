@@ -51,7 +51,8 @@ Address Seq::address(const snd_seq_addr_t& addr) {
   serr = snd_seq_get_any_port_info(seq, addr.client, addr.port, port);
   if (errCheck(serr, "get port info")) return {};
 
-  // TODO: reject SND_SEQ_PORT_CAP_NO_EXPORT here?
+  auto caps = snd_seq_port_info_get_capability(port);
+  if (caps & SND_SEQ_PORT_CAP_NO_EXPORT) return {};
 
   return
     Address(addr,

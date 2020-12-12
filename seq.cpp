@@ -54,8 +54,10 @@ Address Seq::address(const snd_seq_addr_t& addr) {
   if (!(caps & (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE)))
     return {};
 
+  auto types = snd_seq_port_info_get_type(port);
+
   return
-    Address(addr, caps,
+    Address(addr, caps, types,
             snd_seq_client_info_get_name(client),
             snd_seq_port_info_get_name(port));
 }

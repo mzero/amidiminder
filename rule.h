@@ -33,6 +33,7 @@ class PortSpec {
     static PortSpec exact(const std::string&);
     static PortSpec partial(const std::string&);
     static PortSpec numeric(int);
+    static PortSpec type(unsigned int);
     static PortSpec wildcard();
 
     bool match (const Address&) const;
@@ -46,8 +47,9 @@ class PortSpec {
     std::string port;
     bool exactMatch;
     int portNum;
+    unsigned int typeFlag;
 
-    PortSpec(const std::string&, bool, int);
+    PortSpec(const std::string&, bool, int, unsigned int);
 };
 
 

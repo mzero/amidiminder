@@ -86,31 +86,46 @@ void ClientSpec::output(std::ostream& s) const {
 }
 
 
-PortSpec::PortSpec(const std::string& p, bool e, int n)
-  : port(p), exactMatch(e), portNum(n)
+PortSpec::PortSpec(const std::string& p, bool e, int n, unsigned int t)
+  : port(p), exactMatch(e), portNum(n), typeFlag(t)
   { }
 
 PortSpec PortSpec::exact(const std::string& p)
-  { return PortSpec(p, true, -1); }
+  { return PortSpec(p, true, -1, 0); }
 
 PortSpec PortSpec::partial(const std::string& p)
-  { return PortSpec(p, false, -1); }
+  { return PortSpec(p, false, -1, 0); }
 
 PortSpec PortSpec::numeric(int n)
-  { return PortSpec("", false, n); }
+  { return PortSpec("", false, n, 0); }
+
+PortSpec PortSpec::type(unsigned int t)
+  { return PortSpec("", false, -1, t); }
 
 PortSpec PortSpec::wildcard()
-  { return PortSpec("", false, -1); }
+  { return PortSpec("", false, -1, 0); }
 
 bool PortSpec::match(const Address& a) const {
   if      (portNum >= 0)  return a.addr.port == portNum;
   else if (exactMatch)    return a.port == port;
+  else if (typeFlag)      return a.types & typeFlag;
   else                    return a.port.find(port) != std::string::npos;
+}
+
+namespace {
+  void outputTypeFlag(std::ostream& s, unsigned int tf) {
+    switch (tf) {
+      case SND_SEQ_PORT_TYPE_HARDWARE:    s << ".hw";   break;
+      case SND_SEQ_PORT_TYPE_APPLICATION: s << ".app";  break;
+      default:                            s << '.' << std::hex << tf;
+    }
+  }
 }
 
 void PortSpec::output(std::ostream& s) const {
   if      (portNum >= 0)    s << portNum;
   else if (exactMatch)      s << '"' << port << '"';
+  else if (typeFlag)        outputTypeFlag(s, typeFlag);
   else if (port.empty())    s << '*';
   else                      s << port;
 }

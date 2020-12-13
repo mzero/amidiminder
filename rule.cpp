@@ -29,6 +29,7 @@ _endpoint_ ::=
     ""                      -- defaults to port 0 of implicit client
     ":" _port_              -- port of implicit client
     "hardware" | "software" -- magic match types
+    "." ( "hw" | "app" )    -- match ports with given property (client wildcard)
 
 _client_ ::=
     _words_                 -- case independent find
@@ -208,7 +209,18 @@ namespace {
   AddressSpec parseAddressSpec(const std::string& s) {
     std::smatch m;
 
-    static const std::regex addressRE("([^:]*)(:([^:]*))?");
+    static const std::regex portTypeRE("\\.\\w+");
+    if (std::regex_match(s, m, portTypeRE)) {
+      unsigned int type = 0;
+      if      (s == ".hw")    type = SND_SEQ_PORT_TYPE_HARDWARE;
+      else if (s == ".app")   type = SND_SEQ_PORT_TYPE_APPLICATION;
+      else
+        throw Parse(Error() << "invalid port type '" << s << "'");
+
+      return AddressSpec(ClientSpec::wildcard(), PortSpec::type(type));
+    }
+
+    static const std::regex addressRE("([^:.]*)(:([^:.]*))?");
     if (!std::regex_match(s, m, addressRE))
       throw Parse(Error() << "malformed address '" << s << "'");
 

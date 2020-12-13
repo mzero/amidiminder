@@ -33,4 +33,9 @@ this -->> that                      # FAIL too many angles
 this < that                         # FAIL no arrow
 this > that                         # FAIL no arrow
 # this > that                       # PASS because in a comment
-
+.hw <-> test                        # PASS
+.app <-> test                       # PASS
+.blob <-> test                      # FAIL bad category
+thing:.app <-> test                 # FAIL bad port, not a category
+*:.app <-> test                     # FAIL bad wildcard, not a categroy
+.app:moo <-> test                   # FAIL bad category, no port allowed

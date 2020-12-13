@@ -74,9 +74,11 @@ class AddressSpec {
 
 class ConnectionRule {
   public:
-    ConnectionRule(const AddressSpec&, const AddressSpec&);
+    ConnectionRule(const AddressSpec&, const AddressSpec&, bool);
 
     static ConnectionRule exact(const Address&, const Address&);
+
+    bool isBlockingRule() const { return blocking; }
 
     bool senderMatch(const Address& a) const   { return sender.match(a); }
     bool destMatch(const Address& a) const     { return dest.match(a); }
@@ -91,6 +93,7 @@ class ConnectionRule {
   private:
     AddressSpec sender;
     AddressSpec dest;
+    bool blocking;
 };
 
 using ConnectionRules = std::vector<ConnectionRule>;

@@ -39,3 +39,7 @@ this > that                         # FAIL no arrow
 thing:.app <-> test                 # FAIL bad port, not a category
 *:.app <-> test                     # FAIL bad wildcard, not a categroy
 .app:moo <-> test                   # FAIL bad category, no port allowed
+this -x-> *                         # PASS
+this <-x- *                         # PASS
+this <-x-> that                     # PASS
+this --x--> *                       # PASS

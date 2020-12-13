@@ -21,7 +21,8 @@ _endpoint_ _connect_ _endpoint_
 
 _connect_ ::=
     "<->" | "->" | "<-"     -- connections
-    "<x>" | "x>" | "<x"     -- "anti-connections", keep other rules from matching
+    "<-x->" | "-x->" | "<-x-" -- blocking connections, cancel prior rule matches
+       -- note: one or more dashes are supported in all forms
 
 _endpoint_ ::=
     _client_                -- defaults to port 0
@@ -147,15 +148,16 @@ void AddressSpec::output(std::ostream& s) const
   { s << client << ':' << port; }
 
 
-ConnectionRule::ConnectionRule(const AddressSpec& s, const AddressSpec& d)
-  : sender(s), dest(d)
+ConnectionRule::ConnectionRule(
+    const AddressSpec& s, const AddressSpec& d, bool b)
+  : sender(s), dest(d), blocking(b)
   { }
 
 ConnectionRule ConnectionRule::exact(const Address& s, const Address& d)
-  { return ConnectionRule(AddressSpec::exact(s), AddressSpec::exact(d)); }
+  { return ConnectionRule(AddressSpec::exact(s), AddressSpec::exact(d), false); }
 
 void ConnectionRule::output(std::ostream& s) const
-  { s << sender << " --> " << dest; }
+  { s << sender << (blocking ? " -x-> " : " --> ") << dest; }
 
 
 
@@ -234,7 +236,7 @@ namespace {
   ConnectionRules parseConnectionRule(const std::string& s) {
     std::smatch m;
 
-    static const std::regex ruleRE("(.*?)\\s+(-+>|<-+>|<-+)\\s+(.*)");
+    static const std::regex ruleRE("(.*?)\\s+(-+(?:x-+)?>|<-+(?:x-+)?>?)\\s+(.*)");
     if (!std::regex_match(s, m, ruleRE))
       throw Parse(Error() << "malformed rule '" << s << "'");
 
@@ -247,8 +249,9 @@ namespace {
       throw Parse(Error() << "parseConnectionRule match failure with '" << s << "'");
         // should never happen, because ruleRE ensures at least one character
 
-    if (type.back() == '>')   rules.push_back(ConnectionRule(left, right));
-    if (type.front() == '<')  rules.push_back(ConnectionRule(right, left));
+    bool blocking = type.find('x') != std::string::npos;
+    if (type.back() == '>')   rules.push_back(ConnectionRule(left, right, blocking));
+    if (type.front() == '<')  rules.push_back(ConnectionRule(right, left, blocking));
 
     return rules;
   }

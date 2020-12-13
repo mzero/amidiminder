@@ -50,7 +50,7 @@ class MidiMinder {
         if (Args::outputPortDetails)
           seq.outputAddrDetails(std::cout, p);
         this->addPort(p);
-    });
+      });
       seq.scanConnections([&](auto c){ this->addConnection(c); });
 
       while (seq) {
@@ -253,7 +253,13 @@ class MidiMinder {
       bool rulesReadOkay = parseRulesFile(rulesFile, configRules);
 
       for (auto& r : configRules)
-      std::cout << "adding connection rule " << r << std::endl;
+        if (r.isBlockingRule())
+          std::cout << "blocking rules not yet supported, skipped: " << r << std::endl;
+        else
+          std::cout << "adding connection rule " << r << std::endl;
+
+      std::remove_if(configRules.begin(), configRules.end(),
+        [](auto r){ return r.isBlockingRule(); });
 
       return rulesReadOkay;
     }

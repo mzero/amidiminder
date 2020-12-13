@@ -26,9 +26,9 @@ this -> that                        # PASS
 this <-> that                       # PASS
 this <- that                        # PASS
 this <-- that                       # PASS
-this <--- that                      # FAIL too many dashes
+this <--- that                      # PASS
 this <<-- that                      # FAIL too many angles
-this ---> that                      # FAIL too many dashes
+this ---> that                      # PASS
 this -->> that                      # FAIL too many angles
 this < that                         # FAIL no arrow
 this > that                         # FAIL no arrow

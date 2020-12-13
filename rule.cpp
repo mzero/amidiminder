@@ -234,7 +234,7 @@ namespace {
   ConnectionRules parseConnectionRule(const std::string& s) {
     std::smatch m;
 
-    static const std::regex ruleRE("(.*?)\\s+(-->|->|<->|<--|<-)\\s+(.*)");
+    static const std::regex ruleRE("(.*?)\\s+(-+>|<-+>|<-+)\\s+(.*)");
     if (!std::regex_match(s, m, ruleRE))
       throw Parse(Error() << "malformed rule '" << s << "'");
 
@@ -243,17 +243,12 @@ namespace {
 
     ConnectionRules rules;
     std::string type = m.str(2);
-    if      (type == "-->")   rules.push_back(ConnectionRule(left, right));
-    else if (type == "->")    rules.push_back(ConnectionRule(left, right));
-    else if (type == "<->") {
-                              rules.push_back(ConnectionRule(left, right));
-                              rules.push_back(ConnectionRule(right, left));
-                            }
-    else if (type == "<-")    rules.push_back(ConnectionRule(right, left));
-    else if (type == "<--")   rules.push_back(ConnectionRule(right, left));
-    else
+    if (type.empty())
       throw Parse(Error() << "parseConnectionRule match failure with '" << s << "'");
-        // shouldn't ever happen!
+        // should never happen, because ruleRE ensures at least one character
+
+    if (type.back() == '>')   rules.push_back(ConnectionRule(left, right));
+    if (type.front() == '<')  rules.push_back(ConnectionRule(right, left));
 
     return rules;
   }

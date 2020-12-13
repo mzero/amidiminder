@@ -28,6 +28,14 @@ namespace {
 
   inline std::ostream& operator<<(std::ostream& s, Reason r)
     { output(s, r); return s; }
+
+  struct CandidateConnection {
+    const Address& sender;
+    const Address& dest;
+    const ConnectionRule& rule;
+  };
+
+  using CandidateConnections = std::vector<CandidateConnection>;
 }
 
 
@@ -127,52 +135,69 @@ class MidiMinder {
     std::map<snd_seq_addr_t, Address> activePorts;
     std::map<snd_seq_connect_t, Reason> activeConnections;
 
-    void makeConnection(
-      const Address& a, const Address& b,
-      const ConnectionRule& rule, Reason r)
+    void makeConnection(const CandidateConnection& cc, Reason r)
     {
       snd_seq_connect_t conn;
-      conn.sender = a.addr;
-      conn.dest = b.addr;
+      conn.sender = cc.sender.addr;
+      conn.dest = cc.dest.addr;
       if (activeConnections.find(conn) == activeConnections.end()) {
         seq.connect(conn.sender, conn.dest);
         activeConnections[conn] = r;
         switch (r) {
           case Reason::byRule:
-            std::cout << "making connection by rule: " << rule << std::endl;
+            std::cout << "making connection by rule: " << cc.rule << std::endl;
             break;
 
           case Reason::observed:
-            std::cout << "reactiving observed connection: " << rule << std::endl;
+            std::cout << "reactiving observed connection: " << cc.rule << std::endl;
             break;
         }
       }
     }
 
+    void considerConnection(
+      const Address& sender, const Address& dest,
+      const ConnectionRule& rule, CandidateConnections& ccs)
+    {
+      if (!rule.isBlockingRule()) {
+        CandidateConnection cc = {sender, dest, rule};
+        ccs.push_back(cc);
+      }
+      else {
+        CandidateConnections filteredCCs;
+
+        for (auto& cc : ccs)
+          if (!rule.match(cc.sender, cc.dest))
+            filteredCCs.push_back(cc);
+
+        ccs.swap(filteredCCs);
+      }
+    }
+
     void connectEachActiveSender(
-        const Address& a, const ConnectionRule& rule, Reason r)
+        const Address& a, const ConnectionRule& rule, CandidateConnections& ccs)
     {
       for (auto& p : activePorts) {
         auto& b = p.second;
         if (b.canBeSender() && rule.senderMatch(b))
-          makeConnection(b, a, rule, r);
+          considerConnection(b, a, rule, ccs);
       }
     }
 
     void connectEachActiveDest(
-        const Address& a, const ConnectionRule& rule, Reason r)
+        const Address& a, const ConnectionRule& rule, CandidateConnections& ccs)
     {
       for (auto& p : activePorts) {
         auto& b = p.second;
         if (b.canBeDest() && rule.destMatch(b))
-          makeConnection(a, b, rule, r);
+          considerConnection(a, b, rule, ccs);
       }
     }
 
-    void connectByRule(const Address& a, ConnectionRules& rules, Reason r) {
+    void connectByRule(const Address& a, ConnectionRules& rules, CandidateConnections& ccs) {
       for (auto& rule : rules) {
-        if (a.canBeSender() && rule.senderMatch(a))   connectEachActiveDest(a, rule, r);
-        if (a.canBeDest()   && rule.destMatch(a))     connectEachActiveSender(a, rule, r);
+        if (a.canBeSender() && rule.senderMatch(a))   connectEachActiveDest(a, rule, ccs);
+        if (a.canBeDest()   && rule.destMatch(a))     connectEachActiveSender(a, rule, ccs);
       }
     }
 
@@ -181,8 +206,17 @@ class MidiMinder {
       if (!a) return;
       activePorts[addr] = a;
 
-      connectByRule(a, observedRules, Reason::observed);
-      connectByRule(a, configRules, Reason::byRule);
+      CandidateConnections candidates;
+      connectByRule(a, observedRules, candidates);
+      for (auto& cc : candidates)
+        makeConnection(cc, Reason::observed);
+
+      candidates.clear();
+      connectByRule(a, configRules, candidates);
+      for (auto& cc : candidates) {
+        // TODO: implement "only one per rule" logic here
+        makeConnection(cc, Reason::byRule);
+      }
     }
 
     void delPort(const snd_seq_addr_t& addr) {
@@ -253,13 +287,7 @@ class MidiMinder {
       bool rulesReadOkay = parseRulesFile(rulesFile, configRules);
 
       for (auto& r : configRules)
-        if (r.isBlockingRule())
-          std::cout << "blocking rules not yet supported, skipped: " << r << std::endl;
-        else
-          std::cout << "adding connection rule " << r << std::endl;
-
-      std::remove_if(configRules.begin(), configRules.end(),
-        [](auto r){ return r.isBlockingRule(); });
+        std::cout << "adding rule " << r << std::endl;
 
       return rulesReadOkay;
     }

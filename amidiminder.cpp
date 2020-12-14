@@ -214,8 +214,28 @@ class MidiMinder {
       candidates.clear();
       connectByRule(a, configRules, candidates);
       for (auto& cc : candidates) {
-        // TODO: implement "only one per rule" logic here
-        makeConnection(cc, Reason::byRule);
+        bool alreadyConnected = false;
+
+        // TODO: skip this test if rule isn't wildcard at all
+        for (const auto& ac : activeConnections) {
+          if (cc.sender.addr.client != ac.first.sender.client) continue;
+          if (cc.dest.addr.client != ac.first.dest.client) continue;
+
+          // The clients match. See if the proposed rule could have made
+          // the connection:
+          const auto& si = activePorts.find(ac.first.sender);
+          if (si == activePorts.end()) continue;
+          const auto& di = activePorts.find(ac.first.dest);
+          if (di == activePorts.end()) continue;
+
+          if (cc.rule.match(si->second, di->second)) {
+            alreadyConnected = true;
+            break;
+          }
+        }
+
+        if (!alreadyConnected)
+          makeConnection(cc, Reason::byRule);
       }
     }
 

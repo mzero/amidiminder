@@ -14,9 +14,6 @@
 # ...
     -- comment
 
-[_client_]
-    -- following rules only apply when _client_ is present, and _client is implicit
-
 _endpoint_ _connect_ _endpoint_
 
 _connect_ ::=
@@ -25,11 +22,8 @@ _connect_ ::=
        -- note: one or more dashes are supported in all forms
 
 _endpoint_ ::=
-    _client_                -- defaults to port 0
+    _client_                -- defaults to all ports
     _client_ ":" _port_     -- port on a given client
-    ""                      -- defaults to port 0 of implicit client
-    ":" _port_              -- port of implicit client
-    "hardware" | "software" -- magic match types
     "." ( "hw" | "app" )    -- match ports with given property (client wildcard)
 
 _client_ ::=
@@ -42,24 +36,6 @@ _port_ ::=
     '"' _words_ '"'         -- exact match
     _number_                -- port n
     "*"                     -- all ports
-
-
-
-[bicycle]
-:controllers <- nanoKEY2
-:controllers <- nanoKONTROL
-:controllers <- Launchpad Pro MK3:0
-:controllers <- Launchpad Pro MK3:2
-:synths -> Circuit:0
-:synths -> Pisound
-
-== amidiauto rules
-[allow]
-[disallow]
-.... <-> ....
-.... -> ....
-.... <- ....
- where ... is either text of partial client name or *
 
 */
 
@@ -228,7 +204,7 @@ namespace {
 
     ClientSpec cs = parseClientSpec(m.str(1));
     PortSpec ps =
-      m.str(2).empty() ? PortSpec::numeric(0) : parsePortSpec(m.str(3));
+      m.str(2).empty() ? PortSpec::wildcard() : parsePortSpec(m.str(3));
 
     return AddressSpec(cs, ps);
   }

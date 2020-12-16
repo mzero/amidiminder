@@ -57,6 +57,9 @@ bool ClientSpec::match(const Address& a) const {
   else              return a.client.find(client) != std::string::npos;
 }
 
+bool ClientSpec::isWildcard() const
+  { return !exactMatch && client.empty(); }
+
 void ClientSpec::output(std::ostream& s) const {
   if      (exactMatch)      s << '"' << client << '"';
   else if (client.empty())  s << '*';
@@ -82,6 +85,9 @@ PortSpec PortSpec::type(unsigned int t)
 
 PortSpec PortSpec::wildcard()
   { return PortSpec("", false, -1, 0); }
+
+bool PortSpec::isType() const
+  { return portNum < 0 && !exactMatch && typeFlag; }
 
 bool PortSpec::match(const Address& a) const {
   if      (portNum >= 0)  return a.addr.port == portNum;
@@ -120,8 +126,10 @@ AddressSpec AddressSpec::exact(const Address& a)
 bool AddressSpec::match(const Address& a) const
   { return client.match(a) && port.match(a); }
 
-void AddressSpec::output(std::ostream& s) const
-  { s << client << ':' << port; }
+void AddressSpec::output(std::ostream& s) const {
+  if (client.isWildcard() && port.isType())   s << port;
+  else                                        s << client << ':' << port;
+}
 
 
 ConnectionRule::ConnectionRule(

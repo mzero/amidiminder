@@ -19,6 +19,7 @@ class ClientSpec {
     ClientSpec(const ClientSpec&) = default;
     ClientSpec& operator=(const ClientSpec&) = default;
 
+    bool isWildcard() const;
     void output(std::ostream&) const;
 
   private:
@@ -41,6 +42,7 @@ class PortSpec {
     PortSpec(const PortSpec&) = default;
     PortSpec& operator=(const PortSpec&) = default;
 
+    bool isType() const;
     void output(std::ostream&) const;
 
   private:

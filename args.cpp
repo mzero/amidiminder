@@ -3,7 +3,7 @@
 #include "ext/CLI11.hpp"
 
 namespace Args {
-  std::string rulesFilePath = "/etc/amidiminder.rules";
+  std::string rulesFilePath;
   bool rulesCheckOnly = false;
 
   bool outputPortDetails = false;
@@ -13,7 +13,7 @@ namespace Args {
   bool parse(int argc, char* argv[]) {
     CLI::App app{"bicycle - a MIDI looper"};
 
-    app.add_option("-f,--rules-file", rulesFilePath, "defaults to " + rulesFilePath);
+    app.add_option("-f,--rules-file", rulesFilePath, "file of connection rules");
     app.add_flag("-C,--check-rules", rulesCheckOnly, "check rules file then edit");
     app.add_flag("-p,--port-details", outputPortDetails, "output verbose details of each port");
 

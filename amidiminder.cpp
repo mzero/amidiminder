@@ -291,6 +291,10 @@ class MidiMinder {
     }
 
     bool readRules() {
+      if (Args::rulesFilePath.empty()) {
+        std::cout << "no rules file specified, so no rules added" << std::endl;
+        return true;
+      }
       std::ifstream rulesFile(Args::rulesFilePath);
       if (!rulesFile) {
         std::cout << "could not read " << Args::rulesFilePath << std::endl;

@@ -3,7 +3,7 @@ Description=ALSA MIDI minder daemon
 After=sound.target
 
 [Service]
-ExecStart=/usr/bin/amidiminder
+ExecStart=/usr/bin/amidiminder -f /etc/amidiminder.rules
 EnvironmentFile=/etc/environment
 
 [Install]

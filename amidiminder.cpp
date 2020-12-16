@@ -69,24 +69,13 @@ class MidiMinder {
         }
 
         switch (ev->type) {
-          case SND_SEQ_EVENT_CLIENT_START: {
-            // std::cout << "client start " << ev->data.addr << std::endl;
+          case SND_SEQ_EVENT_CLIENT_START:
+          case SND_SEQ_EVENT_CLIENT_EXIT:
+          case SND_SEQ_EVENT_CLIENT_CHANGE:
             break;
-          }
-
-          case SND_SEQ_EVENT_CLIENT_EXIT: {
-            // std::cout << "client exit " << ev->data.addr << std::endl;
-            break;
-          }
-
-          case SND_SEQ_EVENT_CLIENT_CHANGE: {
-            // std::cout << "client change " << ev->data.addr << std::endl;
-            break;
-          }
 
           case SND_SEQ_EVENT_PORT_START: {
             if (Args::outputPortDetails) {
-              std::cout << "port start " << ev->data.addr << std::endl;
               seq.outputAddrDetails(std::cout, ev->data.addr);
             }
             addPort(ev->data.addr);
@@ -94,36 +83,28 @@ class MidiMinder {
           }
 
           case SND_SEQ_EVENT_PORT_EXIT: {
-            if (Args::outputPortDetails) {
-              std::cout << "port exit " << ev->data.addr << std::endl;
-            }
             delPort(ev->data.addr);
             break;
           }
 
           case SND_SEQ_EVENT_PORT_CHANGE: {
-            if (Args::outputPortDetails) {
-              std::cout << "port change " << ev->data.addr << std::endl;
-              seq.outputAddrDetails(std::cout, ev->data.addr);
-            }
+            std::cout << "port change " << ev->data.addr << std::endl;
             // FIXME: treat this as a add/remove?
             break;
           }
 
           case SND_SEQ_EVENT_PORT_SUBSCRIBED: {
-            // std::cout << "port subscribed " << ev->data.connect << std::endl;
             addConnection(ev->data.connect);
             break;
           }
 
           case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: {
-            // std::cout << "port unsubscribed " << ev->data.connect << std::endl;
             delConnection(ev->data.connect);
             break;
           }
 
           default: {
-            std::cout << "some other event ("
+            std::cout << "unknown event ("
                << std::dec << static_cast<int>(ev->type) << ")" << std::endl;
           }
         }
@@ -135,6 +116,12 @@ class MidiMinder {
     std::map<snd_seq_addr_t, Address> activePorts;
     std::map<snd_seq_connect_t, Reason> activeConnections;
 
+    Address knownPort(snd_seq_addr_t addr) {
+      auto i = activePorts.find(addr);
+      if (i == activePorts.end()) return {};
+      return i->second;
+    }
+
     void makeConnection(const CandidateConnection& cc, Reason r)
     {
       snd_seq_connect_t conn;
@@ -143,13 +130,14 @@ class MidiMinder {
       if (activeConnections.find(conn) == activeConnections.end()) {
         seq.connect(conn.sender, conn.dest);
         activeConnections[conn] = r;
+        std::cout << "connecting " << cc.sender << " --> " << cc.dest;
         switch (r) {
           case Reason::byRule:
-            std::cout << "making connection by rule: " << cc.rule << std::endl;
+            std::cout << ", by rule: " << cc.rule << std::endl;
             break;
 
           case Reason::observed:
-            std::cout << "reactiving observed connection: " << cc.rule << std::endl;
+            std::cout << ", restoring prior connection" << std::endl;
             break;
         }
       }
@@ -206,6 +194,8 @@ class MidiMinder {
       if (!a) return;
       activePorts[addr] = a;
 
+      std::cout << "port added " << a << std::endl;
+
       CandidateConnections candidates;
       connectByRule(a, observedRules, candidates);
       for (auto& cc : candidates)
@@ -240,17 +230,25 @@ class MidiMinder {
     }
 
     void delPort(const snd_seq_addr_t& addr) {
-      activePorts.erase(addr);
+      Address port = knownPort(addr);
+      if (port)
+        std::cout << "port removed " << port << std::endl;
 
       std::vector<snd_seq_connect_t> doomed;
-
       for (auto& c : activeConnections) {
         if (c.first.sender == addr || c.first.dest == addr) {
           doomed.push_back(c.first);
-          std::cout << c.second << " connection deactivated: " << c.first << std::endl;
+
+          Address sender = knownPort(c.first.sender);
+          Address dest = knownPort(c.first.dest);
+          if (sender && dest)
+            std::cout << "disconnected " << sender << "-->" << dest << std::endl;
         }
       }
 
+
+
+      activePorts.erase(addr);
       for (auto& d : doomed)
         activeConnections.erase(d);
     }
@@ -270,7 +268,7 @@ class MidiMinder {
       activeConnections[conn] = Reason::observed;
       ConnectionRule c = ConnectionRule::exact(sender, dest);
       observedRules.push_back(c);
-      std::cout << "adding observed connection " << c << std::endl;
+      std::cout << "observed connection " << c << std::endl;
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
@@ -281,17 +279,12 @@ class MidiMinder {
 
       Address sender = seq.address(conn.sender);
       Address dest = seq.address(conn.dest);
+      std::cout << "observed disconnection "
+        << sender << " --> " << dest << std::endl;
 
-      switch (i->second) {
-        case Reason::byRule:
-          std::cout << "rule connection explicitly disconnected " << conn << std::endl;
-          break;
-
-        case Reason::observed:
-          std::remove_if(observedRules.begin(), observedRules.end(),
-            [&](auto r){ return r.match(sender, dest); });
-          std::cout << "removing observed connection " << conn << std::endl;
-          break;
+      if (i->second == Reason::observed) {
+        std::remove_if(observedRules.begin(), observedRules.end(),
+          [&](auto r){ return r.match(sender, dest); });
       }
 
       activeConnections.erase(i);

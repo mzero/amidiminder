@@ -2,10 +2,12 @@ TARGET ?= amidiminder
 PREFIX ?= /usr/local
 BINARY_DIR ?= $(PREFIX)/bin
 CONF_DIR ?= /etc
+CONF_DEFAULT_DIR ?= /etc/default
 INSTALL ?= install
 INSTALL_PROGRAM ?= $(INSTALL) -s
 INSTALL_DATA ?= $(INSTALL) -m 644
 MKDIR_P ?= mkdir -p
+LN_S ?= ln -s
 
 BUILD_DIR ?= ./build
 
@@ -16,9 +18,10 @@ deb:
 	dpkg-buildpackage -b --no-sign
 
 install:
-	$(MKDIR_P) $(DESTDIR)$(BINARY_DIR) $(DESTDIR)$(CONF_DIR)
+	$(MKDIR_P) $(DESTDIR)$(BINARY_DIR) $(DESTDIR)$(CONF_DIR) $(DESTDIR)$(CONF_DEFAULT_DIR)
 	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET) $(DESTDIR)$(BINARY_DIR)/
-	$(INSTALL_DATA) $(TARGET).rules $(DESTDIR)$(CONF_DIR)/
+	$(INSTALL_DATA) $(TARGET).rules $(DESTDIR)$(CONF_DEFAULT_DIR)/
+	$(LN_S) $(CONF_DEFAULT_DIR)/$(TARGET).rules $(DESTDIR)$(CONF_DIR)/$(TARGET).rules
 
 SRCS := amidiminder.cpp args.cpp rule.cpp seq.cpp
 INCS :=

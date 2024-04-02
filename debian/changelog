@@ -3,6 +3,7 @@ amidiminder (0.71.0-1) bookworm; urgency=medium
   * Fixed builds for bookworm.
   * Follow Debian version numbering format.
   * Debian package buildscripts migrated to use debhelper.
+  * Use a symbolic link as /etc/amidiminder.rules for easy overrides.
 
  -- Giedrius Trainavičius <giedrius@blokas.io>  Tue, 02 Apr 2024 08:18:17 +0100
 

@@ -1,10 +1,18 @@
-amidiminder (0.70) unreleased; urgency=medium
+amidiminder (0.71.0-1) bookworm; urgency=medium
+
+  * Fixed builds for bookworm.
+  * Follow Debian version numbering format.
+  * Debian package buildscripts migrated to use debhelper.
+
+ -- Giedrius Trainavičius <giedrius@blokas.io>  Tue, 02 Apr 2024 08:18:17 +0100
+
+amidiminder (0.70) UNRELEASED; urgency=medium
 
   * first full version, ready for early adopter testing
 
  --  <mark@glyphic.com>  Tue, 15 Dec 2020 17:15:06 -0800
 
-amidiminder (0.50) unreleased; urgency=medium
+amidiminder (0.50) UNRELEASED; urgency=medium
 
   * early version
 

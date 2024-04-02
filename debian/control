@@ -1,13 +1,19 @@
-Package: amidiminder
-Version: 0.70
+Source: amidiminder
 Section: sound
 Priority: optional
-Architecture: armhf
-Depends: libc6 (>= 2.19), libgcc1 (>= 1:4.9.2-10), libasound2 (>= 1.1)
-Maintainer: Mark Lentczner <mark@glyphic.com>
-Description: ALSA MIDI connection minder.
+Maintainer: Blokas <hello@blokas.io>
+Build-Depends: debhelper-compat (= 13), libasound2-dev
+Standards-Version: 4.5.1
+Homepage: https://github.com/BlokasLabs/amidiminder/
+Rules-Requires-Root: no
+
+Package: amidiminder
+Architecture: any
+Multi-Arch: foreign
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: ALSA MIDI connection minder, Blokas fork.
  Watches for new MIDI ports (both from hardware devices and from applications),
  and users a rules configuration file to automatically make connections.
  Will also handle reconnecting if a port is removed and later added back, like
  when a device is unplugged and then re-plugged.
- 
+ Original author: Mark Lentczner <mark@glyphic.com>

@@ -21,7 +21,7 @@ void Seq::begin() {
 
   serr = snd_seq_connect_from(seq, evtPort,
     SND_SEQ_CLIENT_SYSTEM, SND_SEQ_PORT_SYSTEM_ANNOUNCE);
-  if (errFatal(serr, "connect to system annouce port")) return;
+  if (errFatal(serr, "connect to system announce port")) return;
 
 }
 

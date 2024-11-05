@@ -283,8 +283,11 @@ class MidiMinder {
         << sender << " --> " << dest << std::endl;
 
       if (i->second == Reason::observed) {
+        observedRules.erase(
         std::remove_if(observedRules.begin(), observedRules.end(),
-          [&](auto r){ return r.match(sender, dest); });
+            [&](auto r){ return r.match(sender, dest); }),
+          observedRules.end()
+        );
       }
 
       activeConnections.erase(i);

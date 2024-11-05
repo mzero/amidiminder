@@ -149,14 +149,14 @@ namespace {
 
   using Error = std::ostringstream;
 
-  std::string errormsg(std::ostream& o) {
-    auto e = dynamic_cast<Error*>(&o);
+  std::string errormsg(const std::ostream& o) {
+    auto e = dynamic_cast<const Error*>(&o);
     return e ? e->str() : "parse error";
   }
 
   class Parse : public std::string {
     public:
-      Parse(std::ostream& o) : std::string(errormsg(o)) { }
+      Parse(const std::ostream& o) : std::string(errormsg(o)) { }
   };
 
   ClientSpec parseClientSpec(const std::string& s) {

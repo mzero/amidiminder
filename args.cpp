@@ -14,7 +14,8 @@ namespace Args {
     CLI::App app{"Maintain MIDI device connections"};
     app.require_subcommand(0, 1);
 
-    app.add_option("-f,--rules-file", rulesFilePath, "File of connection rules");
+    app.add_option("-f,--rules-file", rulesFilePath, "File of connection rules")
+      ->check(CLI::ExistingFile);
 
     CLI::App *helpApp = app.add_subcommand("help");
     helpApp->description(app.get_help_ptr()->get_description());
@@ -27,7 +28,8 @@ namespace Args {
     CLI::App *checkApp = app.add_subcommand("check", "Check the syntax of a rules file");
     checkApp->parse_complete_callback([](){ command = Command::Check; });
     checkApp->add_option("rules-file", rulesFilePath, "rules file to check")
-      ->required();
+      ->required()
+      ->check(CLI::ExistingFile);
 
     try {
         app.parse(argc, argv);

@@ -33,7 +33,7 @@ namespace Args {
 
     CLI::App *checkApp = app.add_subcommand("check", "Check the syntax of a rules file");
     checkApp->parse_complete_callback([](){ command = Command::Check; });
-    checkApp->add_option("rules-file", rulesFilePath, "rules file to check")
+    checkApp->add_option("rules-file", rulesFilePath, "Rules file to check")
       ->required()
       ->check(CLI::ExistingFile);
 

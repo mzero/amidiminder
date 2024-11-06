@@ -2,6 +2,11 @@
 
 #include "ext/CLI11.hpp"
 
+namespace {
+  const auto appDescription = "Maintain MIDI device connections";
+  const auto appVersion = "0.70.1";
+}
+
 namespace Args {
   Command command = Command::Help; // the default command if none given
 
@@ -11,7 +16,8 @@ namespace Args {
   int exitCode = 0;
 
   bool parse(int argc, char* argv[]) {
-    CLI::App app{"Maintain MIDI device connections"};
+    CLI::App app{appDescription};
+    app.set_version_flag("-v,--version", appVersion);
     app.require_subcommand(0, 1);
 
     app.add_option("-f,--rules-file", rulesFilePath, "File of connection rules")

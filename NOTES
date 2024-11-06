@@ -11,9 +11,9 @@ NOTES
     [x] check command
     [x] print help on no args at all
     [x] help subcommand
+    [x] add ExistingPathValidator() to rules file arguments
+    [x] version flag? (set_version_flag())
     [] load rules only after command is switched
-    [] version flag? (set_version_flag())
-    [] add ExistingPathValidator() to rules file arguments
 
 
 [] file locations in code somewhere
@@ -31,6 +31,9 @@ NOTES
 [] connect & disconnect
 [] list
 
+## other
+
+[] improve output of check command
 
 
 

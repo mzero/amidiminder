@@ -1,2 +1,0 @@
-systemctl stop amidiminder
-systemctl disable amidiminder

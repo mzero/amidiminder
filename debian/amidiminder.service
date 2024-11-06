@@ -1,0 +1,13 @@
+[Unit]
+Description=ALSA MIDI minder daemon
+Documentation=https://github.com/mzero/amidiminder/blob/master/README.md
+After=sound.target
+
+[Service]
+ExecStart=/usr/bin/amidiminder -f /etc/amidiminder.rules
+EnvironmentFile=/etc/environment
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

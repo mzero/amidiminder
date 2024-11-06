@@ -1,11 +1,5 @@
-amidiminder (0.70) unreleased; urgency=medium
+amidiminder (0.70.1-1) unstable; urgency=medium
 
-  * first full version, ready for early adopter testing
+  * Initial release. (Closes: #1086796)
 
- --  <mark@glyphic.com>  Tue, 15 Dec 2020 17:15:06 -0800
-
-amidiminder (0.50) unreleased; urgency=medium
-
-  * early version
-
- --  <mark@glyphic.com>  Wed, 11 Nov 2020 11:22:06 -0800
+ -- John Horigan <john@glyphic.com>  Tue, 05 Nov 2024 21:09:45 -0800

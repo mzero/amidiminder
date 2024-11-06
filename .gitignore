@@ -1,1 +1,8 @@
-/build/
+build/
+debian/.debhelper/
+debian/amidiminder.debhelper.log
+debian/amidiminder.postrm.debhelper
+debian/amidiminder.substvars
+debian/amidiminder/
+debian/debhelper-build-stamp
+debian/files

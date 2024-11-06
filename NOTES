@@ -1,0 +1,105 @@
+NOTES
+
+
+# TODO
+
+## state and profiles
+
+[] command line change to commands
+    [] modes
+    [] minder command
+    [] check command
+
+[] file locations in code somewhere
+    [] hard coded
+    [] built from optional environment variables
+
+[] command line and deamon communication
+    [] echo command
+    [] reset command
+    [] load command
+    [] save command
+
+## aconnect functionality
+
+[] connect & disconnect
+[] list
+
+
+
+
+# MAJOR THEMES
+
+## aconnect functionality
+    - using the better syntax and naming for making, listing
+    - and breaking connections
+    - clear all connections
+
+## connection state
+    - keep what is intended even across reboot
+    - create provisional rules when connections are made
+    - (and delete them when broken)
+    - save those in a live file (in /etc?)
+    - on load use the user written set & the saved set
+
+## connection setups
+    - named setups - one is active
+    - merge setups?
+    - save current state as a setup
+    - files in standard places
+
+## maturty
+    - man page
+    - bash completion
+    - SIGHUP for reload
+    - handle daemon running or not
+
+
+# DESIGN
+
+Two rules files:
+    Fixed
+        come from user
+        symlink from /etc/amidiminder.rules to ???
+        how to recognize chances in rules?
+            - observe file change?
+            - command to switch the symlink?
+            - signal to reload?
+    Live
+        from observations of connects and disconnects
+        relative to the Fixed rules
+            a connect that the Fixed rules would make won't be recorded
+            has to be able to record overrides of the Fixed rules
+
+    Static & Dynamic?
+
+Modes:
+    minder          - like the current operation
+    connect         - make a connection, the minder will see it
+    disconnect      - break a connection, the minder will see it
+    reset           - clear the live rules, reset to only connections from Fixed
+    load            - set new Fixed rules & reset
+    save            - save the current Fixed & Live rules as new single rules file
+    check           - check rule set file
+    list            - show devices, ports, and connections
+
+
+
+in service file
+
+RuntimeDirectory=amidiminder
+StateDirectory=amidiminder
+
+these set environment variables
+    $RUNTIME_DIRECTORY
+    $STATE_DIRECTORY
+
+in the app, if not set, default these to
+    /run/amidiminder
+    /var/lib/amidiminder
+
+Then use files as follows:
+    ${RUNTIME_DIRECTORY}/cmd    -- socket to minder if running
+    ${RUNTIME_STATE}/rules      -- fixed rules (copies when user asked)
+    ${RUNTIME_STATE}/observed   -- observed connections & disconnects
+

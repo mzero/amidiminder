@@ -4,9 +4,18 @@
 #include <string>
 
 namespace Args {
-  extern std::string rulesFilePath;
-  extern bool rulesCheckOnly;
 
+  enum class Command {
+    Help,
+    Minder,
+    Check,
+  };
+  extern Command command;
+
+  // Generic options
+  extern std::string rulesFilePath;
+
+  // Minder command options
   extern bool outputPortDetails;
 
   extern int exitCode;

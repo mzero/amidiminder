@@ -321,9 +321,18 @@ int main(int argc, char *argv[]) {
   MidiMinder mm;
 
   bool rulesReadOkay = mm.readRules();
-  if (Args::rulesCheckOnly)
-    return rulesReadOkay ? 0 : 1;
+  switch (Args::command) {
+    case Args::Command::Help:
+      // should never happen, handled in Args::parse()
+      break;
 
-  mm.run();
+    case Args::Command::Check:
+      return rulesReadOkay ? 0 : 1;
+
+    case Args::Command::Minder:
+      mm.run();
+      break;
+  }
+
   return 0;
 }

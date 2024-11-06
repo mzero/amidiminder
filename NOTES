@@ -6,9 +6,15 @@ NOTES
 ## state and profiles
 
 [] command line change to commands
-    [] modes
-    [] minder command
-    [] check command
+    [x] modes
+    [x] minder command
+    [x] check command
+    [x] print help on no args at all
+    [x] help subcommand
+    [] load rules only after command is switched
+    [] version flag? (set_version_flag())
+    [] add ExistingPathValidator() to rules file arguments
+
 
 [] file locations in code somewhere
     [] hard coded

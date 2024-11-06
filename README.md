@@ -103,5 +103,5 @@ bicycle:synths --> Circuit
 ### Open source code used
 
 https://github.com/CLIUtils/CLI11
-CLI11 1.8 Copyright (c) 2017-2019 University of Cincinnati, developed by Henry
+CLI11 2.4.2 Copyright (c) 2017-2024 University of Cincinnati, developed by Henry
 Schreiner under NSF AWARD 1414736. All rights reserved.

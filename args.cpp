@@ -20,9 +20,6 @@ namespace Args {
     app.set_version_flag("-v,--version", appVersion);
     app.require_subcommand(0, 1);
 
-    app.add_option("-f,--rules-file", rulesFilePath, "File of connection rules")
-      ->check(CLI::ExistingFile);
-
     CLI::App *helpApp = app.add_subcommand("help");
     helpApp->description(app.get_help_ptr()->get_description());
     helpApp->parse_complete_callback([](){ command = Command::Help; });
@@ -34,8 +31,7 @@ namespace Args {
     CLI::App *checkApp = app.add_subcommand("check", "Check the syntax of a rules file");
     checkApp->parse_complete_callback([](){ command = Command::Check; });
     checkApp->add_option("rules-file", rulesFilePath, "Rules file to check")
-      ->required()
-      ->check(CLI::ExistingFile);
+      ->required();
 
     try {
         app.parse(argc, argv);

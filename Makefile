@@ -56,7 +56,7 @@ deb-clean:
 	dh clean
 
 test: $(BUILD_DIR)/$(TARGET)
-	$(BUILD_DIR)/$(TARGET) -C -f test.rules && echo PASS || echo FAIL
+	$(BUILD_DIR)/$(TARGET) check test.rules && echo PASS || echo FAIL
 
 DEPS := $(OBJS:.o=.d)
 

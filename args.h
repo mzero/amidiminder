@@ -13,10 +13,12 @@ namespace Args {
   extern Command command;
 
   // Generic options
-  extern std::string rulesFilePath;
 
   // Minder command options
   extern bool outputPortDetails;
+
+  // Check command options
+  extern std::string rulesFilePath;
 
   extern int exitCode;
   bool parse(int argc, char* argv[]);

@@ -11,6 +11,11 @@ namespace Files {
   const std::string& observedFilePath();
 
   const std::string& controlSocketPath();
+
+  // Note: On error, these functions report to cerr, and exit
+  bool fileExists(const std::string& path);
+  std::string readFile(const std::string& path);
+  void writeFile(const std::string& path, const std::string& contents);
 }
 
 

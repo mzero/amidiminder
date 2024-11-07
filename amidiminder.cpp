@@ -7,6 +7,7 @@
 #include <set>
 
 #include "args.h"
+#include "files.h"
 #include "rule.h"
 #include "seq.h"
 
@@ -330,6 +331,7 @@ int main(int argc, char *argv[]) {
       return rulesReadOkay ? 0 : 1;
 
     case Args::Command::Minder:
+      Files::initializeAsService();
       mm.run();
       break;
   }

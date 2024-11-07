@@ -5,6 +5,8 @@ After=sound.target
 [Service]
 ExecStart=/usr/bin/amidiminder -f /etc/amidiminder.rules
 EnvironmentFile=/etc/environment
+RuntimeDirectory=amidiminder
+StateDirectory=amidiminder
 
 [Install]
 WantedBy=multi-user.target

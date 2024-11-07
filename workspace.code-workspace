@@ -61,7 +61,11 @@
 			"filesystem": "cpp",
 			"ratio": "cpp",
 			"string_view": "cpp",
-			"iomanip": "cpp"
+			"iomanip": "cpp",
+			"bit": "cpp",
+			"compare": "cpp",
+			"concepts": "cpp",
+			"numbers": "cpp"
 		}
 	}
 }

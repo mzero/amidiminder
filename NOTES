@@ -17,8 +17,9 @@ NOTES
 
 
 [] file locations in code somewhere
-    [] hard coded
-    [] built from optional environment variables
+    [x] built from optional environment variables
+    [] need to decide how much checking to do
+    [] need to exit when files aren't good
 
 [] command line and deamon communication
     [] echo command

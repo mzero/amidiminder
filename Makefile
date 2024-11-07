@@ -20,7 +20,7 @@ install:
 	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET) $(DESTDIR)$(BINARY_DIR)/
 	$(INSTALL_DATA) $(TARGET).rules $(DESTDIR)$(CONF_DIR)/
 
-SRCS := amidiminder.cpp args.cpp rule.cpp seq.cpp
+SRCS := amidiminder.cpp args.cpp files.cpp rule.cpp seq.cpp
 INCS :=
 LIBS := stdc++ asound
 

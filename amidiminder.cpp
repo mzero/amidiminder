@@ -5,6 +5,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <sstream>
 
 #include "args.h"
 #include "files.h"
@@ -37,6 +38,32 @@ namespace {
   };
 
   using CandidateConnections = std::vector<CandidateConnection>;
+
+
+  void readRules(const std::string& filePath,
+    std::string& contents,    // receives contents of the file
+    ConnectionRules& rules)   // receives parsed rules
+  {
+    if (!Files::fileExists(filePath)) {
+      std::cout << "rules file " << filePath << " doesn't exist, no rules read" << std::endl;
+      contents.clear();
+      rules.clear();
+    }
+
+    contents = Files::readFile(filePath);
+    std::cout << "reading rules from " << filePath << std::endl;
+
+    rules.clear();
+    std::istringstream rulesStream(contents);
+    if (!parseRulesFile(rulesStream, rules)) {
+      std::cerr << "parse error reading rules" << std::endl;
+      std::exit(1);
+    }
+
+    std::cout << "read " << rules.size() << " rules" << std::endl;
+    for (auto& r : rules)
+      std::cout << "    " << r << std::endl;
+  }
 }
 
 
@@ -113,7 +140,11 @@ class MidiMinder {
     }
 
     ConnectionRules configRules;
+    std::string configRulesText;
+
     ConnectionRules observedRules;
+    std::string observedRulesText;
+
     std::map<snd_seq_addr_t, Address> activePorts;
     std::map<snd_seq_connect_t, Reason> activeConnections;
 
@@ -294,23 +325,14 @@ class MidiMinder {
       activeConnections.erase(i);
     }
 
-    bool readRules() {
-      if (Args::rulesFilePath.empty()) {
-        std::cout << "no rules file specified, so no rules added" << std::endl;
-        return true;
+    void readRules() {
+      if (!Files::fileExists(Files::rulesFilePath())) {
+        // TODO: try copying the default rules from, say, /usr/share/
+        // for now, do nothing
       }
-      std::ifstream rulesFile(Args::rulesFilePath);
-      if (!rulesFile) {
-        std::cout << "could not read " << Args::rulesFilePath << std::endl;
-        return false;
-      }
-      std::cout << "reading rules from " << Args::rulesFilePath << std::endl;
-      bool rulesReadOkay = parseRulesFile(rulesFile, configRules);
 
-      for (auto& r : configRules)
-        std::cout << "adding rule " << r << std::endl;
-
-      return rulesReadOkay;
+      ::readRules(Files::rulesFilePath(), configRulesText, configRules);
+      ::readRules(Files::observedFilePath(), observedRulesText, observedRules);
     }
 };
 
@@ -319,21 +341,27 @@ int main(int argc, char *argv[]) {
   if (!Args::parse(argc, argv))
     return Args::exitCode;
 
-  MidiMinder mm;
 
-  bool rulesReadOkay = mm.readRules();
   switch (Args::command) {
     case Args::Command::Help:
       // should never happen, handled in Args::parse()
       break;
 
-    case Args::Command::Check:
-      return rulesReadOkay ? 0 : 1;
+    case Args::Command::Check: {
+      std::string contents;
+      ConnectionRules rules;
+      ::readRules(Args::rulesFilePath, contents, rules);
+      break;
+    }
 
-    case Args::Command::Minder:
+    case Args::Command::Minder: {
       Files::initializeAsService();
+      
+      MidiMinder mm;
+      mm.readRules();
       mm.run();
       break;
+    }
   }
 
   return 0;

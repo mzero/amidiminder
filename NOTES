@@ -18,8 +18,18 @@ NOTES
 
 [] file locations in code somewhere
     [x] built from optional environment variables
-    [] need to decide how much checking to do
-    [] need to exit when files aren't good
+    [x] need to decide how much checking to do
+    [x] need to exit when files aren't good
+    [x] file reading & file writing utilities
+    [x] check file actions
+        [x] read from supplied path
+    [] handle "-" to mean stdin/stdout
+    [] minder file actions
+        [x] read state (profile & observed) on state on start
+        [] if state is missing, copy from /user/share/amidiminder/general.rules
+        [] write observed on changes
+
+[] move main and control commands out of MidiMinder class
 
 [] command line and deamon communication
     [] echo command
@@ -35,6 +45,12 @@ NOTES
 ## other
 
 [] improve output of check command
+[] switch to throwing errors on fatal system (and Seq) errors
+[] review all error messages
+    [] leading case
+    [] wording
+[] rename configRules in MM profileRules
+    [] make the files be observed.rules and profile.rules???
 
 
 

@@ -46,7 +46,7 @@ namespace {
       errCheck(stat(dirPath.c_str(), &statbuf), "Checking", dirPath);
 
       if ((statbuf.st_mode & S_IFMT) != S_IFDIR) {
-        std::cerr << dirPath << " exists, but it is not a direcotry" << std::endl;
+        std::cerr << dirPath << " exists, but it is not a directory" << std::endl;
         std::exit(1);
       }
     }

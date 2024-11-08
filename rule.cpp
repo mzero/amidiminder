@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 // TODO: support case insensitive matches for non-exact
 
@@ -154,9 +155,9 @@ namespace {
     return e ? e->str() : "parse error";
   }
 
-  class Parse : public std::string {
+  class Parse : public std::runtime_error {
     public:
-      Parse(const std::ostream& o) : std::string(errormsg(o)) { }
+      Parse(const std::ostream& o) : std::runtime_error(errormsg(o)) { }
   };
 
   ClientSpec parseClientSpec(const std::string& s) {
@@ -286,7 +287,7 @@ bool parseRulesFile(std::istream& input, ConnectionRules& rules) {
       rules.insert(rules.end(), newRules.begin(), newRules.end());
     }
     catch (Parse& p) {
-      std::cerr << "configuration line " << lineNo << " error: " << p << "\n";
+      std::cerr << "configuration line " << lineNo << " error: " << p.what() << "\n";
       good = false;
     }
   }

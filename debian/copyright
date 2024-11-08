@@ -10,7 +10,7 @@ Copyright: 2020-2024 Mark Lentczner <mark@glyphic.com>
 License:   BSD-2-clause
 
 Files:     ext/CLI11.hpp
-Copyright: 2017-2019 University of Cincinnati
+Copyright: 2017-2024 University of Cincinnati
 License:   BSD-3-clause
 
 Files: debian/*
@@ -20,7 +20,7 @@ Copyright:
 License: BSD-2-clause
 
 License:   BSD-2-clause
- amidiminder version 0.71
+ amidiminder version 0.70.1
  Copyright (c) 2020-2024, Mark Lentczner
  All rights reserved.
  .
@@ -46,8 +46,8 @@ License:   BSD-2-clause
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD-3-clause
- CLI11 version 1.8 
- Copyright (c) 2017-2019 University of Cincinnati
+ CLI11 version 2.4.2
+ Copyright (c) 2017-2024 University of Cincinnati
  .
  Redistribution and use in source and binary forms, with or without 
  modification, are permitted provided that the following conditions 

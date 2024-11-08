@@ -16,4 +16,3 @@ Description: ALSA MIDI connection minder
  and uses a rules configuration file to automatically make connections.
  Will also handle reconnecting if a port is removed and later added back, like
  when a device is unplugged and then re-plugged.
- Original author: Mark Lentczner <mark@glyphic.com>

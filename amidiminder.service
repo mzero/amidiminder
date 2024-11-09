@@ -4,7 +4,7 @@ Documentation=https://github.com/mzero/amidiminder/blob/master/README.md
 After=sound.target
 
 [Service]
-ExecStart=/usr/bin/amidiminder -f /etc/amidiminder.rules
+ExecStart=/usr/bin/amidiminder daemon
 EnvironmentFile=/etc/environment
 RuntimeDirectory=amidiminder
 StateDirectory=amidiminder

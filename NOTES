@@ -32,7 +32,7 @@ NOTES
         [] ? copy from /user/share/amidiminder/general.rules
 
 [] reorg
-    [] rename command to daemon
+    [x] rename command to daemon
     [] move main and control commands out of MidiMinder class
     [] refactor MidiMinder
     [] rename configRules in MM profileRules
@@ -60,7 +60,10 @@ NOTES
 [] handle socket errors in the IPC code intellegently
     [] client wants to report and exit
     [] server wants to report and discard (aborting the command in progress)
-
+[] move verbox port details potion to the list command
+[] find suitable haiku for the commtest command
+[] harmonize CPP_FLAGS with what happens when built for deb
+    [] fix CPP_FLAGS for debugging to -Og
 
 # MAJOR THEMES
 

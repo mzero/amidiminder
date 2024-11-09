@@ -24,9 +24,9 @@ namespace Args {
     helpApp->description(app.get_help_ptr()->get_description());
     helpApp->parse_complete_callback([](){ command = Command::Help; });
 
-    CLI::App *minderApp = app.add_subcommand("minder", "Run the minder service");
-    minderApp->parse_complete_callback([](){ command = Command::Minder; });
-    minderApp->add_flag("-p,--port-details", outputPortDetails, "output verbose details of each port");
+    CLI::App *daemonApp = app.add_subcommand("daemon", "Run the minder service");
+    daemonApp->parse_complete_callback([](){ command = Command::Daemon; });
+    daemonApp->add_flag("-p,--port-details", outputPortDetails, "output verbose details of each port");
 
     CLI::App *checkApp = app.add_subcommand("check", "Check the syntax of a rules file");
     checkApp->parse_complete_callback([](){ command = Command::Check; });

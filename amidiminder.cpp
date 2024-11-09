@@ -429,7 +429,7 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-    case Args::Command::Minder: {
+    case Args::Command::Daemon: {
       Files::initializeAsService();
 
       MidiMinder mm;

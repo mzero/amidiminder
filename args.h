@@ -7,7 +7,7 @@ namespace Args {
 
   enum class Command {
     Help,
-    Minder,
+    Daemon,
     Check,
 
     CommTest,

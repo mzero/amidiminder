@@ -33,10 +33,14 @@ NOTES
 
 [] reorg
     [x] rename command to daemon
-    [] move main and control commands out of MidiMinder class
-    [] refactor MidiMinder
+    [x] move main and control commands out of MidiMinder class
+    [x] refactor MidiMinder
     [] rename configRules in MM profileRules
     [] make the files be observed.rules and profile.rules
+    [] change commtest command on the wire from "ahoy" to "commtest"
+        [] find suitable haiku for the commtest command
+    [] make Files::initialize* idempotent
+        [] call from Client::Client() and Server::Server()
 
 [] command line and deamon communication
     [x] commtest command
@@ -44,6 +48,7 @@ NOTES
     [] reset command
     [] load command
     [] save command
+    [] command logging should be done by each command handler
 
 ## aconnect functionality
 
@@ -61,7 +66,6 @@ NOTES
     [] client wants to report and exit
     [] server wants to report and discard (aborting the command in progress)
 [] move verbox port details potion to the list command
-[] find suitable haiku for the commtest command
 [] harmonize CPP_FLAGS with what happens when built for deb
     [] fix CPP_FLAGS for debugging to -Og
 

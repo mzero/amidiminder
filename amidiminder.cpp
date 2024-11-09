@@ -90,6 +90,17 @@ namespace {
 class MidiMinder {
   private:
     Seq seq;
+    IPC::Server server;
+
+    ConnectionRules configRules;
+    std::string configRulesText;
+
+    ConnectionRules observedRules;
+    std::string observedRulesText;
+
+    std::map<snd_seq_addr_t, Address> activePorts;
+    std::map<snd_seq_connect_t, Reason> activeConnections;
+
 
   public:
     MidiMinder() {
@@ -100,7 +111,7 @@ class MidiMinder {
       seq.end();
     }
 
-
+  private:
     void handleSeqEvent(snd_seq_event_t& ev) {
       switch (ev.type) {
         case SND_SEQ_EVENT_CLIENT_START:
@@ -144,26 +155,26 @@ class MidiMinder {
       }
     }
 
+    void handleResetCommand(IPC::Connection& conn);
+    void handleLoadCommand(IPC::Connection& conn);
+    void handleSaveCommand(IPC::Connection& conn);
+    void handleCommTestCommand(IPC::Connection& conn);
+
     void handleConnection(IPC::Connection& conn) {
       std::string command = conn.receiveCommand();
       std::cout << "Received client command: " << command << std::endl;
 
-      if (command == "ahoy") {
-        std::string text =
-          "A sailor went to sea, sea, sea,\n"
-          "To see what he could see, see, see.\n"
-          "But all that he could see, see, see,\n"
-          "Was the bottom of the deep blue sea, sea, sea.\n";
-        std::istringstream file(text);
-        conn.sendFile(file);
-      }
-      else {
+      if      (command == "reset") handleResetCommand(conn);
+      else if (command == "load")  handleLoadCommand(conn);
+      else if (command == "save")  handleSaveCommand(conn);
+      else if (command == "ahoy")  handleCommTestCommand(conn);
+      else
         std::cerr << "No idea what to do with that!" << std::endl;
-      }
     }
 
+  public:
     void run() {
-      IPC::Server server;
+      readRules();
 
       seq.scanPorts([&](auto p){
         if (Args::outputPortDetails)
@@ -214,15 +225,7 @@ class MidiMinder {
       }
     }
 
-    ConnectionRules configRules;
-    std::string configRulesText;
-
-    ConnectionRules observedRules;
-    std::string observedRulesText;
-
-    std::map<snd_seq_addr_t, Address> activePorts;
-    std::map<snd_seq_connect_t, Reason> activeConnections;
-
+  private:
     Address knownPort(snd_seq_addr_t addr) {
       auto i = activePorts.find(addr);
       if (i == activePorts.end()) return {};
@@ -412,6 +415,65 @@ class MidiMinder {
 };
 
 
+void sendResetCommand() {
+  Files::initializeAsClient();
+
+  IPC::Client client;
+  client.sendCommand("reset");
+}
+
+void MidiMinder::handleResetCommand(IPC::Connection& conn) {
+  std::cerr << "Reset command recieved, but not yet handled" << std::endl;
+}
+
+void sendLoadCommand() {
+  Files::initializeAsClient();
+
+  IPC::Client client;
+  client.sendCommand("load");
+  // TODO: Send file 
+}
+
+void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
+  std::cerr << "Load command recieved, but not yet handled" << std::endl;
+}
+
+void sendSaveCommand() {
+  Files::initializeAsClient();
+
+  IPC::Client client;
+  client.sendCommand("save");
+  // TODO: receive file 
+}
+
+void MidiMinder::handleSaveCommand(IPC::Connection& conn) {
+  std::cerr << "Save command recieved, but not yet handled" << std::endl;
+}
+
+void sendCommTestCommand() {
+  Files::initializeAsClient();
+
+  IPC::Client client;
+  std::cout << "Sending ahoy..." << std::endl;
+  client.sendCommand("ahoy");
+  std::cout << "Waiting for file:" << std::endl;
+  std::cout << "--------" << std::endl;
+  client.receiveFile(std::cout);
+  std::cout << "--------" << std::endl;
+}
+
+void MidiMinder::handleCommTestCommand(IPC::Connection& conn) {
+  std::cerr << "Connection test command recieved" << std::endl;
+  std::string text =
+    "A sailor went to sea, sea, sea,\n"
+    "To see what he could see, see, see.\n"
+    "But all that he could see, see, see,\n"
+    "Was the bottom of the deep blue sea, sea, sea.\n";
+  std::istringstream file(text);
+  conn.sendFile(file);
+}
+
+
 int main(int argc, char *argv[]) {
   if (!Args::parse(argc, argv))
     return Args::exitCode;
@@ -433,21 +495,13 @@ int main(int argc, char *argv[]) {
       Files::initializeAsService();
 
       MidiMinder mm;
-      mm.readRules();
       mm.run();
       break;
     }
 
-    case Args::Command::CommTest: {
-      Files::initializeAsClient();
-      IPC::Client client;
-      std::cout << "Sending ahoy..." << std::endl;
-      client.sendCommand("ahoy");
-      std::cout << "Waiting for file:" << std::endl;
-      std::cout << "--------" << std::endl;
-      client.receiveFile(std::cout);
-      std::cout << "--------" << std::endl;
-    }
+    case Args::Command::CommTest:
+      sendCommTestCommand();
+      break;
   }
 
   return 0;

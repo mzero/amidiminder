@@ -23,14 +23,20 @@ NOTES
     [x] file reading & file writing utilities
     [x] check file actions
         [x] read from supplied path
-    [] handle "-" to mean stdin/stdout
-    [] minder file actions
-        [x] read state (profile & observed) on state on start
-        [] if state is missing, copy from /user/share/amidiminder/general.rules
-        [] write observed on changes
+    [x] read state (profile & observed) on state on start
     [] don't crash on empty statefiles... just be happy
+    [] write observed on changes
+    [] handle "-" to mean stdin/stdout
+    [] if state is missing:
+        [] write empty profile
+        [] ? copy from /user/share/amidiminder/general.rules
 
-[] move main and control commands out of MidiMinder class
+[] reorg
+    [] rename command to daemon
+    [] move main and control commands out of MidiMinder class
+    [] refactor MidiMinder
+    [] rename configRules in MM profileRules
+    [] make the files be observed.rules and profile.rules
 
 [] command line and deamon communication
     [x] commtest command
@@ -51,8 +57,6 @@ NOTES
 [] review all error messages
     [] leading case
     [] wording
-[] rename configRules in MM profileRules
-    [] make the files be observed.rules and profile.rules???
 [] handle socket errors in the IPC code intellegently
     [] client wants to report and exit
     [] server wants to report and discard (aborting the command in progress)

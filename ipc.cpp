@@ -161,6 +161,10 @@ namespace IPC {
   Server::Server() : Socket(makeSocket(true)) { }
   Server::~Server()                           { }
 
+  void Server::scanFDs(std::function<void(int)> fn) {
+    fn(sockFD);
+  }
+
   std::optional<Connection> Server::accept() {
     int connFD = ::accept(sockFD, NULL, NULL);
     if (connFD == -1) {

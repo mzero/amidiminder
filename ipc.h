@@ -2,6 +2,7 @@
 #define _INCLUDE_IPC_H_
 
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -74,6 +75,7 @@ namespace IPC {
       Server();
       ~Server();
 
+      void scanFDs(std::function<void(int)>);
       std::optional<Connection> accept();
   };
 }

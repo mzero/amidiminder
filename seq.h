@@ -53,6 +53,7 @@ class Seq {
 
     Address address(const snd_seq_addr_t&);
 
+    void scanFDs(std::function<void(int)>);
     snd_seq_event_t * eventInput();
       // if nullptr is returned, sleep and call again...
 

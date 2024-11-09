@@ -62,6 +62,14 @@ Address Seq::address(const snd_seq_addr_t& addr) {
             snd_seq_port_info_get_name(port));
 }
 
+void Seq::scanFDs(std::function<void(int)> fn) {
+  int npfd = snd_seq_poll_descriptors_count(seq, POLLIN);
+  auto pfds = (struct pollfd *)alloca(npfd * sizeof(struct pollfd));
+  npfd = snd_seq_poll_descriptors(seq, pfds, npfd, POLLIN);
+  for (int i = 0; i < npfd; ++i)
+    fn(pfds[i].fd);
+}
+
 snd_seq_event_t* Seq::eventInput() {
   if (snd_seq_event_input_pending(seq, 1) == 0)
     return nullptr;

@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <sys/epoll.h>
 
 #include "args.h"
 #include "files.h"
@@ -65,6 +66,23 @@ namespace {
     for (auto& r : rules)
       std::cout << "    " << r << std::endl;
   }
+
+  enum class FDSource : uint32_t {
+    Seq,
+    Server,
+  };
+
+  void addFDToEpoll(int epollFD, int fd, FDSource src) {
+    struct epoll_event evt;
+    evt.events = EPOLLIN | EPOLLERR;
+    evt.data.u32 = (uint32_t)src;
+
+    if (epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &evt) != 0) {
+      std::cerr << "Failed adding to epoll, " << strerror(errno) << std::endl;
+      exit(1);
+    }
+  }
+
 }
 
 
@@ -80,6 +98,50 @@ class MidiMinder {
 
     ~MidiMinder() {
       seq.end();
+    }
+
+
+    void handleSeqEvent(snd_seq_event_t& ev) {
+      switch (ev.type) {
+        case SND_SEQ_EVENT_CLIENT_START:
+        case SND_SEQ_EVENT_CLIENT_EXIT:
+        case SND_SEQ_EVENT_CLIENT_CHANGE:
+          break;
+
+        case SND_SEQ_EVENT_PORT_START: {
+          if (Args::outputPortDetails) {
+            seq.outputAddrDetails(std::cout, ev.data.addr);
+          }
+          addPort(ev.data.addr);
+          break;
+        }
+
+        case SND_SEQ_EVENT_PORT_EXIT: {
+          delPort(ev.data.addr);
+          break;
+        }
+
+        case SND_SEQ_EVENT_PORT_CHANGE: {
+          std::cout << "port change " << ev.data.addr << std::endl;
+          // FIXME: treat this as a add/remove?
+          break;
+        }
+
+        case SND_SEQ_EVENT_PORT_SUBSCRIBED: {
+          addConnection(ev.data.connect);
+          break;
+        }
+
+        case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: {
+          delConnection(ev.data.connect);
+          break;
+        }
+
+        default: {
+          std::cout << "unknown event ("
+              << std::dec << static_cast<int>(ev.type) << ")" << std::endl;
+        }
+      }
     }
 
     void handleConnection(IPC::Connection& conn) {
@@ -110,56 +172,44 @@ class MidiMinder {
       });
       seq.scanConnections([&](auto c){ this->addConnection(c); });
 
-      while (seq) {
-        snd_seq_event_t *ev = seq.eventInput();
-        if (!ev) {
-          auto conn = server.accept();
-          if (conn)
-            handleConnection(conn.value());
-          else
-            sleep(1);
+      int epollFD = epoll_create1(0);
+      if (epollFD == -1) {
+        auto errStr = strerror(errno);
+        std::cerr << "Couldn't create epoll, " << errStr << std::endl;
+        std::exit(1);
+      }
+
+      seq.scanFDs([epollFD](int fd){ addFDToEpoll(epollFD, fd, FDSource::Seq); });
+      server.scanFDs([epollFD](int fd){ addFDToEpoll(epollFD, fd, FDSource::Server); });
+
+      while (true) {
+        struct epoll_event evt;
+        int nfds = epoll_wait(epollFD, &evt, 1, -1);
+        if (nfds == -1) {
+          std::cerr << "Failed epoll_wait, " << strerror(errno) << std::endl;
+          exit(1);
+        };
+        if (nfds == 0)
           continue;
-        }
 
-        switch (ev->type) {
-          case SND_SEQ_EVENT_CLIENT_START:
-          case SND_SEQ_EVENT_CLIENT_EXIT:
-          case SND_SEQ_EVENT_CLIENT_CHANGE:
-            break;
-
-          case SND_SEQ_EVENT_PORT_START: {
-            if (Args::outputPortDetails) {
-              seq.outputAddrDetails(std::cout, ev->data.addr);
-            }
-            addPort(ev->data.addr);
+        switch ((FDSource)evt.data.u32) {
+          case FDSource::Server: {
+            auto conn = server.accept();
+            if (conn)
+              handleConnection(conn.value());
             break;
           }
 
-          case SND_SEQ_EVENT_PORT_EXIT: {
-            delPort(ev->data.addr);
+          case FDSource::Seq: {
+            snd_seq_event_t *ev = seq.eventInput();
+            if (ev)
+              handleSeqEvent(*ev);
             break;
           }
 
-          case SND_SEQ_EVENT_PORT_CHANGE: {
-            std::cout << "port change " << ev->data.addr << std::endl;
-            // FIXME: treat this as a add/remove?
+          default:
+            // should never happen... but who cares if it does!
             break;
-          }
-
-          case SND_SEQ_EVENT_PORT_SUBSCRIBED: {
-            addConnection(ev->data.connect);
-            break;
-          }
-
-          case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: {
-            delConnection(ev->data.connect);
-            break;
-          }
-
-          default: {
-            std::cout << "unknown event ("
-               << std::dec << static_cast<int>(ev->type) << ")" << std::endl;
-          }
         }
       }
     }

@@ -34,7 +34,7 @@ NOTES
 
 [] command line and deamon communication
     [x] commtest command
-    [] use poll or epoll with seq & the socket
+    [x] use poll or epoll with seq & the socket
     [] reset command
     [] load command
     [] save command

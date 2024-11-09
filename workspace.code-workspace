@@ -66,6 +66,7 @@
 			"compare": "cpp",
 			"concepts": "cpp",
 			"numbers": "cpp"
-		}
+		},
+		"C_Cpp.default.cppStandard": "c++17"
 	}
 }

@@ -28,6 +28,7 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 INC_FLAGS := $(addprefix -I,$(INCS))
 CPPFLAGS += $(INC_FLAGS)
+CPPFLAGS += -std=c++17
 CPPFLAGS += -MMD -MP
 CPPFLAGS += -fdata-sections -ffunction-sections
 CPPFLAGS += -O2

@@ -63,6 +63,9 @@ Address Seq::address(const snd_seq_addr_t& addr) {
 }
 
 snd_seq_event_t* Seq::eventInput() {
+  if (snd_seq_event_input_pending(seq, 1) == 0)
+    return nullptr;
+
   snd_seq_event_t *ev;
   auto q = snd_seq_event_input(seq, &ev);
 

@@ -20,7 +20,7 @@ install:
 	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET) $(DESTDIR)$(BINARY_DIR)/
 	$(INSTALL_DATA) $(TARGET).rules $(DESTDIR)$(CONF_DIR)/
 
-SRCS := amidiminder.cpp args.cpp files.cpp rule.cpp seq.cpp
+SRCS := amidiminder.cpp args.cpp files.cpp ipc.cpp rule.cpp seq.cpp
 INCS :=
 LIBS := stdc++ asound
 
@@ -58,6 +58,17 @@ deb-clean:
 
 test: $(BUILD_DIR)/$(TARGET)
 	$(BUILD_DIR)/$(TARGET) check test.rules && echo PASS || echo FAIL
+
+TEST_DIR=/tmp/amidiminder-test
+TEST_RUNTIME_DIR=$(TEST_DIR)/runtime
+TEST_STATE_DIR=$(TEST_DIR)/state
+
+test-shell:
+	$(MKDIR_P) $(TEST_RUNTIME_DIR)
+	$(MKDIR_P) $(TEST_STATE_DIR)
+	touch $(TEST_STATE_DIR)/rules
+	touch $(TEST_STATE_DIR)/observed
+	STATE_DIRECTORY=$(TEST_STATE_DIR) RUNTIME_DIRECTORY=$(TEST_RUNTIME_DIR) $$SHELL -i
 
 DEPS := $(OBJS:.o=.d)
 

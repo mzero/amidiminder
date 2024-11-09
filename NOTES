@@ -5,7 +5,7 @@ NOTES
 
 ## state and profiles
 
-[] command line change to commands
+[x] command line change to commands
     [x] modes
     [x] minder command
     [x] check command
@@ -13,7 +13,7 @@ NOTES
     [x] help subcommand
     [x] add ExistingPathValidator() to rules file arguments
     [x] version flag? (set_version_flag())
-    [] load rules only after command is switched
+    [x] load rules only after command is switched
 
 
 [] file locations in code somewhere
@@ -28,11 +28,13 @@ NOTES
         [x] read state (profile & observed) on state on start
         [] if state is missing, copy from /user/share/amidiminder/general.rules
         [] write observed on changes
+    [] don't crash on empty statefiles... just be happy
 
 [] move main and control commands out of MidiMinder class
 
 [] command line and deamon communication
-    [] echo command
+    [x] commtest command
+    [] use poll or epoll with seq & the socket
     [] reset command
     [] load command
     [] save command
@@ -51,7 +53,9 @@ NOTES
     [] wording
 [] rename configRules in MM profileRules
     [] make the files be observed.rules and profile.rules???
-
+[] handle socket errors in the IPC code intellegently
+    [] client wants to report and exit
+    [] server wants to report and discard (aborting the command in progress)
 
 
 # MAJOR THEMES

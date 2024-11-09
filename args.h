@@ -9,6 +9,8 @@ namespace Args {
     Help,
     Minder,
     Check,
+
+    CommTest,
   };
   extern Command command;
 

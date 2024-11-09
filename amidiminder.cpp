@@ -9,6 +9,7 @@
 
 #include "args.h"
 #include "files.h"
+#include "ipc.h"
 #include "rule.h"
 #include "seq.h"
 
@@ -81,7 +82,27 @@ class MidiMinder {
       seq.end();
     }
 
+    void handleConnection(IPC::Connection& conn) {
+      std::string command = conn.receiveCommand();
+      std::cout << "Received client command: " << command << std::endl;
+
+      if (command == "ahoy") {
+        std::string text =
+          "A sailor went to sea, sea, sea,\n"
+          "To see what he could see, see, see.\n"
+          "But all that he could see, see, see,\n"
+          "Was the bottom of the deep blue sea, sea, sea.\n";
+        std::istringstream file(text);
+        conn.sendFile(file);
+      }
+      else {
+        std::cerr << "No idea what to do with that!" << std::endl;
+      }
+    }
+
     void run() {
+      IPC::Server server;
+
       seq.scanPorts([&](auto p){
         if (Args::outputPortDetails)
           seq.outputAddrDetails(std::cout, p);
@@ -92,7 +113,11 @@ class MidiMinder {
       while (seq) {
         snd_seq_event_t *ev = seq.eventInput();
         if (!ev) {
-          sleep(1);
+          auto conn = server.accept();
+          if (conn)
+            handleConnection(conn.value());
+          else
+            sleep(1);
           continue;
         }
 
@@ -356,11 +381,22 @@ int main(int argc, char *argv[]) {
 
     case Args::Command::Minder: {
       Files::initializeAsService();
-      
+
       MidiMinder mm;
       mm.readRules();
       mm.run();
       break;
+    }
+
+    case Args::Command::CommTest: {
+      Files::initializeAsClient();
+      IPC::Client client;
+      std::cout << "Sending ahoy..." << std::endl;
+      client.sendCommand("ahoy");
+      std::cout << "Waiting for file:" << std::endl;
+      std::cout << "--------" << std::endl;
+      client.receiveFile(std::cout);
+      std::cout << "--------" << std::endl;
     }
   }
 

@@ -33,6 +33,10 @@ namespace Args {
     checkApp->add_option("rules-file", rulesFilePath, "Rules file to check")
       ->required();
 
+    CLI::App *commTestApp = app.add_subcommand("commtest,comm-test", "Test communication with the minder service");
+    commTestApp->parse_complete_callback([](){ command = Command::CommTest; });
+    commTestApp->group(""); // hide from help
+
     try {
         app.parse(argc, argv);
         if (command == Command::Help) {

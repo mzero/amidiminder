@@ -278,7 +278,7 @@ namespace {
 }
 
 
-bool parseRulesFile(std::istream& input, ConnectionRules& rules) {
+bool parseRules(std::istream& input, ConnectionRules& rules) {
   int lineNo = 1;
   bool good = true;
   for (std::string line; std::getline(input, line); ++lineNo) {
@@ -294,4 +294,8 @@ bool parseRulesFile(std::istream& input, ConnectionRules& rules) {
   return good;
 }
 
+bool parseRules(std::string input, ConnectionRules& rules) {
+  std::istringstream stream(input);
+  return parseRules(stream, rules);
+}
 

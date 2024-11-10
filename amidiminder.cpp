@@ -53,15 +53,17 @@ namespace {
       return;
     }
 
-    contents = Files::readFile(filePath);
+    std::string newContents = Files::readFile(filePath);
     std::cout << "reading rules from " << filePath << std::endl;
 
-    rules.clear();
-    std::istringstream rulesStream(contents);
-    if (!parseRulesFile(rulesStream, rules)) {
+    ConnectionRules newRules;
+    if (!parseRules(newContents, newRules)) {
       std::cerr << "parse error reading rules" << std::endl;
       std::exit(1);
     }
+
+    contents.swap(newContents);
+    rules.swap(newRules);
 
     std::cout << "read " << rules.size() << " rules" << std::endl;
     for (auto& r : rules)

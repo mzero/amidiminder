@@ -100,7 +100,8 @@ class ConnectionRule {
 
 using ConnectionRules = std::vector<ConnectionRule>;
 
-bool parseRulesFile(std::istream& input, ConnectionRules& rules);
+bool parseRules(std::istream& input, ConnectionRules& rules);
+bool parseRules(std::string input, ConnectionRules& rules);
 
 
 inline std::ostream& operator<<(std::ostream& s, const ClientSpec& c)

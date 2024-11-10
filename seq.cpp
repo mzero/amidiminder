@@ -167,6 +167,18 @@ void Seq::connect(const snd_seq_addr_t& sender, const snd_seq_addr_t& dest) {
   errCheck(serr, "subscribe");
 }
 
+void Seq::disconnect(const snd_seq_connect_t& conn) {
+  snd_seq_port_subscribe_t *subs;
+  snd_seq_port_subscribe_alloca(&subs);
+  snd_seq_port_subscribe_set_sender(subs, &conn.sender);
+  snd_seq_port_subscribe_set_dest(subs, &conn.dest);
+
+  int serr;
+  serr = snd_seq_unsubscribe_port(seq, subs);
+  if (serr == -ENOENT) return;  // connection not found
+  errCheck(serr, "unsubscribe");
+}
+
 
 bool Seq::errCheck(int serr, const char* op) {
   if (serr >= 0) return false;

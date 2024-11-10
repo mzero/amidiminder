@@ -60,6 +60,7 @@ class Seq {
     void scanPorts(std::function<void(const snd_seq_addr_t&)>);
     void scanConnections(std::function<void(const snd_seq_connect_t&)>);
     void connect(const snd_seq_addr_t& sender, const snd_seq_addr_t& dest);
+    void disconnect(const snd_seq_connect_t& conn);
 
     bool errCheck(int serr, const char* op);
     bool errFatal(int serr, const char* op);

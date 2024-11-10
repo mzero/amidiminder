@@ -50,6 +50,7 @@ namespace {
       std::cout << "rules file " << filePath << " doesn't exist, no rules read" << std::endl;
       contents.clear();
       rules.clear();
+      return;
     }
 
     contents = Files::readFile(filePath);
@@ -404,11 +405,6 @@ class MidiMinder {
     }
 
     void readRules() {
-      if (!Files::fileExists(Files::profileFilePath())) {
-        // TODO: try copying the default rules from, say, /usr/share/
-        // for now, do nothing
-      }
-
       ::readRules(Files::profileFilePath(), profileText, profileRules);
       ::readRules(Files::observedFilePath(), observedText, observedRules);
     }

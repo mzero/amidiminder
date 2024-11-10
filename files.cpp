@@ -85,7 +85,7 @@ namespace Files {
   bool fileExists(const std::string& path) {
     struct stat statbuf;
     auto err = stat(path.c_str(), &statbuf);
-    if (err == ENOENT) return false;
+    if (err < 0 && errno == ENOENT) return false;
     errCheck(err, "Checking", path);
 
     if ((statbuf.st_mode & S_IFMT) != S_IFREG) {

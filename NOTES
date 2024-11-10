@@ -24,12 +24,9 @@ NOTES
     [x] check file actions
         [x] read from supplied path
     [x] read state (profile & observed) on state on start
-    [] don't crash on empty statefiles... just be happy
+    [x] don't crash on empty statefiles... just be happy
     [] write observed on changes
     [] handle "-" to mean stdin/stdout
-    [] if state is missing:
-        [] write empty profile
-        [] ? copy from /user/share/amidiminder/general.rules
 
 [] reorg
     [x] rename command to daemon

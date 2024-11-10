@@ -74,8 +74,6 @@ $(BUILD_DIR)/test-env:
 test-shell: $(BUILD_DIR)/test-env
 	$(MKDIR_P) $(TEST_RUNTIME_DIR)
 	$(MKDIR_P) $(TEST_STATE_DIR)
-	touch $(TEST_STATE_DIR)/profile.rules
-	touch $(TEST_STATE_DIR)/observed.rules
 	$$SHELL --rcfile $(BUILD_DIR)/test-env || true
 
 

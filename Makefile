@@ -59,16 +59,27 @@ deb-clean:
 test: $(BUILD_DIR)/$(TARGET)
 	$(BUILD_DIR)/$(TARGET) check test.rules && echo PASS || echo FAIL
 
+
+# test shell with runtime and state directories in /tmp
+
 TEST_DIR=/tmp/amidiminder-test
 TEST_RUNTIME_DIR=$(TEST_DIR)/runtime
 TEST_STATE_DIR=$(TEST_DIR)/state
 
-test-shell:
+$(BUILD_DIR)/test-env:
+	echo PS1="'(amidiminder test): '" > $@
+	echo export STATE_DIRECTORY=$(TEST_STATE_DIR) >> $@
+	echo export RUNTIME_DIRECTORY=$(TEST_RUNTIME_DIR) >> $@
+
+test-shell: $(BUILD_DIR)/test-env
 	$(MKDIR_P) $(TEST_RUNTIME_DIR)
 	$(MKDIR_P) $(TEST_STATE_DIR)
 	touch $(TEST_STATE_DIR)/profile.rules
 	touch $(TEST_STATE_DIR)/observed.rules
-	STATE_DIRECTORY=$(TEST_STATE_DIR) RUNTIME_DIRECTORY=$(TEST_RUNTIME_DIR) $$SHELL -i
+	$$SHELL --rcfile $(BUILD_DIR)/test-env || true
+
+
+# dependencies
 
 DEPS := $(OBJS:.o=.d)
 

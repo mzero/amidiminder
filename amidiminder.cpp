@@ -487,9 +487,10 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-    case Args::Command::CommTest:
-      sendCommTestCommand();
-      break;
+    case Args::Command::Reset:      sendResetCommand();     break;
+    case Args::Command::Load:       sendLoadCommand();      break;
+    case Args::Command::Save:       sendSaveCommand();      break;
+    case Args::Command::CommTest:   sendCommTestCommand();  break;
   }
 
   return 0;

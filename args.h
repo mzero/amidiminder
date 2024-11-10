@@ -10,6 +10,10 @@ namespace Args {
     Daemon,
     Check,
 
+    Reset,
+    Load,
+    Save,
+
     CommTest,
   };
   extern Command command;

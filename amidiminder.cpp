@@ -416,8 +416,6 @@ class MidiMinder {
 
 
 void sendResetCommand() {
-  Files::initializeAsClient();
-
   IPC::Client client;
   client.sendCommand("reset");
 }
@@ -427,8 +425,6 @@ void MidiMinder::handleResetCommand(IPC::Connection& conn) {
 }
 
 void sendLoadCommand() {
-  Files::initializeAsClient();
-
   IPC::Client client;
   client.sendCommand("load");
   // TODO: Send file
@@ -439,8 +435,6 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
 }
 
 void sendSaveCommand() {
-  Files::initializeAsClient();
-
   IPC::Client client;
   client.sendCommand("save");
   // TODO: receive file
@@ -451,8 +445,6 @@ void MidiMinder::handleSaveCommand(IPC::Connection& conn) {
 }
 
 void sendCommTestCommand() {
-  Files::initializeAsClient();
-
   IPC::Client client;
   std::cout << "Sending ahoy..." << std::endl;
   client.sendCommand("ahoy");
@@ -492,8 +484,6 @@ int main(int argc, char *argv[]) {
     }
 
     case Args::Command::Daemon: {
-      Files::initializeAsService();
-
       MidiMinder mm;
       mm.run();
       break;

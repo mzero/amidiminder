@@ -10,6 +10,9 @@
 
 namespace {
   int makeSocket(bool server) {
+    if (server) Files::initializeAsService();
+    else        Files::initializeAsClient();
+
     int sockType = server ? (SOCK_STREAM | SOCK_NONBLOCK) : SOCK_STREAM;
 
     int sockFD = socket(AF_UNIX, sockType, 0);

@@ -38,10 +38,9 @@ NOTES
     [x] rename configRules in MM profileRules
     [x] make the files be observed.rules and profile.rules
         [x] socket should be control.socket
+    [x] move Files::initialize* into IPC code
     [] change commtest command on the wire from "ahoy" to "commtest"
         [] find suitable haiku for the commtest command
-    [] make Files::initialize* idempotent
-        [] call from Client::Client() and Server::Server()
 
 [] command line and deamon communication
     [x] commtest command

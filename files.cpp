@@ -9,7 +9,7 @@
 
 namespace {
 
-  std::string rulesFilePath;
+  std::string profileFilePath;
   std::string observedFilePath;
 
   std::string controlSocketPath;
@@ -67,10 +67,10 @@ namespace {
         "/run/amidiminder",
         checkForPresence);
 
-    rulesFilePath     = stateDirPath + "/rules";
-    observedFilePath  = stateDirPath + "/observed";
+    profileFilePath   = stateDirPath + "/profile.rules";
+    observedFilePath  = stateDirPath + "/observed.rules";
 
-    controlSocketPath = runtimeDirPath + "/control";
+    controlSocketPath = runtimeDirPath + "/control.socket";
   }
 }
 
@@ -78,7 +78,7 @@ namespace Files {
   void initializeAsClient()   { initialize(false); }
   void initializeAsService()  { initialize(true); }
 
-  const std::string& rulesFilePath()      { return ::rulesFilePath; }
+  const std::string& profileFilePath()    { return ::profileFilePath; }
   const std::string& observedFilePath()   { return ::observedFilePath; }
   const std::string& controlSocketPath()  { return ::controlSocketPath; }
 

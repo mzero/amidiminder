@@ -66,8 +66,8 @@ TEST_STATE_DIR=$(TEST_DIR)/state
 test-shell:
 	$(MKDIR_P) $(TEST_RUNTIME_DIR)
 	$(MKDIR_P) $(TEST_STATE_DIR)
-	touch $(TEST_STATE_DIR)/rules
-	touch $(TEST_STATE_DIR)/observed
+	touch $(TEST_STATE_DIR)/profile.rules
+	touch $(TEST_STATE_DIR)/observed.rules
 	STATE_DIRECTORY=$(TEST_STATE_DIR) RUNTIME_DIRECTORY=$(TEST_RUNTIME_DIR) $$SHELL -i
 
 DEPS := $(OBJS:.o=.d)

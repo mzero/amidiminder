@@ -92,11 +92,11 @@ class MidiMinder {
     Seq seq;
     IPC::Server server;
 
-    ConnectionRules configRules;
-    std::string configRulesText;
+    ConnectionRules profileRules;
+    std::string profileText;
 
     ConnectionRules observedRules;
-    std::string observedRulesText;
+    std::string observedText;
 
     std::map<snd_seq_addr_t, Address> activePorts;
     std::map<snd_seq_connect_t, Reason> activeConnections;
@@ -312,7 +312,7 @@ class MidiMinder {
         makeConnection(cc, Reason::observed);
 
       candidates.clear();
-      connectByRule(a, configRules, candidates);
+      connectByRule(a, profileRules, candidates);
       for (auto& cc : candidates) {
         bool alreadyConnected = false;
 
@@ -404,13 +404,13 @@ class MidiMinder {
     }
 
     void readRules() {
-      if (!Files::fileExists(Files::rulesFilePath())) {
+      if (!Files::fileExists(Files::profileFilePath())) {
         // TODO: try copying the default rules from, say, /usr/share/
         // for now, do nothing
       }
 
-      ::readRules(Files::rulesFilePath(), configRulesText, configRules);
-      ::readRules(Files::observedFilePath(), observedRulesText, observedRules);
+      ::readRules(Files::profileFilePath(), profileText, profileRules);
+      ::readRules(Files::observedFilePath(), observedText, observedRules);
     }
 };
 
@@ -431,7 +431,7 @@ void sendLoadCommand() {
 
   IPC::Client client;
   client.sendCommand("load");
-  // TODO: Send file 
+  // TODO: Send file
 }
 
 void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
@@ -443,7 +443,7 @@ void sendSaveCommand() {
 
   IPC::Client client;
   client.sendCommand("save");
-  // TODO: receive file 
+  // TODO: receive file
 }
 
 void MidiMinder::handleSaveCommand(IPC::Connection& conn) {

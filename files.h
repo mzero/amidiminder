@@ -7,7 +7,7 @@ namespace Files {
   void initializeAsService();
   void initializeAsClient();
 
-  const std::string& rulesFilePath();
+  const std::string& profileFilePath();
   const std::string& observedFilePath();
 
   const std::string& controlSocketPath();

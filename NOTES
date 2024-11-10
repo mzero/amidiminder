@@ -35,8 +35,9 @@ NOTES
     [x] rename command to daemon
     [x] move main and control commands out of MidiMinder class
     [x] refactor MidiMinder
-    [] rename configRules in MM profileRules
-    [] make the files be observed.rules and profile.rules
+    [x] rename configRules in MM profileRules
+    [x] make the files be observed.rules and profile.rules
+        [x] socket should be control.socket
     [] change commtest command on the wire from "ahoy" to "commtest"
         [] find suitable haiku for the commtest command
     [] make Files::initialize* idempotent
@@ -140,7 +141,7 @@ in the app, if not set, default these to
     /var/lib/amidiminder
 
 Then use files as follows:
-    ${RUNTIME_DIRECTORY}/cmd    -- socket to minder if running
-    ${RUNTIME_STATE}/rules      -- fixed rules (copies when user asked)
-    ${RUNTIME_STATE}/observed   -- observed connections & disconnects
+    ${RUNTIME_DIRECTORY}/control.socket -- socket to minder if running
+    ${STATE_DIRECTORY}/profile.rules    -- fixed rules (copies when user asked)
+    ${STATE_DIRECTORY}/observed.rules   -- observed connections & disconnects
 

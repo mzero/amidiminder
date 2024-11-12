@@ -25,8 +25,9 @@ NOTES
         [x] read from supplied path
     [x] read state (profile & observed) on state on start
     [x] don't crash on empty statefiles... just be happy
-    [] write observed on changes
+    [x] write observed on changes
     [] handle "-" to mean stdin/stdout
+    [] safe file write code (write to .save, rename)
 
 [] reorg
     [x] rename command to daemon
@@ -42,10 +43,15 @@ NOTES
 [] command line and deamon communication
     [x] commtest command
     [x] use poll or epoll with seq & the socket
-    [] reset command
-    [] load command
+    [x] reset command
+    [x] load command
     [] save command
     [] command logging should be done by each command handler
+
+[] new observed connection/disconnection logic
+    [x] reset on start
+    [] don't rebuild ports on reset - should be no need
+    [] correctly adjusting observed rules if needed
 
 ## aconnect functionality
 
@@ -62,9 +68,15 @@ NOTES
 [] handle socket errors in the IPC code intellegently
     [] client wants to report and exit
     [] server wants to report and discard (aborting the command in progress)
-[] move verbox port details potion to the list command
+    [] calls to write in ipc.cpp should have the return value checked
+[] move verbose port details option to the list command
 [x] harmonize CPP_FLAGS with what happens when built for deb
     [] fix CPP_FLAGS for debugging to -Og
+[] group subcommands in Args to make help more clear
+[] print rules when loading profile?
+[] optimize saving observedRules
+
+
 
 # MAJOR THEMES
 
@@ -141,3 +153,25 @@ Then use files as follows:
     ${STATE_DIRECTORY}/profile.rules    -- fixed rules (copies when user asked)
     ${STATE_DIRECTORY}/observed.rules   -- observed connections & disconnects
 
+
+
+# ALGOS
+
+add port
+    build a list of candidates:
+        for each rule
+            consider this port as a sender against all possible dests
+            consider this port as a dest against all possible senders
+                for each of these that match the rule
+                    if connect rule, add to candidates if absent
+                    if no-connect rule, remove from candidates
+    for each candidate
+        if wild card
+            consider if any other connection, with these clients (not ports!)
+            matches the rule, and if so, skip this candidate
+        make connection
+
+del port
+    remove all known connections with this port
+
+reset (& startup)

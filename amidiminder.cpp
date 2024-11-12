@@ -175,16 +175,54 @@ class MidiMinder {
         std::cerr << "No idea what to do with that!" << std::endl;
     }
 
+  void saveObserved() {
+    std::ostringstream text;
+    for (auto& r : observedRules)
+      text << r << '\n';
+    observedText = text.str();
+    Files::writeFile(Files::observedFilePath(), observedText);
+  }
+
+  void clearObserved() {
+    observedText.clear();
+    observedRules.clear();
+    saveObserved();
+  }
+
+
+  void resetConnections() {
+    activePorts.clear();
+    activeConnections.clear();
+
+    std::vector<snd_seq_connect_t> doomed;
+      // a little afraid to disconnect connections while scanning them!
+    seq.scanConnections([&](auto c){
+      Address sender = seq.address(c.sender);
+      Address dest = seq.address(c.dest);
+      if (sender && dest) // both ports must be not ignored
+        doomed.push_back(c);
+    });
+    for (auto& c : doomed) {
+      seq.disconnect(c);
+    }
+
+    seq.scanPorts([&](auto p){
+      if (Args::outputPortDetails)
+        seq.outputAddrDetails(std::cout, p);
+      this->addPort(p);
+    });
+  }
+
+  void resetToProfile() {
+    clearObserved();
+    resetConnections();
+  }
+
+
   public:
     void run() {
       readRules();
-
-      seq.scanPorts([&](auto p){
-        if (Args::outputPortDetails)
-          seq.outputAddrDetails(std::cout, p);
-        this->addPort(p);
-      });
-      seq.scanConnections([&](auto c){ this->addConnection(c); });
+      resetConnections();
 
       int epollFD = epoll_create1(0);
       if (epollFD == -1) {
@@ -418,27 +456,55 @@ void sendResetCommand() {
 }
 
 void MidiMinder::handleResetCommand(IPC::Connection& conn) {
-  std::cerr << "Reset command recieved, but not yet handled" << std::endl;
+  std::cerr << "Reset to current profile" << std::endl;
+  resetToProfile();
 }
 
 void sendLoadCommand() {
+  std::string newContents = Files::readFile(Args::rulesFilePath);
+  ConnectionRules newRules;
+  if (!parseRules(newContents, newRules))
+    std::exit(1);
+
   IPC::Client client;
   client.sendCommand("load");
-  // TODO: Send file
+
+  std::istringstream newFile(newContents);
+  client.sendFile(newFile);
 }
 
 void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
-  std::cerr << "Load command recieved, but not yet handled" << std::endl;
+  std::stringstream newFile;
+  conn.receiveFile(newFile);
+
+  std::string newContents = newFile.str();
+  ConnectionRules newRules;
+  if (!parseRules(newFile, newRules)) {
+    std::cerr << "Received profile rules didn't parse, ignoring." << std::endl;
+    return;
+  }
+
+  Files::writeFile(Files::profileFilePath(), newContents);
+  profileText.swap(newContents);
+  profileRules.swap(newRules);
+
+  std::cerr << "Resetting to new profile, ";
+  for (auto& r : profileRules)
+    std::cout << "    " << r << std::endl;
+
+  resetToProfile();
 }
 
 void sendSaveCommand() {
   IPC::Client client;
   client.sendCommand("save");
-  // TODO: receive file
+  // TODO: write file
 }
 
 void MidiMinder::handleSaveCommand(IPC::Connection& conn) {
   std::cerr << "Save command recieved, but not yet handled" << std::endl;
+  // TODO: build concatenation of profileContents and observedContents
+  // TODO: send file
 }
 
 void sendCommTestCommand() {

@@ -36,7 +36,11 @@ namespace {
 
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
-    strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path));
+    strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
+    if (path.length() > sizeof(addr.sun_path) - 1) {
+        std::cerr << "Socket path is too long " << path << std::endl;
+        std::exit(1);
+    }
 
     if (server) {
       if (bind(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0) {

@@ -111,70 +111,29 @@ NOTES
 # DESIGN
 
 Two rules files:
-    Fixed
+    Profile
         come from user
         symlink from /etc/amidiminder.rules to ???
         how to recognize chances in rules?
             - observe file change?
             - command to switch the symlink?
             - signal to reload?
-    Live
+    Observed
         from observations of connects and disconnects
-        relative to the Fixed rules
-            a connect that the Fixed rules would make won't be recorded
-            has to be able to record overrides of the Fixed rules
+        relative to the Profile rules
+            a connect that the Profile rules would make won't be recorded
+            has to be able to record overrides of the Profile rules
 
     Static & Dynamic?
 
 Modes:
-    minder          - like the current operation
+    daemon          - like the current operation
     connect         - make a connection, the minder will see it
     disconnect      - break a connection, the minder will see it
-    reset           - clear the live rules, reset to only connections from Fixed
-    load            - set new Fixed rules & reset
-    save            - save the current Fixed & Live rules as new single rules file
+    reset           - clear the live rules, reset to only connections from Profile
+    load            - set new Profile rules & reset
+    save            - save the current Profile & Observed rules as new single rules file
     check           - check rule set file
     list            - show devices, ports, and connections
 
 
-
-in service file
-
-RuntimeDirectory=amidiminder
-StateDirectory=amidiminder
-
-these set environment variables
-    $RUNTIME_DIRECTORY
-    $STATE_DIRECTORY
-
-in the app, if not set, default these to
-    /run/amidiminder
-    /var/lib/amidiminder
-
-Then use files as follows:
-    ${RUNTIME_DIRECTORY}/control.socket -- socket to minder if running
-    ${STATE_DIRECTORY}/profile.rules    -- fixed rules (copies when user asked)
-    ${STATE_DIRECTORY}/observed.rules   -- observed connections & disconnects
-
-
-
-# ALGOS
-
-add port
-    build a list of candidates:
-        for each rule
-            consider this port as a sender against all possible dests
-            consider this port as a dest against all possible senders
-                for each of these that match the rule
-                    if connect rule, add to candidates if absent
-                    if no-connect rule, remove from candidates
-    for each candidate
-        if wild card
-            consider if any other connection, with these clients (not ports!)
-            matches the rule, and if so, skip this candidate
-        make connection
-
-del port
-    remove all known connections with this port
-
-reset (& startup)

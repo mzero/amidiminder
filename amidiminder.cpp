@@ -215,8 +215,7 @@ class MidiMinder {
           }
 
           case FDSource::Seq: {
-            snd_seq_event_t *ev = seq.eventInput();
-            if (ev)
+            while (snd_seq_event_t* ev = seq.eventInput())
               handleSeqEvent(*ev);
             break;
           }

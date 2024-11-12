@@ -70,6 +70,15 @@ namespace {
       std::cout << "    " << r << std::endl;
   }
 
+  ConnectionRules::const_iterator
+  findRule(const ConnectionRules& rules,
+    const Address& sender, const Address& dest)
+  {
+    auto r = std::find_if(rules.rbegin(), rules.rend(),
+      [&](const ConnectionRule& r){ return r.match(sender, dest); });
+    return r == rules.rend() ? rules.end() : std::next(r).base();
+  }
+
   enum class FDSource : uint32_t {
     Seq,
     Server,
@@ -347,12 +356,8 @@ class MidiMinder {
       std::cout << "port added " << a << std::endl;
 
       CandidateConnections candidates;
-      connectByRule(a, observedRules, candidates);
-      for (auto& cc : candidates)
-        makeConnection(cc, Reason::observed);
-
-      candidates.clear();
       connectByRule(a, profileRules, candidates);
+      connectByRule(a, observedRules, candidates);
       for (auto& cc : candidates) {
         bool alreadyConnected = false;
 
@@ -416,31 +421,64 @@ class MidiMinder {
         return;
 
       activeConnections[conn] = Reason::observed;
+
+      auto oRule = findRule(observedRules, sender, dest);
+      if (oRule == observedRules.end())    ; // just continue onward
+      else if (!oRule->isBlockingRule())    return; // already known
+      else {
+        observedRules.erase(oRule);
+        saveObserved();
+        // and continue onward
+      }
+
+      auto pRule = findRule(profileRules, sender , dest);
+      if (pRule == profileRules.end())     ; // just continue onward
+      else if (!pRule->isBlockingRule())    return; // already known
+      else                                  ; // just continue ownard
+
+      // At this point, no rule would add this connection,
+      // so add an observed rule for it.
       ConnectionRule c = ConnectionRule::exact(sender, dest);
       observedRules.push_back(c);
+      saveObserved();
       std::cout << "observed connection " << c << std::endl;
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
+      // TODO: did we expect this disconnection? do nothing, we made it
+
       auto i = activeConnections.find(conn);
       if (i == activeConnections.end())
         // don't know anything about this connection
         return;
+      activeConnections.erase(i);
 
       Address sender = seq.address(conn.sender);
       Address dest = seq.address(conn.dest);
-      std::cout << "observed disconnection "
-        << sender << " --> " << dest << std::endl;
+      if (!sender || !dest) // if either is an ignored port, ignore this
+        return;
 
-      if (i->second == Reason::observed) {
-        observedRules.erase(
-        std::remove_if(observedRules.begin(), observedRules.end(),
-            [&](auto r){ return r.match(sender, dest); }),
-          observedRules.end()
-        );
+      auto oRule = findRule(observedRules, sender, dest);
+      if (oRule == observedRules.end())    ; // just continue onward
+      else if (oRule->isBlockingRule())     return; // already blocked
+      else {
+        observedRules.erase(oRule);
+        saveObserved();
+        // and continue onward
       }
 
-      activeConnections.erase(i);
+      auto pRule = findRule(profileRules, sender , dest);
+      if (pRule == profileRules.end())   return; // no rule would ever add it
+      else if (pRule->isBlockingRule())   return; // already known
+      else                                ; // just continue onward
+
+      // At this point there is a profileRule that would make this connection,
+      // so add an observed rule to block it.
+      ConnectionRule c = ConnectionRule::exactBlock(sender, dest);
+      observedRules.push_back(c);
+      saveObserved();
+
+      std::cout << "observed disconnection " << c;
     }
 
     void readRules() {

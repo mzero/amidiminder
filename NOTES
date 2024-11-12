@@ -50,8 +50,10 @@ NOTES
 
 [] new observed connection/disconnection logic
     [x] reset on start
-    [] don't rebuild ports on reset - should be no need
     [] correctly adjusting observed rules if needed
+    [] improve messages to the log on adding / removing observed rules
+    [] checking for rule consistency
+    [] expected disconnect optimization
 
 ## aconnect functionality
 
@@ -75,6 +77,7 @@ NOTES
 [] group subcommands in Args to make help more clear
 [] print rules when loading profile?
 [] optimize saving observedRules
+[] don't rebuild ports on reset - should be no need
 
 
 

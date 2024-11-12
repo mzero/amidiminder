@@ -63,7 +63,7 @@ NOTES
     [] client wants to report and exit
     [] server wants to report and discard (aborting the command in progress)
 [] move verbox port details potion to the list command
-[] harmonize CPP_FLAGS with what happens when built for deb
+[x] harmonize CPP_FLAGS with what happens when built for deb
     [] fix CPP_FLAGS for debugging to -Og
 
 # MAJOR THEMES

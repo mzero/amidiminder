@@ -28,10 +28,12 @@ OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
 INC_FLAGS := $(addprefix -I,$(INCS))
 CPPFLAGS += $(INC_FLAGS)
+CPPFLAGS += -Wdate-time -D_FORTIFY_SOURCE=2
 CPPFLAGS += -std=c++17
 CPPFLAGS += -MMD -MP
 CPPFLAGS += -fdata-sections -ffunction-sections
 CPPFLAGS += -O2
+CPPFLAGS += -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -mbranch-protection=standard -Wall -pedantic
 
 LDFLAGS += -Wl,--gc-sections $(addprefix -l,$(LIBS))
 

@@ -79,6 +79,7 @@ class ConnectionRule {
     ConnectionRule(const AddressSpec&, const AddressSpec&, bool);
 
     static ConnectionRule exact(const Address&, const Address&);
+    static ConnectionRule exactBlock(const Address&, const Address&);
 
     bool isBlockingRule() const { return blocking; }
 

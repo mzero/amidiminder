@@ -141,6 +141,9 @@ ConnectionRule::ConnectionRule(
 ConnectionRule ConnectionRule::exact(const Address& s, const Address& d)
   { return ConnectionRule(AddressSpec::exact(s), AddressSpec::exact(d), false); }
 
+ConnectionRule ConnectionRule::exactBlock(const Address& s, const Address& d)
+  { return ConnectionRule(AddressSpec::exact(s), AddressSpec::exact(d), true); }
+
 void ConnectionRule::output(std::ostream& s) const
   { s << sender << (blocking ? " -x-> " : " --> ") << dest; }
 

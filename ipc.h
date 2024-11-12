@@ -25,6 +25,7 @@ namespace IPC {
       void close();
       void invalidate();
 
+      void write(const char*, size_t);
       void sendLine(const std::string&);
       std::string receiveLine();
 

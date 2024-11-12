@@ -96,11 +96,25 @@ namespace IPC {
     invalidate();
   }
 
+  void Socket::write(const char* buf, size_t count) {
+    while (count) {
+      auto n = ::write(sockFD, buf, count);
+      if (n < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+          n = 0;
+        else
+          return; // TODO: error case
+      }
+      buf += n;
+      count -= n;
+    }
+  }
+
   void Socket::sendLine(const std::string& s) {
-    write(sockFD, s.data(), s.length());
+    write(s.data(), s.length());
 
     const char newline = '\n';
-    write(sockFD, &newline, 1);
+    write(&newline, 1);
   }
 
   std::string Socket::receiveLine() {
@@ -124,7 +138,7 @@ namespace IPC {
 
     while (in.good()) {
       in.read(buffer, sizeof(buffer));
-      write(sockFD, &buffer, in.gcount());
+      write(buffer, in.gcount());
     }
   }
 

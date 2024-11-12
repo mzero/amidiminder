@@ -70,7 +70,7 @@ NOTES
 [] handle socket errors in the IPC code intellegently
     [] client wants to report and exit
     [] server wants to report and discard (aborting the command in progress)
-    [] calls to write in ipc.cpp should have the return value checked
+    [x] calls to write in ipc.cpp should have the return value checked
 [] move verbose port details option to the list command
 [x] harmonize CPP_FLAGS with what happens when built for deb
     [] fix CPP_FLAGS for debugging to -Og

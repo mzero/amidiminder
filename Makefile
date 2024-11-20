@@ -31,11 +31,10 @@ CPPFLAGS += $(INC_FLAGS)
 CPPFLAGS += -Wdate-time -D_FORTIFY_SOURCE=2
 CPPFLAGS += -std=c++17
 CPPFLAGS += -MMD -MP
-CPPFLAGS += -fdata-sections -ffunction-sections
 CPPFLAGS += -O2
-CPPFLAGS += -fstack-protector-strong -fstack-clash-protection -Wformat -Werror=format-security -mbranch-protection=standard -Wall -pedantic
+CPPFLAGS += -fstack-protector-strong -Wformat -Werror=format-security -Wall -pedantic
 
-LDFLAGS += -Wl,--gc-sections $(addprefix -l,$(LIBS))
+LDFLAGS += $(addprefix -l,$(LIBS))
 
 ifeq ($(DEBUG),yes)
 	CPPFLAGS += -DDEBUG -ggdb -O0

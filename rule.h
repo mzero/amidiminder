@@ -31,8 +31,9 @@ class ClientSpec {
 
 class PortSpec {
   public:
-    static PortSpec exact(const std::string&);
+    static PortSpec defaulted();
     static PortSpec partial(const std::string&);
+    static PortSpec exact(const std::string&);
     static PortSpec numeric(int);
     static PortSpec type(unsigned int);
     static PortSpec wildcard();
@@ -42,16 +43,27 @@ class PortSpec {
     PortSpec(const PortSpec&) = default;
     PortSpec& operator=(const PortSpec&) = default;
 
+    bool isDefaulted() const;
     bool isType() const;
     void output(std::ostream&) const;
 
   private:
+    enum Kind {
+      Defaulted,
+      Partial,
+      Exact,
+      Numeric,
+      Type,
+      Wildcard
+    };
+
+    Kind kind;
     std::string port;
     bool exactMatch;
     int portNum;
     unsigned int typeFlag;
 
-    PortSpec(const std::string&, bool, int, unsigned int);
+    PortSpec(Kind, const std::string&, bool, int, unsigned int);
 };
 
 

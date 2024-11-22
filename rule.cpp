@@ -23,17 +23,17 @@ _connect_ ::=
        -- note: one or more dashes are supported in all forms
 
 _endpoint_ ::=
-    _client_                -- defaults to all ports
+    _client_                -- default to first port (of correct direction)
     _client_ ":" _port_     -- port on a given client
     "." ( "hw" | "app" )    -- match ports with given property (client wildcard)
 
 _client_ ::=
-    _words_                 -- case independent find
+    _words_                 -- substring find
     '"' _words_ '"'         -- exact match
     "*"                     -- all clients (!)
 
 _port_ ::=
-    _words_                 -- case independent find
+    _words_                 -- substring find
     '"' _words_ '"'         -- exact match
     _number_                -- port n
     "*"                     -- all ports
@@ -68,33 +68,44 @@ void ClientSpec::output(std::ostream& s) const {
 }
 
 
-PortSpec::PortSpec(const std::string& p, bool e, int n, unsigned int t)
-  : port(p), exactMatch(e), portNum(n), typeFlag(t)
+PortSpec::PortSpec(Kind k, const std::string& p, bool e, int n, unsigned int t)
+  : kind(k), port(p), exactMatch(e), portNum(n), typeFlag(t)
   { }
 
-PortSpec PortSpec::exact(const std::string& p)
-  { return PortSpec(p, true, -1, 0); }
+PortSpec PortSpec::defaulted()
+  { return PortSpec(Defaulted, "", false, -1, 0); }
 
 PortSpec PortSpec::partial(const std::string& p)
-  { return PortSpec(p, false, -1, 0); }
+  { return PortSpec(Partial, p, false, -1, 0); }
+
+PortSpec PortSpec::exact(const std::string& p)
+  { return PortSpec(Exact, p, true, -1, 0); }
 
 PortSpec PortSpec::numeric(int n)
-  { return PortSpec("", false, n, 0); }
+  { return PortSpec(Numeric, "", false, n, 0); }
 
 PortSpec PortSpec::type(unsigned int t)
-  { return PortSpec("", false, -1, t); }
+  { return PortSpec(Type, "", false, -1, t); }
 
 PortSpec PortSpec::wildcard()
-  { return PortSpec("", false, -1, 0); }
+  { return PortSpec(Wildcard, "", false, -1, 0); }
+
+bool PortSpec::isDefaulted() const
+  { return kind == Defaulted; }
 
 bool PortSpec::isType() const
-  { return portNum < 0 && !exactMatch && typeFlag; }
+  { return kind == Type; }
 
 bool PortSpec::match(const Address& a) const {
-  if      (portNum >= 0)  return a.addr.port == portNum;
-  else if (exactMatch)    return a.port == port;
-  else if (typeFlag)      return a.types & typeFlag;
-  else                    return a.port.find(port) != std::string::npos;
+  switch (kind) {
+    case Defaulted:   return a.addr.port == 0;   // FIX ME!!!!
+    case Partial:     return a.port.find(port) != std::string::npos;
+    case Exact:       return a.port == port;
+    case Numeric:     return a.addr.port == portNum;
+    case Type:        return a.types & typeFlag;
+    case Wildcard:    return true;
+  }
+  return false; // should never happen
 }
 
 namespace {
@@ -108,11 +119,14 @@ namespace {
 }
 
 void PortSpec::output(std::ostream& s) const {
-  if      (portNum >= 0)    s << portNum;
-  else if (exactMatch)      s << '"' << port << '"';
-  else if (typeFlag)        outputTypeFlag(s, typeFlag);
-  else if (port.empty())    s << '*';
-  else                      s << port;
+  switch (kind) {
+    case Defaulted:   ;                             break;
+    case Partial:     s << port;                    break;
+    case Exact:       s << '"' << port << '"';      break;
+    case Numeric:     s << std::dec << portNum;     break;
+    case Type:        outputTypeFlag(s, typeFlag);  break;
+    case Wildcard:    s << '*';                     break;
+  }
 }
 
 
@@ -129,6 +143,7 @@ bool AddressSpec::match(const Address& a) const
 
 void AddressSpec::output(std::ostream& s) const {
   if (client.isWildcard() && port.isType())   s << port;
+  else if (port.isDefaulted())                s << client;
   else                                        s << client << ':' << port;
 }
 
@@ -216,7 +231,7 @@ namespace {
 
     ClientSpec cs = parseClientSpec(m.str(1));
     PortSpec ps =
-      m.str(2).empty() ? PortSpec::wildcard() : parsePortSpec(m.str(3));
+      m.str(2).empty() ? PortSpec::defaulted() : parsePortSpec(m.str(3));
 
     return AddressSpec(cs, ps);
   }

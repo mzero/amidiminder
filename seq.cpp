@@ -3,6 +3,8 @@
 #include <vector>
 
 
+const Address Address::null;
+
 void Seq::begin() {
   if (seq) return;
 

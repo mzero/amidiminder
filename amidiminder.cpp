@@ -200,21 +200,21 @@ class MidiMinder {
 
 
   void resetConnections() {
-    activePorts.clear();
-    activeConnections.clear();
-
+    // FIX ME: Just iterate and delete activeConnections?
     std::vector<snd_seq_connect_t> doomed;
       // a little afraid to disconnect connections while scanning them!
     seq.scanConnections([&](auto c){
-      Address sender = seq.address(c.sender);
-      Address dest = seq.address(c.dest);
-      if (sender && dest) // both ports must be not ignored
+      const Address& sender = knownPort(c.sender);
+      const Address& dest = knownPort(c.dest);
+      if (sender && dest)
         doomed.push_back(c);
     });
     for (auto& c : doomed) {
       seq.disconnect(c);
     }
+    activeConnections.clear();
 
+    activePorts.clear();
     seq.scanPorts([&](auto p){
       if (Args::outputPortDetails)
         seq.outputAddrDetails(std::cout, p);
@@ -275,9 +275,9 @@ class MidiMinder {
     }
 
   private:
-    Address knownPort(snd_seq_addr_t addr) {
-      auto i = activePorts.find(addr);
-      if (i == activePorts.end()) return {};
+    const Address& knownPort(snd_seq_addr_t addr) {
+      const auto i = activePorts.find(addr);
+      if (i == activePorts.end()) return Address::null;
       return i->second;
     }
 
@@ -351,6 +351,7 @@ class MidiMinder {
     void addPort(const snd_seq_addr_t& addr) {
       Address a = seq.address(addr);
       if (!a) return;
+      // FIX ME: figure out if the Address should be primary
       activePorts[addr] = a;
 
       std::cout << "port added " << a << std::endl;
@@ -385,7 +386,7 @@ class MidiMinder {
     }
 
     void delPort(const snd_seq_addr_t& addr) {
-      Address port = knownPort(addr);
+      const Address&  port = knownPort(addr);
       if (port)
         std::cout << "port removed " << port << std::endl;
 
@@ -394,8 +395,8 @@ class MidiMinder {
         if (c.first.sender == addr || c.first.dest == addr) {
           doomed.push_back(c.first);
 
-          Address sender = knownPort(c.first.sender);
-          Address dest = knownPort(c.first.dest);
+          const Address& sender = knownPort(c.first.sender);
+          const Address& dest = knownPort(c.first.dest);
           if (sender && dest)
             std::cout << "disconnected " << sender << "-->" << dest << std::endl;
         }
@@ -415,9 +416,9 @@ class MidiMinder {
         // already know about this connection
         return;
 
-      Address sender = seq.address(conn.sender);
-      Address dest = seq.address(conn.dest);
-      if (!sender || !dest) // if either is an ignored port, ignore this
+      const Address& sender = knownPort(conn.sender);
+      const Address& dest = knownPort(conn.dest);
+      if (!sender || !dest)
         return;
 
       activeConnections[conn] = Reason::observed;
@@ -453,9 +454,9 @@ class MidiMinder {
         return;
       activeConnections.erase(i);
 
-      Address sender = seq.address(conn.sender);
-      Address dest = seq.address(conn.dest);
-      if (!sender || !dest) // if either is an ignored port, ignore this
+      const Address& sender = knownPort(conn.sender);
+      const Address& dest = knownPort(conn.dest);
+      if (!sender || !dest)
         return;
 
       auto oRule = findRule(observedRules, sender, dest);

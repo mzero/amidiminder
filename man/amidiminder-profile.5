@@ -1,0 +1,224 @@
+.TH AMIDIMINDER-PROFILE 5
+
+.SH NAME
+amidiminder-profile \- Format for MIDI connection rules
+
+.SH DESCRIPTION
+Profiles describe a list of rules for making connections between ALSA sequencer
+MIDI ports. Users can create a profile rules file to describe how they want
+their MIDI environment connected, then use
+.BR amidiminder (1)
+to load it into the system. Connections will be made according to the rules,
+and if some of the devices or software are not yet on-line, connections for
+those ports will be made when they later come on-line.
+.PP
+The
+.BR amidiminder-deamon (8)
+will then continue to ensure these connections are made if devices are
+unplugged and re-plugged, or even if the whole system restarts.
+
+.SH CONCEPTS
+
+.SS ALSA Sequencer structure
+Each device or application that wants to have MIDI ports, registers with ALSA
+as a "client". This client has a name, choosen by the device or application,
+and a number, assigned by ALSA. As the number isn't predicable, profiles only
+refer to client names.
+.PP
+Each client can have one or more ports, and these ports can be \fIin\fR ports,
+supplying MIDI data, \fIout\fR ports (receiving MIDI) data, or they can be both.
+Hardware devices typically have just one port that is both in and out.
+Applications often have separate in ports and out ports.
+.PP
+Like clients, the ports also have both a name supplied by the device or
+application, and a number supplied by ALSA. Here, the numbers are stable, and
+predictable, and so in profiles rules can refere to ports by either name or
+number.
+.PP
+Conections are unidirectional, from one in port to one out port.
+
+.SS Rules
+Rules specify ports that should be connected. Rules can have \fIwildcard\fR
+specifications, so they match multiple ports and cause more than one connection
+to be made.
+.PP
+Rules can also be \fIdisallow\fR rules, specifying ports that should not be
+connected. This can be useful to restrict a wildcard rule to not apply in some
+circumstances. Disallow rules can also be generated when the
+.BR amidiminder-daemon (8)
+observes the user expressly disconnecting two ports that the profile rules
+connected. Such a disallow rule acts as an override.
+.PP
+A profile consists of a sequence of rules. The order matters, and the last
+rule matching a pair of ports governs what happens.
+.BR amidiminder-daemon (8)
+also maintains a list of observed rules. These logically follow the profile
+rules.
+
+.SH EXAMPLE
+This profile connects some hardware MIDI devices to a piece of software
+called "bicycle" (a MIDI looper).
+.PP
+.in +4n
+.EX
+bicycle:control <-- nanoKEY2
+bicycle:control <-- Erae Touch
+   # These connect my controllers to the software. Sometimes I
+   # use the nanoKEY2 keyboard, sometimes I use the Erae surface
+   # to play notes. These rules connect both, so which ever is
+   # plugged in gets connected.
+
+bicycle:control <-> Launchpad Pro:MIDI
+   # Connects the Launchpad to the software, and vice-versa.
+   # This allows buttons on the Launchpad to control the
+   # software, and the software to control the lights on the
+   # Launchpad.
+   #
+   # The Launchpad presents three MIDI ports, and we want the one
+   # that is just plain MIDI from the unit.
+
+bicycle:synth --> MicroMonsta
+bicycle:synth --> Hydrasynth
+bicycle:synth --> Midihub:1
+   # Connects the music output of the software to my synths. The
+   # last line connects to a MIDI interface, which has four
+   # distinct MIDI outputs, numbered from 0. Here we connect to
+   # the second one.
+
+Faderfox --> Midihub:3
+   # Lastly, connect a hardware control surface with knobs to the
+   # fourth output of the MIDI interface. This is just hardware
+   # to hardware connection, used to adjust the parameters of my
+   # reverb unit, connected to the MIDI interface.
+.EE
+.in
+.PP
+Placing the above text in a file, say \fBbicycle-profile.rules\fR,
+these connections could be quickly established by running this
+command:
+.PP
+.in +4n
+.EX
+& \fBamidiminder load bicycle-profile.rules\fR
+.EE
+.in
+
+.SH SYNTAX
+.SS Profile structure
+Profiles are text files with one rule per line.  Comments begin with
+a number sign (\fB#\fR), and continue to the end of the line. Empty
+lines (including comment only lines) are ignored.  Leading and trailing
+white space around a rule is also ignored.
+.SS Clients
+Clients are specified in one of three ways:
+.in +7n
+.TS
+tab(|) nospaces;
+l l l x
+l lI lB x.
+                        | Syntax                  | Example
+
+(a) by partial name     | client-name             | Monsta
+(b) by full exact name  | \fB"\fIclient-name\fB"  | "Launchpad Pro"
+(c) by wildcard         | \fB*                    | *
+.TE
+.TP
+(a)
+A client can be specified by any part of its name. Spaces are allowed. Since
+client names can be long, any substring can be given. For example,
+\fBMonsta\fR will match a client named \fBMicroMonsta\ 2\fR.
+.IP
+Be aware that some client specifications will match multiple devices, should
+your system have them. For example, \fBLaunchpad\fR will match both a
+\fBLaunchpad\ Pro\fR and a \fBLaunchpad\ Pro\ MK3\fR. This may, or may not, be
+exactly what you want.
+.TP
+(b)
+A client can be specified by its full name, by putting the specification in
+double quotes. So \fB"Launchpad\ Pro"\fR will only match a \fBLaunchpad\ Pro\fR,
+but not a \fBLaunchpad\ Pro\ MK3\fR.
+.TP
+(c)
+This specification matches all clients.
+
+.SS Ports
+Ports are specified in one five ways:
+.in +7n
+.TS
+tab(|) nospaces;
+l l l x
+l lI lB x.
+                  | Syntax                      | Example
+
+(a) by default    | client                      | Digitakt
+(b) by name       | client\fB:\fIport-name      | Launch Pad:DAW
+(c) by exact name | client\fB:"\fIport-name\fB" | Launch Pad:"Live Port"
+(d) by number     | client\fB:\fInumber         | Launch Pad:1
+(e) by wildcard   | client\fB:*                 | Launch Pad:*
+.TE
+.IP (a)
+This is the most common way to specify a port, with with just the client name.
+In this case in matches the first \fIin\fR or \fIout\fR port the client has,
+depending on the direction the connection is being made.
+.IP (b)
+A port can be specified by any part of it's name, in the same way
+as clients can.
+.IP (c)
+A port can be specified by its exact, full name, by placing the name in quotes.
+.IP (d)
+Ports can be specified by number. Port numbers start at 0.
+.IP (e)
+This is a wildcard specification, and matches all ports of the client.
+.PP
+There are two special forms for a port specification. These specify all
+ports on all clients that are tagged (by the device or software creating
+the ports) in a certain way.
+.in +7n
+.TS
+tab(|) nospaces;
+l l x
+l lB x.
+                            | Syntax
+
+(f) all hardware ports      | .hw
+(g) all application ports   | .app
+.TE
+.PP
+Note that there is no client specification, nor a colon (\fB:\fR) with these
+specifications.
+
+.SS Connection rules
+A connection rule consists of a port, a connector, and another port.  There
+are three types of connector:
+.TP
+.IR "portA " --> " portB"
+Specifies a connection fron \fIportA\fR to \fIportB\fR.
+.TP
+.IR "portA " <-- " portB"
+Specifies a connection in the other direction, from \fIportB\fR to \fIportA\fR
+.TP
+.IR "portA " <-> " portB"
+This is just a short hand for specifying both rules above. Assuming both ports
+are in and out ports, the this will cause two connections to be made, one in
+each direction.
+.PP
+Note: In the forms above, any number of hyphens (\fB-\fR) are accepted in the
+arrow.
+
+.SS Disallow rules
+A disallow rule has exactly the same form as a connection rule, only the
+connector has an \fBx\fR added in the arrow:
+.RS
+.IR "portA " -x-> " portB"
+.br
+.IR "portA " <-x- " portB"
+.br
+.IR "portA " <-x-> " portB"
+.RE
+.PP
+These rules will keep a connection from being made when prior rules (including
+wildcard rules) would have made one.
+
+.SH SEE ALSO
+.BR amidiminder (1),
+.BR amidiminder-daemon (8),

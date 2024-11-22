@@ -1,0 +1,91 @@
+.TH AMIDIMINDER 1
+
+.SH NAME
+amidiminder \- Utility to manage MIDI device connections
+
+.SH SYNOPSIS
+.B amidiminder load \fIfile
+.br
+.B amidiminder save \fIfile
+.br
+.B amidiminder reset
+.br
+.B amidiminder check \fIfile
+
+
+.SH DESCRIPTION
+The
+.B amidiminder daemon
+maintains a set of desired connections (the \fIprofile\fR) between ALSA
+sequencer MIDI ports. See
+.BR amidiminder-daemon (8)
+for more information.
+.PP
+A profile is a set of rules for connecting MIDI ports between devices and/or
+software. Once a profile is loaded, the daemon will make those connections
+automatically as the devices are connected to the system, and software is
+started.
+.PP
+Profiles are written in a simple rules syntax. See
+.BR amidiminder-profile (5)
+for the rules format.
+.PP
+The daemon also observes connections made by the user (via commands such as
+.BR aconnect (1)
+) and from within other software. These are remembered as a set of \fIobserved\fR
+rules, and these connections are also maintained.
+.PP
+These user commands let you manage the profile of connections used by the
+daemon.
+
+.SH COMMANDS
+.SS Control commands
+.TP
+\fBload \fIfile\fR
+The file is first checked for rule syntax, and if it fails, the command exits,
+making no changes.
+
+If it passes the check, The profile is loaded from the file. Observed rules are
+dropped. All existing connections are disconnected. Then finally, ports are
+reconnected according to the rules in the newly loaded profile.
+
+.TP
+\fBsave \fIfile\fR
+Write the current profile, plus all the observed connection rules, to the
+file.
+.TP
+.B reset
+Reloads the current profile: Observed rules are dropped.
+All existing connections are disconnected. Then finally, ports are reconnected
+according to the rules in the current profile.
+
+.SS Utility commands
+.TP
+\fBcheck \fIfile\fR
+Check that the file parses as a valid profile. Errors are reported by line.
+
+The exit status of the command is \fB0\fR if the file is a valid profile,
+and \fB1\fR if there are any syntax errors.
+
+
+.SH ENVIRONMENT
+.IP RUNTIME_DIRECTORY
+The path to the directory that has the UNIX-domain socket used to communicate
+between the control commands and the running daemon.
+
+Note: If the system configuration is changed such that the daemon is launched
+with a non-default value for this variable, it must also
+be set the same way when using any of the control coammands.
+
+.SH FILES
+.IP /run/amidiminder
+The default location of the runtime directory. If the \fBRUNTIME_DIRECTORY\fR
+environment variable is not set, this is the path used.
+
+.IP control.socket
+This UNIX-domain socket is located in the runtime direcotry, and is used to
+communicate between the control commands and the daemon.
+
+.SH SEE ALSO
+.BR amidiminder-profile (5),
+.BR amidiminder-daemon (8),

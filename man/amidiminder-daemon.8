@@ -1,0 +1,104 @@
+.TH AMIDIMINDER-DAEMON 8
+
+.SH NAME
+amidiminder-daemon \- MIDI device connection daemon
+
+.SH SYNOPSIS
+.B amidiminder daemon
+.RB [ -p ]
+
+.SH DESCRIPTION
+The
+.B amidiminder daemon
+maintains a set of desired connections (the \fIprofile\fR) between ALSA
+sequencer MIDI ports.
+.PP
+ALSA provides library calls, and a user tool
+.BR aconnect (1)
+for connecting pairs of ports.  However, these connections are lost when either
+of the member of the pair disappears, such as if a MIDI device is unplugged,
+or an application with ports exits. Restoring the port doesn't restore the prior
+connections it had. As MIDI gear is often inadvertantly unplugged and replugged,
+or power cycled, losing these connections is a significant frustration.
+.PP
+The
+.B amidiminder daemon
+takes care of this: It tracks what connections were desired between ports, and
+automatically reestablishes those connections when ports reattach to the
+system. Connections (and disconnections) initiated by the user (or applications)
+are tracked and remembered as well. The whole desired connection state is
+persistent, even across system reboots, so that the configuration
+is quickly maintained once devices power back up and applications restarted.
+.SS State
+The desired connection state is composed of two parts:
+.HP
+.B Profile rules
+The profile is a list of rules for which ports to connect. It is written
+in a simple syntax that makes it possible to express these connections, even
+when the devices aren't current connected. The commands in
+.BR amidiminder (1)
+are used by the user to load, save, and reset the profile. The user can
+have multiple profile files prepared, and by loading them, reconfigure all the
+connections with one command.
+.HP
+.B Observed rules
+These are a set of rules the daemon learns by observing connections made by the
+user via commands such as
+.BR aconnect (1)
+and by other software. These rules are considered to override any profile
+rules, should they conflict.  This allows a change from the current profile
+to be just as robust as the profile itself. The user can also easily drop the
+observed rules by loading another profile, or using the
+.B amidiminder reset
+command.
+.PP
+Both parts of the connection state are presisted into the file system so that
+they survive restarts of the deamon, or the whole system.
+
+.SH OPTIONS
+.TP
+.B -p\fR,\fB --port-details
+Causes output of all ALSA sequencer port information when ports are added or
+re-scanned by the deamon. This information is primarily for understanding how
+a piece of hardware is representing itself to the ALSA sequencer.
+
+
+.SH ENVIRONMENT
+These varibales are normally set by
+.BR systemd (8)
+before it launches the daemon.
+
+.IP STATE_DIRECTORY
+The path to the directory that the daemon uses to hold a copies of both the
+profile rules and the observed rules. This directory should not be on a
+temporary file system so that the desired connection state survives reboots.
+
+.IP RUNTIME_DIRECTORY
+The path to the directory that has the UNIX-domain socket used to communicate
+between the control commands and the running daemon.
+
+Note: If the system configuration is changed such that the \fBamidiminder\fR
+daemon is launched with a non-default value for this variable, it must also
+be set the same way when using any of the control coammands.
+
+.SH FILES
+.IP /var/lib/amidiminder
+The default location of the state direcotry.
+
+.IP /run/amidiminder
+The default location of the runtime directory.
+
+.IP profile.rules
+The current, loaded profile rules. Located in the state directory.
+
+.IP observed.rules
+The observed rules. Located in the state directory.
+
+.IP control.socket
+A UNIX-domain socket, located in the runtime direcotry. It is used to
+communicate between the control commands and the daemon.
+
+.SH SEE ALSO
+.BR amidiminder (1),
+.BR amidiminder-profile (5)
+

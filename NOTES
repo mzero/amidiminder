@@ -55,6 +55,15 @@ NOTES
     [] checking for rule consistency
     [] expected disconnect optimization
 
+[] man pages
+    [] amidiminder(1)
+    [] amidiminder-profile(5)
+        [] needs more examples at the end
+    [] amidiminder-daemon(8)
+    [] ? symlink all the user commands, like:
+            amidiminder-load(1) -> amidiminder(1)
+
+
 ## aconnect functionality
 
 [] connect & disconnect
@@ -78,7 +87,7 @@ NOTES
 [] print rules when loading profile?
 [] optimize saving observedRules
 [] don't rebuild ports on reset - should be no need
-
+[] ? case insensitive client and port name matches
 
 
 # MAJOR THEMES

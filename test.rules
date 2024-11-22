@@ -1,6 +1,6 @@
 # Parsing Tests
 # Run this with:
-#     amidiminder -C -f test.rules
+#     amidiminder check test.rules
 
     # hi there                      # PASS indented comment
 

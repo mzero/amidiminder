@@ -96,9 +96,17 @@ bool PortSpec::isDefaulted() const
 bool PortSpec::isType() const
   { return kind == Type; }
 
-bool PortSpec::match(const Address& a) const {
+bool PortSpec::matchAsSender(const Address& a) const {
+  return match(a, a.primarySender);
+}
+
+bool PortSpec::matchAsDest(const Address& a) const {
+  return match(a, a.primaryDest);
+}
+
+bool PortSpec::match(const Address& a, bool primaryFlag) const {
   switch (kind) {
-    case Defaulted:   return a.addr.port == 0;   // FIX ME!!!!
+    case Defaulted:   return primaryFlag;
     case Partial:     return a.port.find(port) != std::string::npos;
     case Exact:       return a.port == port;
     case Numeric:     return a.addr.port == portNum;
@@ -138,8 +146,11 @@ AddressSpec AddressSpec::exact(const Address& a)
   { return AddressSpec(ClientSpec::exact(a.client), PortSpec::exact(a.port)); }
   // TODO: Decide if this should use PortSpec::numeric(a.addr.port) instead.
 
-bool AddressSpec::match(const Address& a) const
-  { return client.match(a) && port.match(a); }
+bool AddressSpec::matchAsSender(const Address& a) const
+  { return client.match(a) && port.matchAsSender(a); }
+
+bool AddressSpec::matchAsDest(const Address& a) const
+  { return client.match(a) && port.matchAsDest(a); }
 
 void AddressSpec::output(std::ostream& s) const {
   if (client.isWildcard() && port.isType())   s << port;

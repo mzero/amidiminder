@@ -38,7 +38,8 @@ class PortSpec {
     static PortSpec type(unsigned int);
     static PortSpec wildcard();
 
-    bool match (const Address&) const;
+    bool matchAsSender(const Address&) const;
+    bool matchAsDest(const Address&) const;
 
     PortSpec(const PortSpec&) = default;
     PortSpec& operator=(const PortSpec&) = default;
@@ -64,6 +65,8 @@ class PortSpec {
     unsigned int typeFlag;
 
     PortSpec(Kind, const std::string&, bool, int, unsigned int);
+
+    bool match(const Address&, bool primaryFlag) const;
 };
 
 
@@ -73,7 +76,8 @@ class AddressSpec {
 
     static AddressSpec exact(const Address&);
 
-    bool match(const Address&) const;
+    bool matchAsSender(const Address&) const;
+    bool matchAsDest(const Address&) const;
 
     AddressSpec(const AddressSpec&) = default;
     AddressSpec& operator=(const AddressSpec&) = default;
@@ -95,10 +99,10 @@ class ConnectionRule {
 
     bool isBlockingRule() const { return blocking; }
 
-    bool senderMatch(const Address& a) const   { return sender.match(a); }
-    bool destMatch(const Address& a) const     { return dest.match(a); }
+    bool senderMatch(const Address& a) const   { return sender.matchAsSender(a); }
+    bool destMatch(const Address& a) const     { return dest.matchAsDest(a); }
     bool match(const Address& s, const Address& d) const
-      { return sender.match(s) && dest.match(d); }
+      { return sender.matchAsSender(s) && dest.matchAsDest(d); }
 
     ConnectionRule(const ConnectionRule&) = default;
     ConnectionRule& operator=(const ConnectionRule&) = default;

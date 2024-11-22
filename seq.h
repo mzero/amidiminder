@@ -15,7 +15,8 @@ class Address {
       { }
     Address(const snd_seq_addr_t& a, unsigned int f, unsigned int t,
         const std::string& c, const std::string& p)
-      : valid(true), addr(a), caps(f), types(t), client(c), port(p)
+      : valid(true), addr(a), caps(f), types(t), client(c), port(p),
+        primarySender(false), primaryDest(false)
       { }
 
     // allow copying
@@ -40,6 +41,8 @@ class Address {
     unsigned int types;
     std::string client;
     std::string port;
+    bool primarySender;
+    bool primaryDest;
 };
 
 

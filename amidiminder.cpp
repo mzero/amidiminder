@@ -540,7 +540,7 @@ void sendSaveCommand() {
 }
 
 void MidiMinder::handleSaveCommand(IPC::Connection& conn) {
-  std::cerr << "Save command recieved, but not yet handled" << std::endl;
+  std::cerr << "Save command received, but not yet handled" << std::endl;
   // TODO: build concatenation of profileContents and observedContents
   // TODO: send file
 }
@@ -556,7 +556,7 @@ void sendCommTestCommand() {
 }
 
 void MidiMinder::handleCommTestCommand(IPC::Connection& conn) {
-  std::cerr << "Connection test command recieved" << std::endl;
+  std::cerr << "Connection test command received" << std::endl;
   std::string text =
     "A sailor went to sea, sea, sea,\n"
     "To see what he could see, see, see.\n"

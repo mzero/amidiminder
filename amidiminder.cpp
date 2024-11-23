@@ -398,11 +398,9 @@ class MidiMinder {
           const Address& sender = knownPort(c.first.sender);
           const Address& dest = knownPort(c.first.dest);
           if (sender && dest)
-            std::cout << "disconnected " << sender << "-->" << dest << std::endl;
+            std::cout << "disconnected " << sender << " --> " << dest << std::endl;
         }
       }
-
-
 
       activePorts.erase(addr);
       for (auto& d : doomed)
@@ -479,7 +477,7 @@ class MidiMinder {
       observedRules.push_back(c);
       saveObserved();
 
-      std::cout << "observed disconnection " << c;
+      std::cout << "observed disconnection " << c << std::endl;
     }
 
     void readRules() {
@@ -527,7 +525,7 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
   profileText.swap(newContents);
   profileRules.swap(newRules);
 
-  std::cerr << "Resetting to new profile, ";
+  std::cerr << "Resetting to new profile, " << std::endl;
   for (auto& r : profileRules)
     std::cout << "    " << r << std::endl;
 

@@ -111,7 +111,7 @@ class MidiMinder {
     std::string observedText;
 
     std::map<snd_seq_addr_t, Address> activePorts;
-    std::map<snd_seq_connect_t, Reason> activeConnections;
+    std::set<snd_seq_connect_t> activeConnections;
 
 
   public:
@@ -288,7 +288,7 @@ class MidiMinder {
       conn.dest = cc.dest.addr;
       if (activeConnections.find(conn) == activeConnections.end()) {
         seq.connect(conn.sender, conn.dest);
-        activeConnections[conn] = r;
+        activeConnections.insert(conn);
         std::cout << "connecting " << cc.sender << " --> " << cc.dest;
         switch (r) {
           case Reason::byRule:
@@ -397,11 +397,11 @@ class MidiMinder {
 
       std::vector<snd_seq_connect_t> doomed;
       for (auto& c : activeConnections) {
-        if (c.first.sender == addr || c.first.dest == addr) {
-          doomed.push_back(c.first);
+        if (c.sender == addr || c.dest == addr) {
+          doomed.push_back(c);
 
-          const Address& sender = knownPort(c.first.sender);
-          const Address& dest = knownPort(c.first.dest);
+          const Address& sender = knownPort(c.sender);
+          const Address& dest = knownPort(c.dest);
           if (sender && dest)
             std::cout << "disconnected " << sender << " --> " << dest << std::endl;
         }
@@ -424,7 +424,7 @@ class MidiMinder {
       if (!sender || !dest)
         return;
 
-      activeConnections[conn] = Reason::observed;
+      activeConnections.insert(conn);
 
       auto oRule = findRule(observedRules, sender, dest);
       if (oRule == observedRules.end())    ; // just continue onward

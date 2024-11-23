@@ -348,47 +348,52 @@ class MidiMinder {
       }
     }
 
+    // Note: The computation of primary port status assumes that
+    // applications will create their ports from zero, in order,
+    // and when they delete ports, they delete them all. All
+    // applications we tested do this. Should an application
+    // create ports with explicit port numbers out of order, or
+    // delete low numbered ports, then recreate them... it
+    // would logically cause the priamry port to jump around.
+    // This code base doesn't handle that case, though invoking
+    // the reset function will clear up any mess that was made.
+
     void addPort(const snd_seq_addr_t& addr) {
+      if (knownPort(addr)) return;
+
       Address a = seq.address(addr);
       if (!a) return;
-      // FIX ME: figure out if the Address should be primary
-      activePorts[addr] = a;
 
+      bool foundPrimarySender = false;
+      bool foundPrimaryDest = false;
+      for (const auto& i : activePorts) {
+        if (i.first.client == addr.client) {
+          foundPrimarySender = foundPrimarySender || i.second.primarySender;
+          foundPrimaryDest   = foundPrimaryDest   || i.second.primaryDest;
+        }
+        if (foundPrimarySender && foundPrimaryDest)
+          break;
+      }
+      if (a.canBeSender() && !foundPrimarySender)   a.primarySender = true;
+      if (a.canBeDest() && !foundPrimaryDest)       a.primaryDest = true;
+
+      activePorts[addr] = a;
       std::cout << "port added " << a << std::endl;
 
       CandidateConnections candidates;
       connectByRule(a, profileRules, candidates);
       connectByRule(a, observedRules, candidates);
       for (auto& cc : candidates) {
-        bool alreadyConnected = false;
-
-        // TODO: skip this test if rule isn't wildcard at all
-        for (const auto& ac : activeConnections) {
-          if (cc.sender.addr.client != ac.first.sender.client) continue;
-          if (cc.dest.addr.client != ac.first.dest.client) continue;
-
-          // The clients match. See if the proposed rule could have made
-          // the connection:
-          const auto& si = activePorts.find(ac.first.sender);
-          if (si == activePorts.end()) continue;
-          const auto& di = activePorts.find(ac.first.dest);
-          if (di == activePorts.end()) continue;
-
-          if (cc.rule.match(si->second, di->second)) {
-            alreadyConnected = true;
-            break;
-          }
-        }
-
-        if (!alreadyConnected)
-          makeConnection(cc, Reason::byRule);
+        makeConnection(cc, Reason::byRule);
       }
     }
 
     void delPort(const snd_seq_addr_t& addr) {
-      const Address&  port = knownPort(addr);
-      if (port)
-        std::cout << "port removed " << port << std::endl;
+      const Address& port = knownPort(addr);
+      if (!port)
+        return;
+
+      std::cout << "port removed " << port << std::endl;
 
       std::vector<snd_seq_connect_t> doomed;
       for (auto& c : activeConnections) {

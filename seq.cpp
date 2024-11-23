@@ -99,6 +99,13 @@ void Seq::scanPorts(std::function<void(const snd_seq_addr_t&)> func) {
   while (snd_seq_query_next_client(seq, client) >= 0) {
     auto clientId = snd_seq_client_info_get_client(client);
 
+    // Note: The ALSA docs imply that the ports will be scanned
+    // in numeric order. A review of the kernel code found that
+    // it explicitly does so. The rest of the code relies on
+    // this property, so if it ever changes, this code would need
+    // to gather the snd_seq_addr_t values and sort them before
+    // passing them to the call back func.
+
     snd_seq_port_info_set_client(port, clientId);
     snd_seq_port_info_set_port(port, -1);
     while (snd_seq_query_next_port(seq, port) >= 0) {
@@ -199,7 +206,9 @@ bool Seq::errFatal(int serr, const char* op) {
 
 void Address::output(std::ostream& s) const {
   if (valid)
-    s << client << ":" << port << " [" << addr << "]";
+    s << client << ":" << port
+      << " [" << addr << "]"
+      << ((primarySender || primaryDest) ? "+" : "");
   else
     s << "--:--";
 }

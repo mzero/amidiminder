@@ -54,6 +54,17 @@ NOTES
     [] improve messages to the log on adding / removing observed rules
     [] checking for rule consistency
     [] expected disconnect optimization
+    [] remove Reason enum
+
+[] Primary port logic - and general refactor
+    [] ? on reset just scan activeConnections
+    [x] on addPort, figure out if port is primary
+    [x] print something for primary ports
+    [x] is it reasonable to assume we'll see PORT_START events
+        before any PORT_SUBSCRIBE or PORT_UNSUBSCRIBE events
+        that reference those ports? yes, I think so
+    [x] when scanning ports, do they come out in order
+        - yes, yes they do - the kernel does this explicitly
 
 [] man pages
     [] amidiminder(1)
@@ -146,3 +157,42 @@ Modes:
     list            - show devices, ports, and connections
 
 
+# DAW NOTES
+
+PureData
+    - When changing number of MIDI ports, deletes them all
+      then re-adds them. This works for us.
+
+Renoise
+    - Has separate clients for In and Out!
+    - Has non-exported ports first, so user ports don't start from zero
+    - Adds and removes ports, at times willy-nilly. If you connect a port
+      to a device in the app, it deletes its port, recreates it named with
+      the name of the other port, and then connects them.  This seems okay
+      with midiminder
+    - ? Perhaps we want a "ignore client" list - since Renoise does a fine
+      job of managing MIDI ports on it's own.
+    - Interestingly: no output ports other than sync!!
+
+Reaper
+    - Normally talks to raw MIDI devices
+    - Has one "virtual" in and one "virtual" out port, each uses its own
+      ALSA client (!), and the clients are named "Client-128" and "Client-129",
+      the ports are named "Virtual RawMIDI" no matter what they are renamed in
+      the UI.
+
+LMMS
+    - Lets users pick other ALSA ports as MIDI in/out for specific tracks
+    - Will create a port and connect it for each such assignment
+    - Doesn't seem to notice when connections are changed outside of it
+    -
+
+Ardour
+    - Creates a ton of clients: A pair for each other ALSA port, each client
+      has one port in or out. These are connected to each of the other
+      ports. BUT, none of the Ardour ports are marked subs - so no idea how
+      these connections are made.
+    [] caused amidiminder to generate ALSA Seq error -2 in get client info
+    [] need to make sure these ports are completely and correctly ignored
+
+bitwig - only x86-64 available

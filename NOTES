@@ -100,6 +100,14 @@ NOTES
 [] don't rebuild ports on reset - should be no need
 [] ? case insensitive client and port name matches
 
+## future
+
+[] periodically check clients and ports for name and capability changes
+    (since, due to kernel bugs, the change events are never sent), and if there
+    are changes, remove and re-add the relevant ports
+    N.B.: Not clear this is really needed, since we don't see any applications
+    that really change port names or capabilities after being created. See the
+    code in MidiMinder::handleSeqEvent for details about client name changes.
 
 # MAJOR THEMES
 

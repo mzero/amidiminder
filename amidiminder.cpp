@@ -129,9 +129,40 @@ class MidiMinder {
       if (Args::debug()) std::cout << ev << std::endl;
 
       switch (ev.type) {
-        case SND_SEQ_EVENT_CLIENT_START:
+        case SND_SEQ_EVENT_CLIENT_START: {
+          std::string name = seq.clientName(ev.data.addr);
+          if (name.find("Client-", 0) == 0) {
+            // Should use .starts_with(), but that is only in C++20
+
+            // The kernel assigns sprintf(..., "Client-%d", client_num) as the
+            // name of a new client. Most clients immediately change the name to
+            // something more useful before doing anything else. Some
+            // applications (looking at you, PureData), create their ports first
+            // then set their client name. As a consequence, This code may see
+            // the PORT_START event from the port creation, before the client
+            // has changed its name.
+
+            // This is a cheap hack: If we learn about a client before it has
+            // changed its name, just sleep for a little bit, and it should be
+            // updated by the time we're back.
+
+            // Empirically, on a RPi4b, using PureData as the test app, 10ms
+            // wasn't enough, 25ms was. Using 100ms to be safe. We want this as
+            // low as reasonable to keep the code being responsive.
+            timespec nap = { 0, 100000 };
+            nanosleep(&nap, nullptr);
+          }
+        }
+
         case SND_SEQ_EVENT_CLIENT_EXIT:
+          // We will have received PORT_EXIT events for all ports, so there
+          // is nothing left to do here.
+          break;
+
         case SND_SEQ_EVENT_CLIENT_CHANGE:
+          // The kernel has a bug in that it never sends this event. If it did
+          // this code should look to see if the name of the client has changed
+          // and if so, remove and re-add all it's ports under the new name.
           break;
 
         case SND_SEQ_EVENT_PORT_START: {
@@ -148,8 +179,10 @@ class MidiMinder {
         }
 
         case SND_SEQ_EVENT_PORT_CHANGE: {
-          std::cout << "port change " << ev.data.addr << std::endl;
-          // FIXME: treat this as a add/remove?
+          // The kernel has a bug in that it doesn't send this event in most
+          // cases. If it did, then this code should look to see if the name
+          // or the capabilities we care about have changed, and if so, remove
+          // and re-add the port.
           break;
         }
 

@@ -54,6 +54,7 @@ class Seq {
     void end();
     operator bool() const { return seq; }
 
+    std::string clientName(const snd_seq_addr_t&);
     Address address(const snd_seq_addr_t&);
 
     void scanFDs(std::function<void(int)>);

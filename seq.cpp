@@ -36,6 +36,20 @@ void Seq::end() {
 }
 
 
+std::string Seq::clientName(const snd_seq_addr_t& addr) {
+  if (addr.client == SND_SEQ_CLIENT_SYSTEM) return "";
+
+  int serr;
+
+  snd_seq_client_info_t *client;
+  snd_seq_client_info_alloca(&client);
+  serr = snd_seq_get_any_client_info(seq, addr.client, client);
+  if (errCheck(serr, "get client info")) return "";
+
+  return snd_seq_client_info_get_name(client);
+}
+
+
 Address Seq::address(const snd_seq_addr_t& addr) {
   if (addr.client == SND_SEQ_CLIENT_SYSTEM) return {};
 

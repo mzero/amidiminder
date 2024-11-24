@@ -162,6 +162,7 @@ Modes:
 PureData
     - When changing number of MIDI ports, deletes them all
       then re-adds them. This works for us.
+    - OMG - it sets the name of the client AFTER it creates the ports
 
 Renoise
     - Has separate clients for In and Out!

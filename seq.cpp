@@ -222,6 +222,54 @@ void Seq::outputConnect(std::ostream& s, const snd_seq_connect_t& conn) {
   s << conn.sender << " --> " << conn.dest;
 }
 
+void Seq::outputEvent(std::ostream& s, const snd_seq_event_t& ev) {
+  switch (ev.type) {
+	case SND_SEQ_EVENT_CLIENT_START:
+    s << "SND_SEQ_EVENT_CLIENT_START ";
+    outputAddr(s, ev.data.addr);
+    break;
+
+	case SND_SEQ_EVENT_CLIENT_EXIT:
+    s << "SND_SEQ_EVENT_CLIENT_EXIT ";
+    outputAddr(s, ev.data.addr);
+    break;
+
+	case SND_SEQ_EVENT_CLIENT_CHANGE:
+    s << "SND_SEQ_EVENT_CLIENT_CHANGE ";
+    outputAddr(s, ev.data.addr);
+    break;
+
+	case SND_SEQ_EVENT_PORT_START:
+    s << "SND_SEQ_EVENT_PORT_START ";
+    outputAddr(s, ev.data.addr);
+    break;
+
+	case SND_SEQ_EVENT_PORT_EXIT:
+    s << "SND_SEQ_EVENT_PORT_EXIT ";
+    outputAddr(s, ev.data.addr);
+    break;
+
+	case SND_SEQ_EVENT_PORT_CHANGE:
+    s << "SND_SEQ_EVENT_PORT_CHANGE ";
+    outputAddr(s, ev.data.addr);
+    break;
+
+	case SND_SEQ_EVENT_PORT_SUBSCRIBED:
+    s << "SND_SEQ_EVENT_PORT_SUBSCRIBED ";
+    outputConnect(s, ev.data.connect);
+    break;
+
+	case SND_SEQ_EVENT_PORT_UNSUBSCRIBED:
+    s << "SND_SEQ_EVENT_PORT_UNSUBSCRIBED ";
+    outputConnect(s, ev.data.connect);
+    break;
+
+  default:
+    s << "SND_SEQ_EVENT type " << ev.type;
+  }
+}
+
+
 
 void Seq::outputAddrDetails(std::ostream& out, const snd_seq_addr_t& addr) {
   int serr;
@@ -292,3 +340,4 @@ void Seq::outputAddrDetails(std::ostream& out, const snd_seq_addr_t& addr) {
     out << (count++ ? ", " : "") << s;
   out << std::endl;
 }
+

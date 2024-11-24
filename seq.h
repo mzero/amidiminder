@@ -75,6 +75,7 @@ class Seq {
   public:
     static void outputAddr(std::ostream&, const snd_seq_addr_t&);
     static void outputConnect(std::ostream&, const snd_seq_connect_t&);
+    static void outputEvent(std::ostream& out, const snd_seq_event_t& ev);
 
     void outputAddrDetails(std::ostream&, const snd_seq_addr_t&);
 };
@@ -89,6 +90,8 @@ inline std::ostream& operator<<(std::ostream& s, const snd_seq_addr_t& a)
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_connect_t& c)
   { Seq::outputConnect(s, c); return s; }
 
+inline std::ostream& operator<<(std::ostream& s, const snd_seq_event_t& ev)
+  { Seq::outputEvent(s, ev); return s; }
 
 inline bool operator==(const snd_seq_addr_t& a, const snd_seq_addr_t& b) {
   return a.client == b.client && a.port == b.port;

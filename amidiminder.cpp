@@ -126,6 +126,8 @@ class MidiMinder {
 
   private:
     void handleSeqEvent(snd_seq_event_t& ev) {
+      if (Args::debug()) std::cout << ev << std::endl;
+
       switch (ev.type) {
         case SND_SEQ_EVENT_CLIENT_START:
         case SND_SEQ_EVENT_CLIENT_EXIT:

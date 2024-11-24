@@ -18,25 +18,26 @@
 
 namespace {
 
-  enum class Reason {
-    byRule,
+  enum class RuleSource {
+    profile,
     observed,
   };
 
-  void output(std::ostream&s, Reason r) {
+  void output(std::ostream&s, RuleSource r) {
     switch (r) {
-      case Reason:: byRule:     s << "by rule";  break;
-      case Reason:: observed:   s << "observed"; break;
+      case RuleSource::profile:    s << "profile";  break;
+      case RuleSource::observed:   s << "observed"; break;
     }
   }
 
-  inline std::ostream& operator<<(std::ostream& s, Reason r)
+  inline std::ostream& operator<<(std::ostream& s, RuleSource r)
     { output(s, r); return s; }
 
   struct CandidateConnection {
     const Address& sender;
     const Address& dest;
     const ConnectionRule& rule;
+    RuleSource source;
   };
 
   using CandidateConnections = std::vector<CandidateConnection>;
@@ -281,7 +282,7 @@ class MidiMinder {
       return i->second;
     }
 
-    void makeConnection(const CandidateConnection& cc, Reason r)
+    void makeConnection(const CandidateConnection& cc)
     {
       snd_seq_connect_t conn;
       conn.sender = cc.sender.addr;
@@ -289,25 +290,17 @@ class MidiMinder {
       if (activeConnections.find(conn) == activeConnections.end()) {
         seq.connect(conn.sender, conn.dest);
         activeConnections.insert(conn);
-        std::cout << "connecting " << cc.sender << " --> " << cc.dest;
-        switch (r) {
-          case Reason::byRule:
-            std::cout << ", by rule: " << cc.rule << std::endl;
-            break;
-
-          case Reason::observed:
-            std::cout << ", restoring prior connection" << std::endl;
-            break;
-        }
+        std::cout << "connecting " << cc.sender << " --> " << cc.dest << '\n'
+          << "    by " << cc.source << " rule: " << cc.rule << std::endl;
       }
     }
 
     void considerConnection(
       const Address& sender, const Address& dest,
-      const ConnectionRule& rule, CandidateConnections& ccs)
+      const ConnectionRule& rule, RuleSource source, CandidateConnections& ccs)
     {
       if (!rule.isBlockingRule()) {
-        CandidateConnection cc = {sender, dest, rule};
+        CandidateConnection cc = {sender, dest, rule, source};
         ccs.push_back(cc);
       }
       else {
@@ -322,29 +315,29 @@ class MidiMinder {
     }
 
     void connectEachActiveSender(
-        const Address& a, const ConnectionRule& rule, CandidateConnections& ccs)
+        const Address& a, const ConnectionRule& rule, RuleSource source, CandidateConnections& ccs)
     {
       for (auto& p : activePorts) {
         auto& b = p.second;
         if (b.canBeSender() && rule.senderMatch(b))
-          considerConnection(b, a, rule, ccs);
+          considerConnection(b, a, rule, source, ccs);
       }
     }
 
     void connectEachActiveDest(
-        const Address& a, const ConnectionRule& rule, CandidateConnections& ccs)
+        const Address& a, const ConnectionRule& rule, RuleSource source, CandidateConnections& ccs)
     {
       for (auto& p : activePorts) {
         auto& b = p.second;
         if (b.canBeDest() && rule.destMatch(b))
-          considerConnection(a, b, rule, ccs);
+          considerConnection(a, b, rule, source, ccs);
       }
     }
 
-    void connectByRule(const Address& a, ConnectionRules& rules, CandidateConnections& ccs) {
+    void connectByRule(const Address& a, ConnectionRules& rules, RuleSource source, CandidateConnections& ccs) {
       for (auto& rule : rules) {
-        if (a.canBeSender() && rule.senderMatch(a))   connectEachActiveDest(a, rule, ccs);
-        if (a.canBeDest()   && rule.destMatch(a))     connectEachActiveSender(a, rule, ccs);
+        if (a.canBeSender() && rule.senderMatch(a))   connectEachActiveDest(a, rule, source, ccs);
+        if (a.canBeDest()   && rule.destMatch(a))     connectEachActiveSender(a, rule, source, ccs);
       }
     }
 
@@ -381,11 +374,10 @@ class MidiMinder {
       std::cout << "port added " << a << std::endl;
 
       CandidateConnections candidates;
-      connectByRule(a, profileRules, candidates);
-      connectByRule(a, observedRules, candidates);
-      for (auto& cc : candidates) {
-        makeConnection(cc, Reason::byRule);
-      }
+      connectByRule(a, profileRules, RuleSource::profile, candidates);
+      connectByRule(a, observedRules, RuleSource::observed, candidates);
+      for (auto& cc : candidates)
+        makeConnection(cc);
     }
 
     void delPort(const snd_seq_addr_t& addr) {

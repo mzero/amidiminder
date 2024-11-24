@@ -54,7 +54,7 @@ NOTES
     [] improve messages to the log on adding / removing observed rules
     [] checking for rule consistency
     [] expected disconnect optimization
-    [] remove Reason enum
+    [x] remove Reason enum
 
 [] Primary port logic - and general refactor
     [] ? on reset just scan activeConnections

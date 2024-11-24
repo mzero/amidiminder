@@ -10,6 +10,8 @@ namespace {
 namespace Args {
   Command command = Command::Help; // the default command if none given
 
+  int verbosity = 1;
+
   bool outputPortDetails = false;
   std::string rulesFilePath;
 
@@ -17,9 +19,11 @@ namespace Args {
 
   bool parse(int argc, char* argv[]) {
     CLI::App app{appDescription};
-    app.set_version_flag("-v,--version", appVersion);
+    app.set_version_flag("--version", appVersion);
     app.require_subcommand(0, 1);
 
+    app.add_flag("-v,--verbose", [](auto n){ verbosity = n + 1; }, "Increase level of verbosity");
+    app.add_flag("-q,--quiet",   [](auto _){ verbosity = 0; },     "Quiet all normal output");
 
     CLI::App *checkApp = app.add_subcommand("check", "Check the syntax of a rules file");
     checkApp->parse_complete_callback([](){ command = Command::Check; });

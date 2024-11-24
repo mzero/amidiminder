@@ -19,6 +19,11 @@ namespace Args {
   extern Command command;
 
   // Generic options
+  extern int verbosity;
+  inline bool quiet()   { return verbosity <= 0; }
+  inline bool output()  { return verbosity >= 1; }
+  inline bool chatty()  { return verbosity >= 2; }
+  inline bool debug()   { return verbosity >= 3; }
 
   // Minder command options
   extern bool outputPortDetails;

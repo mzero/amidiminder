@@ -5,75 +5,46 @@ NOTES
 
 ## state and profiles
 
-[x] command line change to commands
-    [x] modes
-    [x] minder command
-    [x] check command
-    [x] print help on no args at all
-    [x] help subcommand
-    [x] add ExistingPathValidator() to rules file arguments
-    [x] version flag? (set_version_flag())
-    [x] load rules only after command is switched
-
-
 [] file locations in code somewhere
-    [x] built from optional environment variables
-    [x] need to decide how much checking to do
-    [x] need to exit when files aren't good
-    [x] file reading & file writing utilities
-    [x] check file actions
-        [x] read from supplied path
-    [x] read state (profile & observed) on state on start
-    [x] don't crash on empty statefiles... just be happy
-    [x] write observed on changes
     [] handle "-" to mean stdin/stdout
     [] safe file write code (write to .save, rename)
 
 [] reorg
-    [x] rename command to daemon
-    [x] move main and control commands out of MidiMinder class
-    [x] refactor MidiMinder
-    [x] rename configRules in MM profileRules
-    [x] make the files be observed.rules and profile.rules
-        [x] socket should be control.socket
-    [x] move Files::initialize* into IPC code
     [] change commtest command on the wire from "ahoy" to "commtest"
         [] find suitable haiku for the commtest command
+    [] don't rebuild ports on reset - should be no need
 
 [] command line and deamon communication
-    [x] commtest command
-    [x] use poll or epoll with seq & the socket
-    [x] reset command
-    [x] load command
     [] save command
     [] command logging should be done by each command handler
 
 [] new observed connection/disconnection logic
-    [x] reset on start
     [] correctly adjusting observed rules if needed
     [] improve messages to the log on adding / removing observed rules
     [] checking for rule consistency
     [] expected disconnect optimization
-    [x] remove Reason enum
+    [] optimize saving observedRules
 
 [] Primary port logic - and general refactor
     [] ? on reset just scan activeConnections
-    [x] on addPort, figure out if port is primary
-    [x] print something for primary ports
-    [x] is it reasonable to assume we'll see PORT_START events
-        before any PORT_SUBSCRIBE or PORT_UNSUBSCRIBE events
-        that reference those ports? yes, I think so
-    [x] when scanning ports, do they come out in order
-        - yes, yes they do - the kernel does this explicitly
+
+## general
 
 [] man pages
-    [] amidiminder(1)
-    [] amidiminder-profile(5)
-        [] needs more examples at the end
-    [] amidiminder-daemon(8)
+    [] need more examples at the end of amidiminder-profile.5
     [] ? symlink all the user commands, like:
             amidiminder-load(1) -> amidiminder(1)
 
+[] error handling
+    [] switch to throwing errors on fatal system (and Seq) errors
+    [] review all error messages
+        [] leading case
+        [] wording
+    [] handle socket errors in the IPC code intellegently
+        [] client wants to report and exit
+        [] server wants to report and discard (aborting the command in progress)
+        [x] calls to write in ipc.cpp should have the return value checked
+    [] when user commands can't find the socket - tell user to start the daemon
 
 ## aconnect functionality
 
@@ -83,22 +54,12 @@ NOTES
 ## other
 
 [] improve output of check command
-[] switch to throwing errors on fatal system (and Seq) errors
-[] review all error messages
-    [] leading case
-    [] wording
-[] handle socket errors in the IPC code intellegently
-    [] client wants to report and exit
-    [] server wants to report and discard (aborting the command in progress)
-    [x] calls to write in ipc.cpp should have the return value checked
 [] move verbose port details option to the list command
-[x] harmonize CPP_FLAGS with what happens when built for deb
-    [] fix CPP_FLAGS for debugging to -Og
+ [] fix CPP_FLAGS for debugging to -Og
 [] group subcommands in Args to make help more clear
 [] print rules when loading profile?
-[] optimize saving observedRules
-[] don't rebuild ports on reset - should be no need
 [] ? case insensitive client and port name matches
+[] ? get systemctl reload to call amidiminder reset
 
 ## future
 

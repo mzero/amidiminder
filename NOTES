@@ -6,7 +6,7 @@ NOTES
 ## state and profiles
 
 [] file locations in code somewhere
-    [] handle "-" to mean stdin/stdout
+    [x] handle "-" to mean stdin/stdout
     [] safe file write code (write to .save, rename)
 
 [] reorg
@@ -15,7 +15,7 @@ NOTES
     [] don't rebuild ports on reset - should be no need
 
 [] command line and deamon communication
-    [] save command
+    [x] save command
     [] command logging should be done by each command handler
 
 [] new observed connection/disconnection logic
@@ -29,6 +29,9 @@ NOTES
     [] ? on reset just scan activeConnections
 
 ## general
+
+[] tidy port names in observed rules
+    - if client name is a prefix of the port, remove it and make partial match
 
 [] man pages
     [] need more examples at the end of amidiminder-profile.5

@@ -16,6 +16,10 @@ namespace Files {
   bool fileExists(const std::string& path);
   std::string readFile(const std::string& path);
   void writeFile(const std::string& path, const std::string& contents);
+
+  // These versions support "-" to mean stdin/stdout
+  std::string readUserFile(const std::string& path);
+  void writeUserFile(const std::string& path, const std::string& contents);
 }
 
 

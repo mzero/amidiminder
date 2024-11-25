@@ -530,7 +530,7 @@ void MidiMinder::handleResetCommand(IPC::Connection& conn) {
 }
 
 void sendLoadCommand() {
-  std::string newContents = Files::readFile(Args::rulesFilePath);
+  std::string newContents = Files::readUserFile(Args::rulesFilePath);
   ConnectionRules newRules;
   if (!parseRules(newContents, newRules))
     std::exit(1);
@@ -567,13 +567,29 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
 void sendSaveCommand() {
   IPC::Client client;
   client.sendCommand("save");
-  // TODO: write file
+
+  std::stringstream saveFile;
+  client.receiveFile(saveFile);
+
+  Files::writeUserFile(Args::rulesFilePath, saveFile.str());
 }
 
 void MidiMinder::handleSaveCommand(IPC::Connection& conn) {
-  std::cerr << "Save command received, but not yet handled" << std::endl;
-  // TODO: build concatenation of profileContents and observedContents
-  // TODO: send file
+  std::stringstream combinedProfile;
+  if (!profileText.empty()) {
+    combinedProfile << "# Profile rules:\n";
+    combinedProfile << profileText;
+
+  }
+  if (!observedText.empty()) {
+    combinedProfile << "# Observed rules:\n";
+    combinedProfile << observedText;
+  }
+  if (profileText.empty() && observedText.empty()) {
+    combinedProfile << "# No rules defined.\n";
+  }
+
+  conn.sendFile(combinedProfile);
 }
 
 void sendCommTestCommand() {

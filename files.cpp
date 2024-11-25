@@ -119,4 +119,23 @@ namespace Files {
 
     file << contents;
   }
+
+  std::string readUserFile(const std::string& path) {
+    if (path == "-") {
+      std::stringstream ss;
+      ss << std::cin.rdbuf();
+      return ss.str();
+    }
+    else
+      return readFile(path);
+  }
+
+  void writeUserFile(const std::string& path, const std::string& contents) {
+    if (path == "-") {
+      std::cout << contents;
+      std::cout.flush();
+    }
+    else
+      writeFile(path, contents);
+  }
 }

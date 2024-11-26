@@ -22,8 +22,11 @@ namespace Args {
     app.set_version_flag("--version", appVersion);
     app.require_subcommand(0, 1);
 
-    app.add_flag("-v,--verbose", [](auto n){ verbosity = n + 1; }, "Increase level of verbosity");
-    app.add_flag("-q,--quiet",   [](auto _){ verbosity = 0; },     "Quiet all normal output");
+    auto vFlag = app.add_flag("-v,--verbose", [](auto n){ verbosity = n + 1; }, "Increase level of verbosity");
+    auto qFlag = app.add_flag("-q,--quiet",   [](auto _){ verbosity = 0; },     "Quiet all normal output");
+    qFlag->excludes(vFlag);
+    vFlag->option_text(" ");  // no need to spam the help with excludes info
+    qFlag->option_text(" ");
 
     const char* userGroup = "User subcommands";
 

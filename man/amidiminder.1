@@ -1,8 +1,6 @@
 .TH AMIDIMINDER 1
-
 .SH NAME
 amidiminder \- Utility to manage MIDI device connections
-
 .SH SYNOPSIS
 .B amidiminder load \fIfile
 .br
@@ -11,7 +9,6 @@ amidiminder \- Utility to manage MIDI device connections
 .B amidiminder reset
 .br
 .B amidiminder check \fIfile
-
 
 .SH DESCRIPTION
 The
@@ -49,24 +46,27 @@ If it passes the check, The profile is loaded from the file. Observed rules are
 dropped. All existing connections are disconnected. Then finally, ports are
 reconnected according to the rules in the newly loaded profile.
 
+A file name of \fB-\fR (hyphen-minus) loads from the standard input.
 .TP
 \fBsave \fIfile\fR
 Write the current profile, plus all the observed connection rules, to the
 file.
+
+A file name of \fB-\fR (hyphen-minus) writes to the standard output.
 .TP
 .B reset
 Reloads the current profile: Observed rules are dropped.
 All existing connections are disconnected. Then finally, ports are reconnected
 according to the rules in the current profile.
-
 .SS Utility commands
 .TP
 \fBcheck \fIfile\fR
 Check that the file parses as a valid profile. Errors are reported by line.
 
+A file name of \fB-\fR (hyphen-minus) checks from the standard input.
+
 The exit status of the command is \fB0\fR if the file is a valid profile,
 and \fB1\fR if there are any syntax errors.
-
 
 .SH ENVIRONMENT
 .IP RUNTIME_DIRECTORY
@@ -88,4 +88,4 @@ communicate between the control commands and the daemon.
 
 .SH SEE ALSO
 .BR amidiminder-profile (5),
-.BR amidiminder-daemon (8),
+.BR amidiminder-daemon (8)

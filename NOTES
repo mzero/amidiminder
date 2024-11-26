@@ -59,7 +59,7 @@ NOTES
 [] improve output of check command
 [] move verbose port details option to the list command
  [] fix CPP_FLAGS for debugging to -Og
-[] group subcommands in Args to make help more clear
+[x] group subcommands in Args to make help more clear
 [] print rules when loading profile?
 [] ? case insensitive client and port name matches
 [] ? get systemctl reload to call amidiminder reset

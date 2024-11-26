@@ -5,13 +5,11 @@ AMIDIMINDER(1)              General Commands Manual             AMIDIMINDER(1)
 NAME
        amidiminder - Utility to manage MIDI device connections
 
-
 SYNOPSIS
        amidiminder load file
        amidiminder save file
        amidiminder reset
        amidiminder check file
-
 
 
 DESCRIPTION
@@ -47,24 +45,27 @@ COMMANDS
               nected. Then finally, ports are  reconnected  according  to  the
               rules in the newly loaded profile.
 
+              A file name of - (hyphen-minus) loads from the standard input.
 
        save file
               Write  the  current  profile,  plus  all the observed connection
               rules, to the file.
 
+              A file name of - (hyphen-minus) writes to the standard output.
+
        reset  Reloads the current profile: Observed rules  are  dropped.   All
               existing  connections  are disconnected. Then finally, ports are
               reconnected according to the rules in the current profile.
-
 
    Utility commands
        check file
               Check that the file parses as a valid profile.  Errors  are  re‐
               ported by line.
 
+              A file name of - (hyphen-minus) checks from the standard input.
+
               The  exit status of the command is 0 if the file is a valid pro‐
               file, and 1 if there are any syntax errors.
-
 
 
 ENVIRONMENT
@@ -93,7 +94,7 @@ FILES
 
 
 SEE ALSO
-       amidiminder-profile(5), amidiminder-daemon(8),
+       amidiminder-profile(5), amidiminder-daemon(8)
 
 
 

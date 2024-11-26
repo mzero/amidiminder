@@ -39,6 +39,7 @@ namespace IPC {
     friend class Connection;
   };
 
+  using Options = std::vector<std::string>;
 
   class Client : Socket {
     public:
@@ -46,6 +47,7 @@ namespace IPC {
       ~Client();
 
       void sendCommand(const std::string&);
+      void sendCommandAndOptions(const std::string&, const Options&);
       void sendFile(std::istream&);
       void receiveFile(std::ostream&);
   };
@@ -65,6 +67,7 @@ namespace IPC {
       Connection& operator=(Connection&&) noexcept;
 
       std::string receiveCommand();
+      std::pair<std::string, Options> receiveCommandAndOptions();
       void sendFile(std::istream&);
       void receiveFile(std::ostream&);
 

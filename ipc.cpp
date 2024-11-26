@@ -1,6 +1,7 @@
 #include "ipc.h"
 
 #include <stdio.h>
+#include <sstream>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -69,6 +70,7 @@ namespace {
     return sockFD;
   }
 
+  const char optionsDelimiter = ',';
 }
 
 
@@ -159,7 +161,17 @@ namespace IPC {
   Client::Client() : Socket(makeSocket(false))  { }
   Client::~Client()                             { }
 
-  void Client::sendCommand(const std::string& cmd)  { sendLine(cmd); }
+  void Client::sendCommand(const std::string& cmd) {
+    static Options noOptions;
+    sendCommandAndOptions(cmd, noOptions);
+  }
+  void Client::sendCommandAndOptions(const std::string& cmd, const Options& opts) {
+    std::ostringstream line;
+    line << cmd;
+    for (auto o : opts)
+      line << optionsDelimiter << o;
+    sendLine(line.str());
+  }
   void Client::sendFile(std::istream& f)            { Socket::sendFile(f); }
   void Client::receiveFile(std::ostream& f)         { Socket::receiveFile(f); }
 
@@ -174,7 +186,24 @@ namespace IPC {
     return *this;
   }
 
-  std::string Connection::receiveCommand()          { return receiveLine(); }
+  std::string Connection::receiveCommand() {
+    return receiveCommandAndOptions().first;
+  }
+  std::pair<std::string, Options> Connection::receiveCommandAndOptions() {
+    std::string line = receiveLine();
+    std::cout << "Received client command: " << line << std::endl;
+
+    std::istringstream is(line);
+    std::string cmd;
+    Options opts;
+    for (std::string word; std::getline(is, word, optionsDelimiter);)
+      if (!word.empty()) {
+        if (cmd.empty())  cmd = word;
+        else              opts.push_back(word);
+      }
+
+    return std::make_pair(cmd, opts);
+  }
   void Connection::sendFile(std::istream& f)        { Socket::sendFile(f); }
   void Connection::receiveFile(std::ostream& f)     { Socket::receiveFile(f); }
 

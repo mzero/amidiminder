@@ -15,6 +15,9 @@ namespace Args {
   bool outputPortDetails = false;
   std::string rulesFilePath;
 
+  bool keepObserved = false;
+  bool resetHard = false;
+
   int exitCode = 0;
 
   bool parse(int argc, char* argv[]) {
@@ -54,6 +57,9 @@ namespace Args {
     CLI::App *resetApp = app.add_subcommand("reset", "Reset connections to match the current profile");
     resetApp->group(userGroup);
     resetApp->parse_complete_callback([](){ command = Command::Reset; });
+    resetApp->add_flag("--keep", keepObserved, "Keep the observed rules");
+    resetApp->add_flag("--hard", resetHard, "Reload ALSA state while resetting;"
+                                          "\nshould never be needed");
 
 
     const char* systemGroup = "System commands";

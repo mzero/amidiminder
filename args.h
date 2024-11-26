@@ -31,6 +31,10 @@ namespace Args {
   // Check command options
   extern std::string rulesFilePath;
 
+  // Reset command options
+  extern bool keepObserved;
+  extern bool resetHard;
+
   extern int exitCode;
   bool parse(int argc, char* argv[]);
 }

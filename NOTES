@@ -9,14 +9,17 @@ NOTES
     [x] handle "-" to mean stdin/stdout
     [x] safe file write code (write to .save, rename)
 
-[] reorg
-    [] change commtest command on the wire from "ahoy" to "commtest"
+[ ] reorg
+    [ ] change commtest command on the wire from "ahoy" to "commtest"
         [] find suitable haiku for the commtest command
-    [] don't rebuild ports on reset - should be no need
+    [x] hard and soft resets
+        [x] user optinos on the reset command
 
-[] command line and deamon communication
+
+[x] command line and deamon communication
     [x] save command
-    [] command logging should be done by each command handler
+    [x] command logging reception in IPC
+    [x] support command options
 
 [] new observed connection/disconnection logic
     [] correctly adjusting observed rules if needed
@@ -63,6 +66,8 @@ NOTES
 [] print rules when loading profile?
 [] ? case insensitive client and port name matches
 [] ? get systemctl reload to call amidiminder reset
+[] replace -p with just a verbosity check
+
 
 ## future
 

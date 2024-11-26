@@ -203,16 +203,17 @@ class MidiMinder {
       }
     }
 
-    void handleResetCommand(IPC::Connection& conn);
+    void handleResetCommand(IPC::Connection& conn, const IPC::Options& opts);
     void handleLoadCommand(IPC::Connection& conn);
     void handleSaveCommand(IPC::Connection& conn);
     void handleCommTestCommand(IPC::Connection& conn);
 
     void handleConnection(IPC::Connection& conn) {
-      std::string command = conn.receiveCommand();
-      std::cout << "Received client command: " << command << std::endl;
+      auto msg = conn.receiveCommandAndOptions();
+      auto command = msg.first;
+      auto& options = msg.second;
 
-      if      (command == "reset") handleResetCommand(conn);
+      if      (command == "reset") handleResetCommand(conn, options);
       else if (command == "load")  handleLoadCommand(conn);
       else if (command == "save")  handleSaveCommand(conn);
       else if (command == "ahoy")  handleCommTestCommand(conn);
@@ -234,20 +235,19 @@ class MidiMinder {
     saveObserved();
   }
 
+  void resetConnectionsHard() {
+  // reset ports & connections from scratch, rescanning ALSA Seq
 
-  void resetConnections() {
-    // FIX ME: Just iterate and delete activeConnections?
     std::vector<snd_seq_connect_t> doomed;
       // a little afraid to disconnect connections while scanning them!
     seq.scanConnections([&](auto c){
       const Address& sender = knownPort(c.sender);
       const Address& dest = knownPort(c.dest);
-      if (sender && dest)
+      if (sender && dest) // check if it's a connection we would manage
         doomed.push_back(c);
     });
-    for (auto& c : doomed) {
-      seq.disconnect(c);
-    }
+    for (auto& c : doomed)
+      seq.disconnect(c);  // will generate UNSUB events that should be ignored
     activeConnections.clear();
 
     activePorts.clear();
@@ -258,16 +258,24 @@ class MidiMinder {
     });
   }
 
-  void resetToProfile() {
-    clearObserved();
-    resetConnections();
+  void resetConnectionsSoft() {
+  // reset ports & connections without rescanning ALSA Seq
+
+    for (auto& c : activeConnections)
+      seq.disconnect(c);  // will generate UNSUB events that should be ignored
+    activeConnections.clear();
+
+    std::map<snd_seq_addr_t, Address> ports;
+    ports.swap(activePorts);
+    for (auto& p: ports)
+      addPort(p.first);   // does regenreate the Address from Seq::address()
   }
 
 
   public:
     void run() {
       readRules();
-      resetConnections();
+      resetConnectionsHard();
 
       int epollFD = epoll_create1(0);
       if (epollFD == -1) {
@@ -521,12 +529,29 @@ class MidiMinder {
 
 void sendResetCommand() {
   IPC::Client client;
-  client.sendCommand("reset");
+  IPC::Options opts;
+  if (Args::keepObserved)   opts.push_back("keepObserved");
+  if (Args::resetHard)      opts.push_back("resetHard");
+  client.sendCommandAndOptions("reset", opts);
 }
 
-void MidiMinder::handleResetCommand(IPC::Connection& conn) {
-  std::cerr << "Reset to current profile" << std::endl;
-  resetToProfile();
+void MidiMinder::handleResetCommand(IPC::Connection& conn, const IPC::Options& opts) {
+  bool keepObserved = false;
+  bool resetHard = false;
+  for (auto& o : opts) {
+    if (o == "keepObserved")          keepObserved = true;
+    else if (o == "resetHard")        resetHard = true;
+    else
+      std::cerr << "Reset option " << o << " not recognized, ignoring" << std::endl;
+  }
+
+  if (!keepObserved)
+    clearObserved();
+
+  if (resetHard)
+    resetConnectionsHard();
+  else
+    resetConnectionsSoft();
 }
 
 void sendLoadCommand() {
@@ -561,7 +586,8 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
   for (auto& r : profileRules)
     std::cout << "    " << r << std::endl;
 
-  resetToProfile();
+  clearObserved();
+  resetConnectionsSoft();
 }
 
 void sendSaveCommand() {

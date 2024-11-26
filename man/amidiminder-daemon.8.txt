@@ -7,7 +7,7 @@ NAME
 
 
 SYNOPSIS
-       amidiminder daemon [-p]
+       amidiminder [-v|-q] daemon [-p]
 
 
 DESCRIPTION
@@ -33,27 +33,37 @@ DESCRIPTION
    State
        The desired connection state is composed of two parts:
 
-       Profile rules The profile is a list of rules for which  ports  to  con‐
-              nect. It is written in a simple syntax that makes it possible to
-              express these connections, even when the devices aren't  current
-              connected.  The  commands in amidiminder(1) are used by the user
-              to load, save, and reset the profile. The user can have multiple
+       Profile rules
+              The profile is a list of rules for which ports to connect. It is
+              written  in  a  simple  syntax that makes it possible to express
+              these connections, even when the  devices  aren't  current  con‐
+              nected.  The  commands in amidiminder(1) are used by the user to
+              load, save, and reset the profile. The user  can  have  multiple
               profile files prepared, and by loading them, reconfigure all the
               connections with one command.
 
-       Observed rules These are a set of rules the daemon learns by  observing
-              connections  made  by  the user via commands such as aconnect(1)
-              and by other software. These rules are  considered  to  override
-              any  profile  rules, should they conflict.  This allows a change
-              from the current profile to be just as robust as the profile it‐
-              self.  The user can also easily drop the observed rules by load‐
-              ing another profile, or using the amidiminder reset command.
+       Observed rules
+              These are a set of rules the daemon learns by observing  connec‐
+              tions  made  by the user via commands such as aconnect(1) and by
+              other software. These rules are considered to override any  pro‐
+              file rules, should they conflict.  This allows a change from the
+              current profile to be just as robust as the profile itself.  The
+              user  can also easily drop the observed rules by loading another
+              profile, or using the amidiminder reset command.
 
        Both parts of the connection state are persisted into the  file  system
        so that they survive restarts of the daemon, or the whole system.
 
 
 OPTIONS
+       -v, --verbose
+              Increases  output message verbosity. Can be applied twice, which
+              increasee output to debugging level.
+
+       -q, --quiet
+              Suppress all output except errors, and basic logging to know the
+              daemon is running.
+
        -p, --port-details
               Causes  output of all ALSA sequencer port information when ports
               are added or re-scanned by the daemon. This information is  pri‐

@@ -4,7 +4,7 @@
 amidiminder-daemon \- MIDI device connection daemon
 
 .SH SYNOPSIS
-.B amidiminder daemon
+.B amidiminder [\fB-v\fR|\fB-q\fR] daemon
 .RB [ -p ]
 
 .SH DESCRIPTION
@@ -31,7 +31,7 @@ persistent, even across system reboots, so that the configuration
 is quickly maintained once devices power back up and applications restarted.
 .SS State
 The desired connection state is composed of two parts:
-.HP
+.TP
 .B Profile rules
 The profile is a list of rules for which ports to connect. It is written
 in a simple syntax that makes it possible to express these connections, even
@@ -40,7 +40,7 @@ when the devices aren't current connected. The commands in
 are used by the user to load, save, and reset the profile. The user can
 have multiple profile files prepared, and by loading them, reconfigure all the
 connections with one command.
-.HP
+.TP
 .B Observed rules
 These are a set of rules the daemon learns by observing connections made by the
 user via commands such as
@@ -56,6 +56,14 @@ Both parts of the connection state are persisted into the file system so that
 they survive restarts of the daemon, or the whole system.
 
 .SH OPTIONS
+.TP
+.B -v\fR,\fB --verbose
+Increases output message verbosity. Can be applied twice, which increasee output
+to debugging level.
+.TP
+.B -q\fR,\fB --quiet
+Suppress all output except errors, and basic logging to know the daemon is
+running.
 .TP
 .B -p\fR,\fB --port-details
 Causes output of all ALSA sequencer port information when ports are added or

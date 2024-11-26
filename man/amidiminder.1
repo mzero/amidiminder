@@ -6,7 +6,7 @@ amidiminder \- Utility to manage MIDI device connections
 .br
 .B amidiminder save \fIfile
 .br
-.B amidiminder reset
+.B amidiminder reset [\fB--keep\fR] [\fB--hard\fR]
 .br
 .B amidiminder check \fIfile
 
@@ -54,10 +54,22 @@ file.
 
 A file name of \fB-\fR (hyphen-minus) writes to the standard output.
 .TP
-.B reset
+.BR reset " [" --keep "] [" --hard "]"
 Reloads the current profile: Observed rules are dropped.
 All existing connections are disconnected. Then finally, ports are reconnected
 according to the rules in the current profile.
+
+.B Options
+.TP +12n
+.in +7n
+.B --keep
+Keep the observed rules, don't drop them.
+.TP +12n
+.in +7n
+.B --hard
+Resync all connections and ports from the ALSA Seq system. This should never be
+necissary, but misbehaving software might cause the daemon to be out of sync
+with reality. If you find you need this, please contact the author.
 .SS Utility commands
 .TP
 \fBcheck \fIfile\fR

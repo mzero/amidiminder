@@ -67,6 +67,7 @@ NOTES
 [] ? case insensitive client and port name matches
 [] ? get systemctl reload to call amidiminder reset
 [] replace -p with just a verbosity check
+    [] ? move -v and -q flags to daemon only... only place really used
 
 
 ## future

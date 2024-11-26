@@ -14,7 +14,7 @@ DESCRIPTION
        rules, and if some of the devices or software are not yet on-line, con‐
        nections for those ports will be made when they later come on-line.
 
-       The amidiminder-deamon(8) will then continue to  ensure  these  connec‐
+       The amidiminder-daemon(8) will then continue to  ensure  these  connec‐
        tions  are made if devices are unplugged and re-plugged, or even if the
        whole system restarts.
 

@@ -8,7 +8,7 @@ NAME
 SYNOPSIS
        amidiminder load file
        amidiminder save file
-       amidiminder reset
+       amidiminder reset [--keep] [--hard]
        amidiminder check file
 
 
@@ -53,36 +53,48 @@ COMMANDS
 
               A file name of - (hyphen-minus) writes to the standard output.
 
-       reset  Reloads the current profile: Observed rules  are  dropped.   All
+       reset [--keep] [--hard]
+              Reloads the current profile: Observed rules  are  dropped.   All
               existing  connections  are disconnected. Then finally, ports are
               reconnected according to the rules in the current profile.
 
+              Options
+
+              --keep
+                   Keep the observed rules, don't drop them.
+
+              --hard
+                   Resync all connections and ports from the ALSA Seq  system.
+                   This  should  never  be necissary, but misbehaving software
+                   might cause the daemon to be out of sync with  reality.  If
+                   you find you need this, please contact the author.
+
    Utility commands
        check file
-              Check that the file parses as a valid profile.  Errors  are  re‐
+              Check  that  the  file parses as a valid profile. Errors are re‐
               ported by line.
 
               A file name of - (hyphen-minus) checks from the standard input.
 
-              The  exit status of the command is 0 if the file is a valid pro‐
+              The exit status of the command is 0 if the file is a valid  pro‐
               file, and 1 if there are any syntax errors.
 
 
 ENVIRONMENT
        RUNTIME_DIRECTORY
-              The path to the directory that has the UNIX-domain  socket  used
+              The  path  to the directory that has the UNIX-domain socket used
               to communicate between the control commands and the running dae‐
               mon.
 
-              Note: If the system configuration is changed such that the  dae‐
-              mon  is  launched with a non-default value for this variable, it
-              must also be set the same way when  using  any  of  the  control
+              Note:  If the system configuration is changed such that the dae‐
+              mon is launched with a non-default value for this  variable,  it
+              must  also  be  set  the  same way when using any of the control
               coammands.
 
 
 FILES
        /run/amidiminder
-              The  default  location  of  the  runtime  directory. If the RUN‐
+              The default location of  the  runtime  directory.  If  the  RUN‐
               TIME_DIRECTORY environment variable is not set, this is the path
               used.
 

@@ -78,6 +78,19 @@ test-shell: $(BUILD_DIR)/test-env
 	$$SHELL --rcfile $(BUILD_DIR)/test-env || true
 
 
+# man files
+
+MANDIR ?= man
+MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8
+MANFILES ?= $(foreach page,$(MANPAGES),$(MANDIR)/$(page))
+MANFORMATED ?= $(foreach file,$(MANFILES),$(file).txt)
+
+$(MANFORMATED): %.txt : %
+	groff -t -man -Tutf8 $< | col -b -x > $@
+
+format-man-pages: $(MANFORMATED)
+
+
 # dependencies
 
 DEPS := $(OBJS:.o=.d)

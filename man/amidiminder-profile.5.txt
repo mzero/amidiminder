@@ -1,0 +1,210 @@
+AMIDIMINDER-PROFILE(5)        File Formats Manual       AMIDIMINDER-PROFILE(5)
+
+
+
+NAME
+       amidiminder-profile - Format for MIDI connection rules
+
+
+DESCRIPTION
+       Profiles  describe  a list of rules for making connections between ALSA
+       sequencer MIDI ports. Users can create a profile rules file to describe
+       how they want their MIDI environment connected, then use amidiminder(1)
+       to load it into the system. Connections will be made according  to  the
+       rules, and if some of the devices or software are not yet on-line, con‐
+       nections for those ports will be made when they later come on-line.
+
+       The amidiminder-deamon(8) will then continue to  ensure  these  connec‐
+       tions  are made if devices are unplugged and re-plugged, or even if the
+       whole system restarts.
+
+
+CONCEPTS
+   ALSA Sequencer structure
+       Each device or application that wants to  have  MIDI  ports,  registers
+       with  ALSA  as a "client". This client has a name, chosen by the device
+       or application, and a number, assigned by ALSA.  As  the  number  isn't
+       predicable, profiles only refer to client names.
+
+       Each  client  can  have  one  or  more ports, and these ports can be in
+       ports, supplying MIDI data, out ports (receiving MIDI)  data,  or  they
+       can  be  both.   Hardware  devices typically have just one port that is
+       both in and out.  Applications often have separate  in  ports  and  out
+       ports.
+
+       Like clients, the ports also have both a name supplied by the device or
+       application, and a number supplied by ALSA. Here, the numbers are  sta‐
+       ble,  and  predictable, and so in profiles rules can refere to ports by
+       either name or number.
+
+       Connections are unidirectional, from one in port to one out port.
+
+
+   Rules
+       Rules specify ports that should be connected. Rules can  have  wildcard
+       specifications,  so  they  match multiple ports and cause more than one
+       connection to be made.
+
+       Rules can also be disallow rules, specifying ports that should  not  be
+       connected.  This can be useful to restrict a wildcard rule to not apply
+       in some circumstances. Disallow rules can also be  generated  when  the
+       amidiminder-daemon(8)  observes  the  user  expressly disconnecting two
+       ports that the profile rules connected. Such a disallow rule acts as an
+       override.
+
+       A  profile  consists of a sequence of rules. The order matters, and the
+       last rule matching a pair of ports governs what happens.   amidiminder-
+       daemon(8) also maintains a list of observed rules. These logically fol‐
+       low the profile rules.
+
+
+EXAMPLE
+       This profile connects some hardware MIDI devices to a piece of software
+       called "bicycle" (a MIDI looper).
+
+           bicycle:control <-- nanoKEY2
+           bicycle:control <-- Erae Touch
+              # These connect my controllers to the software. Sometimes I
+              # use the nanoKEY2 keyboard, sometimes I use the Erae surface
+              # to play notes. These rules connect both, so which ever is
+              # plugged in gets connected.
+
+           bicycle:control <-> Launchpad Pro:MIDI
+              # Connects the Launchpad to the software, and vice-versa.
+              # This allows buttons on the Launchpad to control the
+              # software, and the software to control the lights on the
+              # Launchpad.
+              #
+              # The Launchpad presents three MIDI ports, and we want the one
+              # that is just plain MIDI from the unit.
+
+           bicycle:synth --> MicroMonsta
+           bicycle:synth --> Hydrasynth
+           bicycle:synth --> Midihub:1
+              # Connects the music output of the software to my synths. The
+              # last line connects to a MIDI interface, which has four
+              # distinct MIDI outputs, numbered from 0. Here we connect to
+              # the second one.
+
+           Faderfox --> Midihub:3
+              # Lastly, connect a hardware control surface with knobs to the
+              # fourth output of the MIDI interface. This is just hardware
+              # to hardware connection, used to adjust the parameters of my
+              # reverb unit, connected to the MIDI interface.
+
+       Placing the above text in a file, say bicycle-profile.rules, these con‐
+       nections could be quickly established by running this command:
+
+           & amidiminder load bicycle-profile.rules
+
+
+SYNTAX
+   Profile structure
+       Profiles are text files with one rule per line.  Comments begin with  a
+       number  sign (#), and continue to the end of the line. Empty lines (in‐
+       cluding comment only lines) are ignored.  Leading  and  trailing  white
+       space around a rule is also ignored.
+
+   Clients
+       Clients are specified in one of three ways:
+
+                                       Syntax          Example
+
+              (a) by partial name      client-name     Monsta
+              (b) by full exact name   "client-name"   "Launchpad Pro"
+              (c) by wildcard          *               *
+
+       (a)    A  client  can  be specified by any part of its name. Spaces are
+              allowed. Since client names can be long, any  substring  can  be
+              given.  For  example, Monsta will match a client named MicroMon‐
+              sta 2.
+
+              Be aware that some client specifications will match multiple de‐
+              vices, should your system have them. For example, Launchpad will
+              match both a Launchpad Pro and a Launchpad Pro MK3. This may, or
+              may not, be exactly what you want.
+
+       (b)    A client can be specified by its full name, by putting the spec‐
+              ification in double quotes. So "Launchpad Pro" will only match a
+              Launchpad Pro, but not a Launchpad Pro MK3.
+
+       (c)    This specification matches all clients.
+
+
+   Ports
+       Ports are specified in one five ways:
+
+                                  Syntax               Example
+
+              (a) by default      client               Digitakt
+              (b) by name         client:port-name     Launch Pad:DAW
+              (c) by exact name   client:"port-name"   Launch Pad:"Live Port"
+              (d) by number       client:number        Launch Pad:1
+              (e) by wildcard     client:*             Launch Pad:*
+
+       (a)    This  is  the  most common way to specify a port, with with just
+              the client name.  In this case in matches the first  in  or  out
+              port  the  client has, depending on the direction the connection
+              is being made.
+
+       (b)    A port can be specified by any part of it's name,  in  the  same
+              way as clients can.
+
+       (c)    A  port can be specified by its exact, full name, by placing the
+              name in quotes.
+
+       (d)    Ports can be specified by number. Port numbers start at 0.
+
+       (e)    This is a wildcard specification, and matches all ports  of  the
+              client.
+
+       There are two special forms for a port specification. These specify all
+       ports on all clients that are tagged (by the device or software  creat‐
+       ing the ports) in a certain way.
+
+                                          Syntax
+
+              (f) all hardware ports      .hw
+              (g) all application ports   .app
+
+       Note  that there is no client specification, nor a colon (:) with these
+       specifications.
+
+
+   Connection rules
+       A connection rule consists of a port, a connector,  and  another  port.
+       There are three types of connector:
+
+       portA --> portB
+              Specifies a connection fron portA to portB.
+
+       portA <-- portB
+              Specifies  a  connection  in  the other direction, from portB to
+              portA
+
+       portA <-> portB
+              This is just a short hand for specifying both rules  above.  As‐
+              suming  both ports are in and out ports, the this will cause two
+              connections to be made, one in each direction.
+
+       Note: In the forms above, any number of hyphens (-) are accepted in the
+       arrow.
+
+
+   Disallow rules
+       A  disallow  rule  has exactly the same form as a connection rule, only
+       the connector has an x added in the arrow:
+              portA -x-> portB
+              portA <-x- portB
+              portA <-x-> portB
+
+       These rules will keep a connection from being  made  when  prior  rules
+       (including wildcard rules) would have made one.
+
+
+SEE ALSO
+       amidiminder(1), amidiminder-daemon(8),
+
+
+
+                                                        AMIDIMINDER-PROFILE(5)

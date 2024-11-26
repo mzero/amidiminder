@@ -110,14 +110,29 @@ namespace Files {
   }
 
   void writeFile(const std::string& path, const std::string& contents) {
-    std::ofstream file(path);
+    std::string tempPath = path + ".save";
+
+    std::ofstream file(tempPath);
     if (!file.good()) {
       std::string errStr = ::strerror(errno);
-      std::cerr << "Could not write " << path << ", " << errStr << std::endl;
+      std::cerr << "Could not write " << tempPath << ", " << errStr << std::endl;
       std::exit(1);
     }
 
     file << contents;
+    file.flush();
+    // Should call fsync() here with the file descriptor underlying the file.
+    // But, there is no way in current GCC implementation to get the FD.
+    // file.rdbuf()->fd() used to work, but it is gone now.  ¯\_(ツ)_/¯
+    file.close();
+
+    int err = std::rename(tempPath.c_str(), path.c_str());
+    if (err != 0) {
+      std::string errStr = ::strerror(errno);
+      std::cerr << "Could not rename " << tempPath << " to " << path
+        << ", " << errStr << std::endl;
+      std::exit(1);
+    }
   }
 
   std::string readUserFile(const std::string& path) {

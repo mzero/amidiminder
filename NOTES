@@ -5,9 +5,9 @@ NOTES
 
 ## state and profiles
 
-[] file locations in code somewhere
+[x] file locations in code somewhere
     [x] handle "-" to mean stdin/stdout
-    [] safe file write code (write to .save, rename)
+    [x] safe file write code (write to .save, rename)
 
 [] reorg
     [] change commtest command on the wire from "ahoy" to "commtest"
@@ -72,6 +72,7 @@ NOTES
     N.B.: Not clear this is really needed, since we don't see any applications
     that really change port names or capabilities after being created. See the
     code in MidiMinder::handleSeqEvent for details about client name changes.
+[] figure out how to fsync in Files::writeFile()
 
 # MAJOR THEMES
 

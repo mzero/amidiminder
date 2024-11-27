@@ -24,11 +24,10 @@ NOTES
     [] correctly adjusting observed rules if needed
     [] improve messages to the log on adding / removing observed rules
     [] checking for rule consistency
-    [] expected disconnect optimization
-    [] optimize saving observedRules
+    [x] expected disconnect optimization
+    [-] optimize saving observedRules
+        - no longer really needed, as never saved more than once per event
 
-[] Primary port logic - and general refactor
-    [] ? on reset just scan activeConnections
 
 ## general
 
@@ -83,6 +82,14 @@ NOTES
     that really change port names or capabilities after being created. See the
     code in MidiMinder::handleSeqEvent for details about client name changes.
 [] figure out how to fsync in Files::writeFile()
+[] ? on soft reset, we could just scan activeConnections and only disconnect
+    those that the rules wouldn't put back; and then, when adding back the
+    ports, be careful to not try to reconnect connections that remainded
+    (or just ignore the ALSA Seq connection error) - this would ensure no
+    disruption of connections when switching profiles where a connection is
+    in both the old and new profile. Really may not be worth the effort!
+
+
 
 # MAJOR THEMES
 

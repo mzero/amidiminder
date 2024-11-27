@@ -115,6 +115,8 @@ class MidiMinder {
     std::map<snd_seq_addr_t, Address> activePorts;
     std::set<snd_seq_connect_t> activeConnections;
 
+    std::set<snd_seq_connect_t> expectedDisconnects;
+    std::set<snd_seq_connect_t> expectedConnects;
 
   public:
     MidiMinder() {
@@ -188,11 +190,13 @@ class MidiMinder {
         }
 
         case SND_SEQ_EVENT_PORT_SUBSCRIBED: {
+          if (expectedConnects.erase(ev.data.connect)) break;
           addConnection(ev.data.connect);
           break;
         }
 
         case SND_SEQ_EVENT_PORT_UNSUBSCRIBED: {
+          if (expectedDisconnects.erase(ev.data.connect)) break;
           delConnection(ev.data.connect);
           break;
         }
@@ -228,6 +232,8 @@ class MidiMinder {
       text << r << '\n';
     observedText = text.str();
     Files::writeFile(Files::observedFilePath(), observedText);
+    if (Args::debug())
+      std::cout << "Observed rules written" << std::endl;
   }
 
   void clearObserved() {
@@ -240,6 +246,7 @@ class MidiMinder {
   // reset ports & connections from scratch, rescanning ALSA Seq
 
     std::vector<snd_seq_connect_t> doomed;
+    activeConnections.clear();
       // a little afraid to disconnect connections while scanning them!
     seq.scanConnections([&](auto c){
       const Address& sender = knownPort(c.sender);
@@ -247,9 +254,10 @@ class MidiMinder {
       if (sender && dest) // check if it's a connection we would manage
         doomed.push_back(c);
     });
-    for (auto& c : doomed)
+    for (auto& c : doomed) {
       seq.disconnect(c);  // will generate UNSUB events that should be ignored
-    activeConnections.clear();
+      expectedDisconnects.insert(c);
+    }
 
     activePorts.clear();
     seq.scanPorts([&](auto p){
@@ -261,10 +269,12 @@ class MidiMinder {
 
   void resetConnectionsSoft() {
   // reset ports & connections without rescanning ALSA Seq
-
-    for (auto& c : activeConnections)
+    std::set<snd_seq_connect_t> doomed;
+    doomed.swap(activeConnections);
+    for (auto& c : doomed) {
       seq.disconnect(c);  // will generate UNSUB events that should be ignored
-    activeConnections.clear();
+      expectedDisconnects.insert(c);
+    }
 
     std::map<snd_seq_addr_t, Address> ports;
     ports.swap(activePorts);
@@ -333,6 +343,7 @@ class MidiMinder {
       conn.dest = cc.dest.addr;
       if (activeConnections.find(conn) == activeConnections.end()) {
         seq.connect(conn.sender, conn.dest);
+        expectedConnects.insert(conn);
         activeConnections.insert(conn);
         std::cout << "connecting " << cc.sender << " --> " << cc.dest << '\n'
           << "    by " << cc.source << " rule: " << cc.rule << std::endl;

@@ -10,6 +10,7 @@ SYNOPSIS
        amidiminder save file
        amidiminder reset [--keep] [--hard]
        amidiminder check file
+       amidiminder status
 
 
 DESCRIPTION
@@ -78,6 +79,10 @@ COMMANDS
 
               The exit status of the command is 0 if the file is a valid  pro‐
               file, and 1 if there are any syntax errors.
+
+       status Connects  to  the daemon, retreives some status information, and
+              outputs it.  This is a good way to check that the daemon  is  up
+              and running.
 
 
 ENVIRONMENT

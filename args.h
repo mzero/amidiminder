@@ -14,7 +14,7 @@ namespace Args {
     Load,
     Save,
 
-    CommTest,
+    Status,
   };
   extern Command command;
 

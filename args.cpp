@@ -61,6 +61,15 @@ namespace Args {
     resetApp->add_flag("--hard", resetHard, "Reload ALSA state while resetting;"
                                           "\nshould never be needed");
 
+    CLI::App *statusApp = app.add_subcommand("status", "Report current status of the daemon");
+    statusApp->parse_complete_callback([](){ command = Command::Status; });
+    statusApp->group(userGroup);
+
+    CLI::App *helpApp = app.add_subcommand("help");
+    helpApp->group(userGroup);
+    helpApp->description(app.get_help_ptr()->get_description());
+    helpApp->parse_complete_callback([](){ command = Command::Help; });
+
 
     const char* systemGroup = "System commands";
 
@@ -69,15 +78,6 @@ namespace Args {
     daemonApp->parse_complete_callback([](){ command = Command::Daemon; });
     daemonApp->add_flag("-p,--port-details", outputPortDetails, "output verbose details of each port");
 
-    CLI::App *helpApp = app.add_subcommand("help");
-    helpApp->group(userGroup);
-    helpApp->description(app.get_help_ptr()->get_description());
-    helpApp->parse_complete_callback([](){ command = Command::Help; });
-
-
-    CLI::App *commTestApp = app.add_subcommand("commtest", "Test communication with the minder service");
-    commTestApp->parse_complete_callback([](){ command = Command::CommTest; });
-    commTestApp->group(""); // hide from help
 
     try {
         app.parse(argc, argv);

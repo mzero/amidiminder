@@ -9,9 +9,8 @@ NOTES
     [x] handle "-" to mean stdin/stdout
     [x] safe file write code (write to .save, rename)
 
-[ ] reorg
-    [ ] change commtest command on the wire from "ahoy" to "commtest"
-        [] find suitable haiku for the commtest command
+[x] reorg
+    [x] replace commtest command with a status command
     [x] hard and soft resets
         [x] user optinos on the reset command
 
@@ -50,7 +49,12 @@ NOTES
         [] client wants to report and exit
         [] server wants to report and discard (aborting the command in progress)
         [x] calls to write in ipc.cpp should have the return value checked
-    [] when user commands can't find the socket - tell user to start the daemon
+    [x] when user commands can't find the socket - tell user to start the daemon
+        - this should work nicely for sendStatusCommand()
+    [] std::exit(1) points should be throws, caught in main()
+        - in particular, we want MidiMinder to destruct, and it's Server
+          to destruct so that the control socket gets removed.
+
 
 ## aconnect functionality
 

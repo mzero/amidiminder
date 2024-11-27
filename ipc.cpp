@@ -10,6 +10,19 @@
 #include "files.h"
 
 namespace {
+
+  void removeSocketFile() {
+    auto path = Files::controlSocketPath();
+
+    int err = remove(path.c_str());
+    if (err == -1 && (errno != 0 && errno != ENOENT)) {
+      auto errStr = strerror(errno);
+      std::cerr << "Couldn't remove socket path " << path
+        << ", " << errStr << std::endl;
+      std::exit(1);
+    }
+  }
+
   int makeSocket(bool server) {
     if (server) Files::initializeAsService();
     else        Files::initializeAsClient();
@@ -25,15 +38,7 @@ namespace {
 
     auto path = Files::controlSocketPath();
 
-    if (server) {
-      int err = remove(path.c_str());
-      if (err == -1 && (errno != 0 && errno != ENOENT)) {
-        auto errStr = strerror(errno);
-        std::cerr << "Couldn't clean socket path " << path
-          << ", " << errStr << std::endl;
-        std::exit(1);
-      }
-    }
+    if (server) removeSocketFile();
 
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
@@ -61,8 +66,16 @@ namespace {
     else {
       if (connect(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0) {
         auto errStr = strerror(errno);
-        std::cerr << "Couldn't connect to socket path " << path
-          << ", " << errStr << std::endl;
+        std::cerr << "Couldn't connect to the amidiminder daemon.\n"
+          "\n"
+          "Use systemctl to check or start it:\n"
+          "    systemctl status amidiminder.service\n"
+          "    systemctl start amidiminder.service\n"
+          "\n"
+          "(While trying to connect to the socket path:\n"
+          "    " << path << "\n"
+          "    got the error: " << errStr << ")\n" <<
+          "\n" << std::endl;
         std::exit(1);
       }
     }
@@ -209,7 +222,7 @@ namespace IPC {
 
 
   Server::Server() : Socket(makeSocket(true)) { }
-  Server::~Server()                           { }
+  Server::~Server()                           { removeSocketFile(); }
 
   void Server::scanFDs(std::function<void(int)> fn) {
     fn(sockFD);

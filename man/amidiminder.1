@@ -9,6 +9,8 @@ amidiminder \- Utility to manage MIDI device connections
 .B amidiminder reset [\fB--keep\fR] [\fB--hard\fR]
 .br
 .B amidiminder check \fIfile
+.br
+.B amidiminder status
 
 .SH DESCRIPTION
 The
@@ -79,6 +81,10 @@ A file name of \fB-\fR (hyphen-minus) checks from the standard input.
 
 The exit status of the command is \fB0\fR if the file is a valid profile,
 and \fB1\fR if there are any syntax errors.
+.TP
+.B status
+Connects to the daemon, retreives some status information, and outputs it.
+This is a good way to check that the daemon is up and running.
 
 .SH ENVIRONMENT
 .IP RUNTIME_DIRECTORY

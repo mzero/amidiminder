@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <alsa/asoundlib.h>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <list>
 #include <map>
@@ -206,7 +207,7 @@ class MidiMinder {
     void handleResetCommand(IPC::Connection& conn, const IPC::Options& opts);
     void handleLoadCommand(IPC::Connection& conn);
     void handleSaveCommand(IPC::Connection& conn);
-    void handleCommTestCommand(IPC::Connection& conn);
+    void handleStatusCommand(IPC::Connection& conn);
 
     void handleConnection(IPC::Connection& conn) {
       auto msg = conn.receiveCommandAndOptions();
@@ -216,7 +217,7 @@ class MidiMinder {
       if      (command == "reset") handleResetCommand(conn, options);
       else if (command == "load")  handleLoadCommand(conn);
       else if (command == "save")  handleSaveCommand(conn);
-      else if (command == "ahoy")  handleCommTestCommand(conn);
+      else if (command == "status")  handleStatusCommand(conn);
       else
         std::cerr << "No idea what to do with that!" << std::endl;
     }
@@ -618,25 +619,21 @@ void MidiMinder::handleSaveCommand(IPC::Connection& conn) {
   conn.sendFile(combinedProfile);
 }
 
-void sendCommTestCommand() {
+void sendStatusCommand() {
   IPC::Client client;
-  std::cout << "Sending ahoy..." << std::endl;
-  client.sendCommand("ahoy");
-  std::cout << "Waiting for file:" << std::endl;
-  std::cout << "--------" << std::endl;
+  client.sendCommand("status");
   client.receiveFile(std::cout);
-  std::cout << "--------" << std::endl;
 }
 
-void MidiMinder::handleCommTestCommand(IPC::Connection& conn) {
-  std::cerr << "Connection test command received" << std::endl;
-  std::string text =
-    "A sailor went to sea, sea, sea,\n"
-    "To see what he could see, see, see.\n"
-    "But all that he could see, see, see,\n"
-    "Was the bottom of the deep blue sea, sea, sea.\n";
-  std::istringstream file(text);
-  conn.sendFile(file);
+void MidiMinder::handleStatusCommand(IPC::Connection& conn) {
+  std::stringstream report;
+  auto w = std::setw(4);
+  report << "Daemon is running.\n";
+  report << w << profileRules.size()        << " profile rules.\n";
+  report << w << observedRules.size()       << " observed rules.\n";
+  report << w << activePorts.size()         << " active ports.\n";
+  report << w << activeConnections.size()   << " active connections\n";
+  conn.sendFile(report);
 }
 
 
@@ -666,7 +663,7 @@ int main(int argc, char *argv[]) {
     case Args::Command::Reset:      sendResetCommand();     break;
     case Args::Command::Load:       sendLoadCommand();      break;
     case Args::Command::Save:       sendSaveCommand();      break;
-    case Args::Command::CommTest:   sendCommTestCommand();  break;
+    case Args::Command::Status:     sendStatusCommand();    break;
   }
 
   return 0;

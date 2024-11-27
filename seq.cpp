@@ -44,6 +44,7 @@ std::string Seq::clientName(const snd_seq_addr_t& addr) {
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
   serr = snd_seq_get_any_client_info(seq, addr.client, client);
+  if (serr == -ENOENT) return {}; // client has already exited!
   if (errCheck(serr, "get client info")) return "";
 
   return snd_seq_client_info_get_name(client);
@@ -58,6 +59,7 @@ Address Seq::address(const snd_seq_addr_t& addr) {
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
   serr = snd_seq_get_any_client_info(seq, addr.client, client);
+  if (serr == -ENOENT) return {}; // client has already exited!
   if (errCheck(serr, "get client info")) return {};
 
   snd_seq_port_info_t *port;

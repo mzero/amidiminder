@@ -15,7 +15,7 @@ NOTES
         [x] user optinos on the reset command
 
 
-[x] command line and deamon communication
+[x] command line and daemon communication
     [x] save command
     [x] command logging reception in IPC
     [x] support command options

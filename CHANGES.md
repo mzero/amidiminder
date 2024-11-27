@@ -11,8 +11,8 @@ This file summarizes the changes made with each release of the code.
 * Profile files
   * no longer a single file in /etc
   * loaded by user commands, and persisted by daemon
-  * observed rules also persisted by deamon
-  * persisted state survives deamon restarts and system reboots
+  * observed rules also persisted by daemon
+  * persisted state survives daemon restarts and system reboots
 
 * Command line overhaul:
   * subcommands for running the daemon, and for controlling it

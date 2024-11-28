@@ -3,10 +3,19 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <stdexcept>
 
 // TODO: support case insensitive matches for non-exact
+
+
+namespace {
+  template <typename Iter> inline
+  Iter string_to(Iter i, std::string_view s) {
+    return std::copy(s.begin(), s.end(), i);
+  }
+}
 
 /*
 
@@ -61,10 +70,11 @@ bool ClientSpec::match(const Address& a) const {
 bool ClientSpec::isWildcard() const
   { return !exactMatch && client.empty(); }
 
-void ClientSpec::output(std::ostream& s) const {
-  if      (exactMatch)      s << '"' << client << '"';
-  else if (client.empty())  s << '*';
-  else                      s << client;
+fmt::format_context::iterator
+ClientSpec::format(fmt::format_context& ctx) const {
+  if      (exactMatch)      return fmt::format_to(ctx.out(), "\"{}\"", client);
+  else if (client.empty())  return string_to(ctx.out(), "*");
+  else                      return string_to(ctx.out(), client);
 }
 
 
@@ -116,25 +126,23 @@ bool PortSpec::match(const Address& a, bool primaryFlag) const {
   return false; // should never happen
 }
 
-namespace {
-  void outputTypeFlag(std::ostream& s, unsigned int tf) {
-    switch (tf) {
-      case SND_SEQ_PORT_TYPE_HARDWARE:    s << ".hw";   break;
-      case SND_SEQ_PORT_TYPE_APPLICATION: s << ".app";  break;
-      default:                            s << '.' << std::hex << tf;
-    }
-  }
-}
-
-void PortSpec::output(std::ostream& s) const {
+fmt::format_context::iterator
+PortSpec::format(fmt::format_context& ctx) const {
   switch (kind) {
-    case Defaulted:   ;                             break;
-    case Partial:     s << port;                    break;
-    case Exact:       s << '"' << port << '"';      break;
-    case Numeric:     s << std::dec << portNum;     break;
-    case Type:        outputTypeFlag(s, typeFlag);  break;
-    case Wildcard:    s << '*';                     break;
+    case Defaulted:   break;
+    case Partial:     return string_to(ctx.out(), port);
+    case Exact:       return fmt::format_to(ctx.out(), "\"{}\"", port);
+    case Numeric:     return fmt::format_to(ctx.out(), "{}", portNum);
+    case Type:
+      switch (typeFlag) {
+        case SND_SEQ_PORT_TYPE_HARDWARE:    return string_to(ctx.out(), ".hw");
+        case SND_SEQ_PORT_TYPE_APPLICATION: return string_to(ctx.out(), ".app");
+        default:
+          return fmt::format_to(ctx.out(), "{:x}", typeFlag);
+      }
+    case Wildcard:    return string_to(ctx.out(), "*");
   }
+  return ctx.out();
 }
 
 
@@ -152,10 +160,11 @@ bool AddressSpec::matchAsSender(const Address& a) const
 bool AddressSpec::matchAsDest(const Address& a) const
   { return client.match(a) && port.matchAsDest(a); }
 
-void AddressSpec::output(std::ostream& s) const {
-  if (client.isWildcard() && port.isType())   s << port;
-  else if (port.isDefaulted())                s << client;
-  else                                        s << client << ':' << port;
+fmt::format_context::iterator
+AddressSpec::format(fmt::format_context& ctx) const {
+  if (client.isWildcard() && port.isType())   return fmt::format_to(ctx.out(), "{}", port);
+  else if (port.isDefaulted())                return fmt::format_to(ctx.out(), "{}", client);
+  else                                        return fmt::format_to(ctx.out(), "{}:{}", client, port);
 }
 
 
@@ -170,8 +179,11 @@ ConnectionRule ConnectionRule::exact(const Address& s, const Address& d)
 ConnectionRule ConnectionRule::exactBlock(const Address& s, const Address& d)
   { return ConnectionRule(AddressSpec::exact(s), AddressSpec::exact(d), true); }
 
-void ConnectionRule::output(std::ostream& s) const
-  { s << sender << (blocking ? " -x-> " : " --> ") << dest; }
+fmt::format_context::iterator
+ConnectionRule::format(fmt::format_context& ctx) const {
+  return fmt::format_to(ctx.out(), "{} {} {}",
+    sender, (blocking ? "-x->" : "-->"), dest);
+}
 
 
 

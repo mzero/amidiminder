@@ -1,11 +1,11 @@
 #pragma once
 
+#include <fmt/format.h>
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "seq.h"
-
 
 
 class ClientSpec {
@@ -20,7 +20,7 @@ class ClientSpec {
     ClientSpec& operator=(const ClientSpec&) = default;
 
     bool isWildcard() const;
-    void output(std::ostream&) const;
+    fmt::format_context::iterator format(fmt::format_context&) const;
 
   private:
     std::string client;
@@ -46,7 +46,8 @@ class PortSpec {
 
     bool isDefaulted() const;
     bool isType() const;
-    void output(std::ostream&) const;
+
+    fmt::format_context::iterator format(fmt::format_context&) const;
 
   private:
     enum Kind {
@@ -82,7 +83,7 @@ class AddressSpec {
     AddressSpec(const AddressSpec&) = default;
     AddressSpec& operator=(const AddressSpec&) = default;
 
-    void output(std::ostream&) const;
+    fmt::format_context::iterator format(fmt::format_context&) const;
 
   private:
     ClientSpec client;
@@ -107,7 +108,7 @@ class ConnectionRule {
     ConnectionRule(const ConnectionRule&) = default;
     ConnectionRule& operator=(const ConnectionRule&) = default;
 
-    void output(std::ostream&) const;
+    fmt::format_context::iterator format(fmt::format_context&) const;
 
   private:
     AddressSpec sender;
@@ -121,14 +122,34 @@ bool parseRules(std::istream& input, ConnectionRules& rules);
 bool parseRules(std::string input, ConnectionRules& rules);
 
 
+template <> struct fmt::formatter<ClientSpec> : formatter<string_view> {
+  auto format(const ClientSpec& c, format_context& ctx) const
+    { return c.format(ctx); }
+};
+
+template <> struct fmt::formatter<PortSpec> : formatter<string_view> {
+  auto format(const PortSpec& p, format_context& ctx) const
+    { return p.format(ctx); }
+};
+
+template <> struct fmt::formatter<AddressSpec> : formatter<string_view> {
+  auto format(const AddressSpec& a, format_context& ctx) const
+    { return a.format(ctx); }
+};
+
+template <> struct fmt::formatter<ConnectionRule> : formatter<string_view> {
+  auto format(const ConnectionRule& r, format_context& ctx) const
+    { return r.format(ctx); }
+};
+
 inline std::ostream& operator<<(std::ostream& s, const ClientSpec& c)
-  { c.output(s); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", c); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const PortSpec& p)
-  { p.output(s); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", p); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const AddressSpec& a)
-  { a.output(s); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", a); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const ConnectionRule& c)
-  { c.output(s); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", c); return s; }

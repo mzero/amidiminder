@@ -261,7 +261,7 @@ class MidiMinder {
     seq.scanPorts([&](auto p){
       if (Args::outputPortDetails)
         seq.outputAddrDetails(std::cout, p);
-      this->addPort(p);
+      this->addPort(p, true);
     });
   }
 
@@ -277,7 +277,7 @@ class MidiMinder {
     std::map<snd_seq_addr_t, Address> ports;
     ports.swap(activePorts);
     for (auto& p: ports)
-      addPort(p.first);   // does regenreate the Address from Seq::address()
+      addPort(p.first, true); // does regenreate the Address from Seq::address()
   }
 
 
@@ -405,7 +405,7 @@ class MidiMinder {
     // This code base doesn't handle that case, though invoking
     // the reset function will clear up any mess that was made.
 
-    void addPort(const snd_seq_addr_t& addr) {
+    void addPort(const snd_seq_addr_t& addr, bool fromReset = false) {
       if (knownPort(addr)) return;
 
       Address a = seq.address(addr);
@@ -425,7 +425,7 @@ class MidiMinder {
       if (a.canBeDest() && !foundPrimaryDest)       a.primaryDest = true;
 
       activePorts[addr] = a;
-      Msg::output("System added port: {}", a);
+      Msg::output("{} port: {}", fromReset ? "Reviewing" : "System added", a);
 
       CandidateConnections candidates;
       connectByRule(a, profileRules, RuleSource::profile, candidates);

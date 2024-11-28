@@ -227,7 +227,7 @@ Address::format(fmt::format_context& ctx) const {
     return fmt::format_to(ctx.out(), "{}:{} [{}]{}", client, port, addr,
       ((primarySender || primaryDest) ? "+" : ""));
   else
-    return format_to(ctx.out(), "--:--");
+    return fmt::format_to(ctx.out(), "--:--");
 }
 
 fmt::format_context::iterator

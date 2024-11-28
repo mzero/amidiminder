@@ -143,13 +143,13 @@ template <> struct fmt::formatter<ConnectionRule> : formatter<string_view> {
 };
 
 inline std::ostream& operator<<(std::ostream& s, const ClientSpec& c)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", c); return s; }
+  { s << fmt::format("{}", c); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const PortSpec& p)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", p); return s; }
+  { s << fmt::format("{}", p); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const AddressSpec& a)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", a); return s; }
+  { s << fmt::format("{}", a); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const ConnectionRule& c)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", c); return s; }
+  { s << fmt::format("{}", c); return s; }

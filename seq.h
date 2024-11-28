@@ -106,16 +106,16 @@ template <> struct fmt::formatter<snd_seq_event_t> : formatter<string_view> {
 
 
 inline std::ostream& operator<<(std::ostream& s, const Address& a)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", a); return s; }
+  { s << fmt::format("{}", a); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_addr_t& a)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", a); return s; }
+  { s << fmt::format("{}", a); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_connect_t& c)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", c); return s; }
+  { s << fmt::format("{}", c); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_event_t& ev)
-  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", ev); return s; }
+  { s << fmt::format("{}", ev); return s; }
 
 
 inline bool operator==(const snd_seq_addr_t& a, const snd_seq_addr_t& b) {

@@ -2,7 +2,7 @@ Source: amidiminder
 Section: sound
 Priority: optional
 Maintainer: John Horigan <john@glyphic.com>
-Build-Depends: debhelper-compat (= 13), libasound2-dev
+Build-Depends: debhelper-compat (= 13), libasound2-dev, libfmt-dev
 Standards-Version: 4.7.0
 Homepage: https://github.com/mzero/amidiminder
 Rules-Requires-Root: no

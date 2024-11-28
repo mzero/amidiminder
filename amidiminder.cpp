@@ -12,6 +12,7 @@
 #include "args.h"
 #include "files.h"
 #include "ipc.h"
+#include "msg.h"
 #include "rule.h"
 #include "seq.h"
 
@@ -24,15 +25,14 @@ namespace {
     observed,
   };
 
-  void output(std::ostream&s, RuleSource r) {
+  const char* ruleSourceName(RuleSource r) {
     switch (r) {
-      case RuleSource::profile:    s << "profile";  break;
-      case RuleSource::observed:   s << "observed"; break;
+      case RuleSource::profile:    return "profile";
+      case RuleSource::observed:   return "observed";
+      default:                     return "???";
     }
   }
 
-  inline std::ostream& operator<<(std::ostream& s, RuleSource r)
-    { output(s, r); return s; }
 
   struct CandidateConnection {
     const Address& sender;
@@ -49,27 +49,27 @@ namespace {
     ConnectionRules& rules)   // receives parsed rules
   {
     if (!Files::fileExists(filePath)) {
-      std::cout << "rules file " << filePath << " doesn't exist, no rules read" << std::endl;
+      Msg::output("Rules file {} dosn't exist, no rules read.", filePath);
       contents.clear();
       rules.clear();
       return;
     }
 
     std::string newContents = Files::readFile(filePath);
-    std::cout << "reading rules from " << filePath << std::endl;
 
     ConnectionRules newRules;
     if (!parseRules(newContents, newRules)) {
-      std::cerr << "parse error reading rules" << std::endl;
+      Msg::error("Parse error reading rules file {}", filePath);
       std::exit(1);
     }
 
     contents.swap(newContents);
     rules.swap(newRules);
 
-    std::cout << "read " << rules.size() << " rules" << std::endl;
-    for (auto& r : rules)
-      std::cout << "    " << r << std::endl;
+    Msg::output("Rules file {} read, {} rules.", filePath, rules.size());
+    if (Args::detail())
+      for (auto& r : rules)
+        Msg::detail("    {}", r);
   }
 
   ConnectionRules::const_iterator
@@ -92,7 +92,8 @@ namespace {
     evt.data.u32 = (uint32_t)src;
 
     if (epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &evt) != 0) {
-      std::cerr << "Failed adding to epoll, " << strerror(errno) << std::endl;
+      auto e = errno;
+      Msg::error("Failed adding to epoll: {}", strerror(e));
       exit(1);
     }
   }
@@ -129,7 +130,7 @@ class MidiMinder {
 
   private:
     void handleSeqEvent(snd_seq_event_t& ev) {
-      if (Args::debug()) std::cout << ev << std::endl;
+      Msg::debug("ALSA Seq event: {}", ev);
 
       switch (ev.type) {
         case SND_SEQ_EVENT_CLIENT_START: {
@@ -201,10 +202,8 @@ class MidiMinder {
           break;
         }
 
-        default: {
-          std::cout << "unknown event ("
-              << std::dec << static_cast<int>(ev.type) << ")" << std::endl;
-        }
+        default:
+          Msg::error("Unknown ALSA Seq event: {}, ignoring.", ev.type);
       }
     }
 
@@ -223,7 +222,7 @@ class MidiMinder {
       else if (command == "save")  handleSaveCommand(conn);
       else if (command == "status")  handleStatusCommand(conn);
       else
-        std::cerr << "No idea what to do with that!" << std::endl;
+        Msg::error("Unrecognized user command \"{}\", ignoring.", command);
     }
 
   void saveObserved() {
@@ -232,8 +231,7 @@ class MidiMinder {
       text << r << '\n';
     observedText = text.str();
     Files::writeFile(Files::observedFilePath(), observedText);
-    if (Args::debug())
-      std::cout << "Observed rules written" << std::endl;
+    Msg::debug("Observed rules written.");
   }
 
   void clearObserved() {
@@ -290,8 +288,8 @@ class MidiMinder {
 
       int epollFD = epoll_create1(0);
       if (epollFD == -1) {
-        auto errStr = strerror(errno);
-        std::cerr << "Couldn't create epoll, " << errStr << std::endl;
+        auto e = errno;
+        Msg::error("Fatal, epoll_create failed: {}", strerror(e));
         std::exit(1);
       }
 
@@ -302,7 +300,8 @@ class MidiMinder {
         struct epoll_event evt;
         int nfds = epoll_wait(epollFD, &evt, 1, -1);
         if (nfds == -1) {
-          std::cerr << "Failed epoll_wait, " << strerror(errno) << std::endl;
+          auto e = errno;
+          Msg::error("Fatal, epoll_wait failed: {}", strerror(e));
           exit(1);
         };
         if (nfds == 0)
@@ -345,8 +344,8 @@ class MidiMinder {
         seq.connect(conn.sender, conn.dest);
         expectedConnects.insert(conn);
         activeConnections.insert(conn);
-        std::cout << "connecting " << cc.sender << " --> " << cc.dest << '\n'
-          << "    by " << cc.source << " rule: " << cc.rule << std::endl;
+        Msg::output("Connecting {} --> {}\n    by {} rule: {}",
+          cc.sender, cc.dest, ruleSourceName(cc.source), cc.rule);
       }
     }
 
@@ -426,7 +425,7 @@ class MidiMinder {
       if (a.canBeDest() && !foundPrimaryDest)       a.primaryDest = true;
 
       activePorts[addr] = a;
-      std::cout << "port added " << a << std::endl;
+      Msg::output("System added port: {}", a);
 
       CandidateConnections candidates;
       connectByRule(a, profileRules, RuleSource::profile, candidates);
@@ -440,7 +439,7 @@ class MidiMinder {
       if (!port)
         return;
 
-      std::cout << "port removed " << port << std::endl;
+      Msg::output("System removed port: {}", port);
 
       std::vector<snd_seq_connect_t> doomed;
       for (auto& c : activeConnections) {
@@ -450,7 +449,7 @@ class MidiMinder {
           const Address& sender = knownPort(c.sender);
           const Address& dest = knownPort(c.dest);
           if (sender && dest)
-            std::cout << "disconnected " << sender << " --> " << dest << std::endl;
+            Msg::detail("    disconnected {} --> {}", sender, dest);
         }
       }
 
@@ -470,6 +469,8 @@ class MidiMinder {
       const Address& dest = knownPort(conn.dest);
       if (!sender || !dest)
         return;
+
+      Msg::output("Observed connection: {} --> {}", sender, dest);
 
       activeConnections.insert(conn);
 
@@ -492,7 +493,6 @@ class MidiMinder {
       ConnectionRule c = ConnectionRule::exact(sender, dest);
       observedRules.push_back(c);
       saveObserved();
-      std::cout << "observed connection " << c << std::endl;
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
@@ -508,6 +508,8 @@ class MidiMinder {
       const Address& dest = knownPort(conn.dest);
       if (!sender || !dest)
         return;
+
+      Msg::output("Observed connection: {} --> {}", sender, dest);
 
       auto oRule = findRule(observedRules, sender, dest);
       if (oRule == observedRules.end())    ; // just continue onward
@@ -528,8 +530,6 @@ class MidiMinder {
       ConnectionRule c = ConnectionRule::exactBlock(sender, dest);
       observedRules.push_back(c);
       saveObserved();
-
-      std::cout << "observed disconnection " << c << std::endl;
     }
 
     void readRules() {
@@ -554,7 +554,7 @@ void MidiMinder::handleResetCommand(IPC::Connection& conn, const IPC::Options& o
     if (o == "keepObserved")          keepObserved = true;
     else if (o == "resetHard")        resetHard = true;
     else
-      std::cerr << "Reset option " << o << " not recognized, ignoring" << std::endl;
+      Msg::error("Option to reset command not recognized: {}, ignoring.", o);
   }
 
   if (!keepObserved)
@@ -586,7 +586,7 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
   std::string newContents = newFile.str();
   ConnectionRules newRules;
   if (!parseRules(newFile, newRules)) {
-    std::cerr << "Received profile rules didn't parse, ignoring." << std::endl;
+    Msg::error("Received profile rules didn't parse, ignoring.");
     return;
   }
 
@@ -594,9 +594,10 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
   profileText.swap(newContents);
   profileRules.swap(newRules);
 
-  std::cerr << "Resetting to new profile, " << std::endl;
-  for (auto& r : profileRules)
-    std::cout << "    " << r << std::endl;
+  Msg::output("Loading profile, {} rules.", profileRules.size());
+  if (Args::detail())
+    for (auto& r : profileRules)
+      Msg::detail("    {}", r);
 
   clearObserved();
   resetConnectionsSoft();

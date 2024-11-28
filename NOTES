@@ -22,7 +22,7 @@ NOTES
 
 [] new observed connection/disconnection logic
     [] correctly adjusting observed rules if needed
-    [] improve messages to the log on adding / removing observed rules
+    [x] improve messages to the log on adding / removing observed rules
     [] checking for rule consistency
     [x] expected disconnect optimization
     [-] optimize saving observedRules
@@ -66,7 +66,7 @@ NOTES
 [] move verbose port details option to the list command
  [] fix CPP_FLAGS for debugging to -Og
 [x] group subcommands in Args to make help more clear
-[] print rules when loading profile?
+[x] print rules when loading profile?
 [] ? case insensitive client and port name matches
 [] ? get systemctl reload to call amidiminder reset
 [] replace -p with just a verbosity check

@@ -7,6 +7,9 @@
 #include <vector>
 #include <stdexcept>
 
+#include "msg.h"
+
+
 // TODO: support case insensitive matches for non-exact
 
 
@@ -328,7 +331,7 @@ bool parseRules(std::istream& input, ConnectionRules& rules) {
       rules.insert(rules.end(), newRules.begin(), newRules.end());
     }
     catch (Parse& p) {
-      std::cerr << "configuration line " << lineNo << " error: " << p.what() << "\n";
+      Msg::error("Parse error on line {}: {}", lineNo, p.what());
       good = false;
     }
   }

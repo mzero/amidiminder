@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "msg.h"
+
 
 const Address Address::null;
 
@@ -207,9 +209,7 @@ void Seq::disconnect(const snd_seq_connect_t& conn) {
 
 bool Seq::errCheck(int serr, const char* op) {
   if (serr >= 0) return false;
-  std::cerr << "ALSA Seq error " << std::dec << serr;
-  if (op) std::cerr << " in " << op;
-  std::cerr << std::endl;
+  Msg::error("ALSA Seq error {} in {}", serr, op);
   return true;
 }
 

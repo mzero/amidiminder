@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "files.h"
+#include "msg.h"
 
 namespace {
 
@@ -204,7 +205,7 @@ namespace IPC {
   }
   std::pair<std::string, Options> Connection::receiveCommandAndOptions() {
     std::string line = receiveLine();
-    std::cout << "Received client command: " << line << std::endl;
+    Msg::output("Received client command: {}", line);
 
     std::istringstream is(line);
     std::string cmd;

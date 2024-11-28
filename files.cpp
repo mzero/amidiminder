@@ -7,6 +7,9 @@
 #include <string.h>   // for ::stderror
 #include <sys/stat.h>
 
+#include "msg.h"
+
+
 namespace {
 
   std::string profileFilePath;
@@ -39,8 +42,8 @@ namespace {
       dirPath = defaultPath;
 
     if (checkForPresence) {
-      std::cerr << envVar << "=" << dirPath
-        << (useDefault ? " (defaulted)" : "") << std::endl;
+      Msg::output("{}={}{}", envVar, dirPath,
+        (useDefault ? " (defaulted)" : ""));
 
       struct stat statbuf;
       errCheck(stat(dirPath.c_str(), &statbuf), "Checking", dirPath);

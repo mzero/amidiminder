@@ -220,68 +220,58 @@ bool Seq::errFatal(int serr, const char* op) {
 }
 
 
-void Address::output(std::ostream& s) const {
+
+fmt::format_context::iterator
+Address::format(fmt::format_context& ctx) const {
   if (valid)
-    s << client << ":" << port
-      << " [" << addr << "]"
-      << ((primarySender || primaryDest) ? "+" : "");
+    return fmt::format_to(ctx.out(), "{}:{} [{}]{}", client, port, addr,
+      ((primarySender || primaryDest) ? "+" : ""));
   else
-    s << "--:--";
+    return format_to(ctx.out(), "--:--");
 }
 
-void Seq::outputAddr(std::ostream& s, const snd_seq_addr_t& addr) {
-  s << std::dec << static_cast<unsigned>(addr.client)
-    << ":" << static_cast<unsigned>(addr.port);
+fmt::format_context::iterator
+fmt::formatter<snd_seq_addr_t>::format(
+    const snd_seq_addr_t& a, format_context& ctx) const {
+  return format_to(ctx.out(), "{:d}:{:d}", a.client, a.port);
 }
 
-void Seq::outputConnect(std::ostream& s, const snd_seq_connect_t& conn) {
-  s << conn.sender << " --> " << conn.dest;
+fmt::format_context::iterator
+fmt::formatter<snd_seq_connect_t>::format(
+    const snd_seq_connect_t& c, format_context& ctx) const {
+  return format_to(ctx.out(), "{} --> {}", c.sender, c.dest);
 }
 
-void Seq::outputEvent(std::ostream& s, const snd_seq_event_t& ev) {
+fmt::format_context::iterator
+fmt::formatter<snd_seq_event_t>::format(
+    const snd_seq_event_t& ev, format_context& ctx) const {
   switch (ev.type) {
 	case SND_SEQ_EVENT_CLIENT_START:
-    s << "SND_SEQ_EVENT_CLIENT_START ";
-    outputAddr(s, ev.data.addr);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_CLIENT_START {}", ev.data.addr);
 
 	case SND_SEQ_EVENT_CLIENT_EXIT:
-    s << "SND_SEQ_EVENT_CLIENT_EXIT ";
-    outputAddr(s, ev.data.addr);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_CLIENT_EXIT {}", ev.data.addr);
 
 	case SND_SEQ_EVENT_CLIENT_CHANGE:
-    s << "SND_SEQ_EVENT_CLIENT_CHANGE ";
-    outputAddr(s, ev.data.addr);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_CLIENT_CHANGE {}", ev.data.addr);
 
 	case SND_SEQ_EVENT_PORT_START:
-    s << "SND_SEQ_EVENT_PORT_START ";
-    outputAddr(s, ev.data.addr);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_PORT_START {}", ev.data.addr);
 
 	case SND_SEQ_EVENT_PORT_EXIT:
-    s << "SND_SEQ_EVENT_PORT_EXIT ";
-    outputAddr(s, ev.data.addr);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_PORT_EXIT {}", ev.data.addr);
 
 	case SND_SEQ_EVENT_PORT_CHANGE:
-    s << "SND_SEQ_EVENT_PORT_CHANGE ";
-    outputAddr(s, ev.data.addr);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_PORT_CHANGE {}", ev.data.addr);
 
 	case SND_SEQ_EVENT_PORT_SUBSCRIBED:
-    s << "SND_SEQ_EVENT_PORT_SUBSCRIBED ";
-    outputConnect(s, ev.data.connect);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_PORT_SUBSCRIBED {}", ev.data.connect);
 
 	case SND_SEQ_EVENT_PORT_UNSUBSCRIBED:
-    s << "SND_SEQ_EVENT_PORT_UNSUBSCRIBED ";
-    outputConnect(s, ev.data.connect);
-    break;
+    return format_to(ctx.out(), "SND_SEQ_EVENT_PORT_UNSUBSCRIBED {}", ev.data.connect);
 
   default:
-    s << "SND_SEQ_EVENT type " << ev.type;
+    return format_to(ctx.out(), "SND_SEQ_EVENT type {:d} ", ev.type);
   }
 }
 

@@ -3,6 +3,7 @@
 // Manage being an ALSA Sequencer client
 
 #include <alsa/asoundlib.h>
+#include <fmt/format.h>
 #include <functional>
 #include <iostream>
 #include <string>
@@ -33,7 +34,7 @@ class Address {
     bool matches(const snd_seq_addr_t& a) const
       { return valid && addr.client == a.client && addr.port == a.port; }
 
-    void output(std::ostream&) const;
+    fmt::format_context::iterator format(fmt::format_context&) const;
 
     bool valid;
     snd_seq_addr_t addr;
@@ -82,17 +83,40 @@ class Seq {
 };
 
 
+
+template <> struct fmt::formatter<Address> : formatter<string_view> {
+  auto format(const Address& a, format_context& ctx) const
+    { return a.format(ctx); }
+};
+
+template <> struct fmt::formatter<snd_seq_addr_t> : formatter<string_view> {
+  format_context::iterator
+  format(const snd_seq_addr_t &, format_context &) const;
+};
+
+template <> struct fmt::formatter<snd_seq_connect_t> : formatter<string_view> {
+  format_context::iterator
+  format(const snd_seq_connect_t &, format_context &) const;
+};
+
+template <> struct fmt::formatter<snd_seq_event_t> : formatter<string_view> {
+  format_context::iterator
+  format(const snd_seq_event_t &, format_context &) const;
+};
+
+
 inline std::ostream& operator<<(std::ostream& s, const Address& a)
-  { a.output(s); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", a); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_addr_t& a)
-  { Seq::outputAddr(s, a); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", a); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_connect_t& c)
-  { Seq::outputConnect(s, c); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", c); return s; }
 
 inline std::ostream& operator<<(std::ostream& s, const snd_seq_event_t& ev)
-  { Seq::outputEvent(s, ev); return s; }
+  { fmt::format_to(std::ostreambuf_iterator<char>(s), "{}", ev); return s; }
+
 
 inline bool operator==(const snd_seq_addr_t& a, const snd_seq_addr_t& b) {
   return a.client == b.client && a.port == b.port;

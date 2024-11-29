@@ -39,14 +39,14 @@ NOTES
     [] ? symlink all the user commands, like:
             amidiminder-load(1) -> amidiminder(1)
 
-[] error handling
+[x] error handling
     [x] switch to throwing errors on fatal system (and Seq) errors
     [x] review all error messages
         [x] leading case
         [x] wording
-    [] handle socket errors in the IPC code intellegently
-        [] client wants to report and exit
-        [] server wants to report and discard (aborting the command in progress)
+    [x] handle socket errors in the IPC code intellegently
+        [x] client wants to report and exit
+        [x] server wants to report and discard (aborting the command in progress)
         [x] calls to write in ipc.cpp should have the return value checked
     [x] when user commands can't find the socket - tell user to start the daemon
         - this should work nicely for sendStatusCommand()

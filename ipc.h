@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <optional>
+#include <stdexcept>
 #include <string>
 
 namespace IPC {
@@ -37,6 +38,11 @@ namespace IPC {
     friend class Client;
     friend class Server;
     friend class Connection;
+  };
+
+  class SocketError : public std::system_error {
+    public:
+      SocketError(const char*);
   };
 
   using Options = std::vector<std::string>;

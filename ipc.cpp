@@ -17,7 +17,9 @@ namespace {
 
     int err = remove(path.c_str());
     if (err == -1 && (errno != 0 && errno != ENOENT))
-      throw Msg::system_error("Couldn't remove socket {}", path);
+      Msg::error("Couldn't remove socket {}", path);
+      // This doesn't throw as we don't want to obscure any error that is
+      // causing the code to shutdown.
   }
 
   int makeSocket(bool server) {
@@ -99,10 +101,10 @@ namespace IPC {
     while (count) {
       auto n = ::write(sockFD, buf, count);
       if (n < 0) {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR)
           n = 0;
         else
-          return; // TODO: error case
+          throw SocketError("Socket write failed");
       }
       buf += n;
       count -= n;
@@ -126,8 +128,13 @@ namespace IPC {
       char ch;
       int n = read(sockFD, &ch, 1);
 
-      if (n <= 0) return "error";
-      if (ch == '\n') return s;
+      if (n < 0) {
+        if (errno == EAGAIN || errno == EINTR)
+          continue;
+        else
+          throw SocketError("Socket receive line failed");
+      }
+      if (n == 0 || ch == '\n') return s;
       s.push_back(ch);
     }
   }
@@ -147,12 +154,22 @@ namespace IPC {
     while(true) {
       int n = read(sockFD, &buffer, sizeof(buffer));
 
-      if (n < 0) return;  // TODO: error case
+      if (n < 0) {
+        if (errno == EAGAIN || errno == EINTR)
+          continue;
+        else
+          throw SocketError("Socket receive file failed");
+      }
       if (n == 0) return;
 
       out.write(buffer, n);
     }
   }
+
+
+  SocketError::SocketError(const char* what)
+    : std::system_error(errno, std::generic_category(), what)
+    { };
 
 
   Client::Client() : Socket(makeSocket(false))  { }
@@ -215,11 +232,11 @@ namespace IPC {
   std::optional<Connection> Server::accept() {
     int connFD = ::accept(sockFD, NULL, NULL);
     if (connFD == -1) {
-      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
         return {};
       }
 
-      throw Msg::system_error("Accepting a connection");
+      throw Msg::system_error("Accepting a connection failed");
     }
 
     return Connection(connFD);

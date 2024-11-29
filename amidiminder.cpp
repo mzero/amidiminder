@@ -223,17 +223,26 @@ class MidiMinder {
     void handleSaveCommand(IPC::Connection& conn);
     void handleStatusCommand(IPC::Connection& conn);
 
-    void handleConnection(IPC::Connection& conn) {
-      auto msg = conn.receiveCommandAndOptions();
-      auto command = msg.first;
-      auto& options = msg.second;
+    void handleConnection() {
+      try {
+        auto ac = server.accept();
+        if (!ac.has_value()) return;
+        auto conn = std::move(ac.value());
 
-      if      (command == "reset") handleResetCommand(conn, options);
-      else if (command == "load")  handleLoadCommand(conn);
-      else if (command == "save")  handleSaveCommand(conn);
-      else if (command == "status")  handleStatusCommand(conn);
-      else
-        Msg::error("Unrecognized user command \"{}\", ignoring.", command);
+        auto msg = conn.receiveCommandAndOptions();
+        auto command = msg.first;
+        auto& options = msg.second;
+
+        if      (command == "reset") handleResetCommand(conn, options);
+        else if (command == "load")  handleLoadCommand(conn);
+        else if (command == "save")  handleSaveCommand(conn);
+        else if (command == "status")  handleStatusCommand(conn);
+        else
+          Msg::error("Unrecognized user command \"{}\", ignoring.", command);
+      }
+      catch (const IPC::SocketError& se) {
+        Msg::error("Client connection failed: {}, ignoring", se.what());
+      }
     }
 
   void saveObserved() {
@@ -329,9 +338,7 @@ class MidiMinder {
 
         switch ((FDSource)evt.data.u32) {
           case FDSource::Server: {
-            auto conn = server.accept();
-            if (conn)
-              handleConnection(conn.value());
+            handleConnection();
             break;
           }
 

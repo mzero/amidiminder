@@ -28,5 +28,16 @@ namespace Msg {
   void verror(const char* format, fmt::format_args args) {
       std::cerr << fmt::vformat(format, args) << std::endl;
   }
+
+
+  std::runtime_error vruntime_error(const char* format, fmt::format_args args) {
+    return std::runtime_error(fmt::vformat(format, args));
+  }
+
+  std::system_error vsystem_error(const char* format, fmt::format_args args) {
+    auto ec = std::error_code(errno, std::generic_category());
+    return std::system_error(ec, fmt::vformat(format, args));
+  }
+
 }
 

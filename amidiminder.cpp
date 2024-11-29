@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <alsa/asoundlib.h>
+#include <csignal>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -96,6 +97,12 @@ namespace {
     }
   }
 
+  volatile std::sig_atomic_t caughtSignal = 0;
+
+  void signal_handler(int signal)
+    { caughtSignal = signal; }
+
+
 }
 
 
@@ -119,11 +126,17 @@ class MidiMinder {
 
   public:
     MidiMinder() {
+      std::signal(SIGHUP, signal_handler);
+      std::signal(SIGINT, signal_handler);
+      std::signal(SIGTERM, signal_handler);
       seq.begin();
     }
 
     ~MidiMinder() {
       seq.end();
+      std::signal(SIGHUP, SIG_DFL);
+      std::signal(SIGINT, SIG_DFL);
+      std::signal(SIGTERM, SIG_DFL);
     }
 
   private:
@@ -292,6 +305,19 @@ class MidiMinder {
       server.scanFDs([epollFD](int fd){ addFDToEpoll(epollFD, fd, FDSource::Server); });
 
       while (true) {
+        switch (caughtSignal) {
+          case 0: break;
+          case SIGHUP: {
+            auto s = caughtSignal;
+            caughtSignal = 0;
+            Msg::output("Reset requested by signal {}", s);
+            resetConnectionsHard();
+            break;
+          }
+          default:
+            throw Msg::runtime_error("Interrupted by signal {}", caughtSignal);
+        }
+
         struct epoll_event evt;
         int nfds = epoll_wait(epollFD, &evt, 1, -1);
         if (nfds == -1) {

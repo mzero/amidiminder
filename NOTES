@@ -69,7 +69,7 @@ NOTES
 [x] group subcommands in Args to make help more clear
 [x] print rules when loading profile?
 [] ? case insensitive client and port name matches
-[] ? get systemctl reload to call amidiminder reset
+[] ? get systemctl reload to call amidiminder reset - or send SIGHUP
 [] move verbose port details (-p) option to the list command
     [] recode Seq::outputAddrDetails to use fmt... or???
 [] ? move -v and -q flags to daemon only... only place really used

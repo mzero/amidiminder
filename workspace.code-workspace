@@ -65,7 +65,8 @@
 			"bit": "cpp",
 			"compare": "cpp",
 			"concepts": "cpp",
-			"numbers": "cpp"
+			"numbers": "cpp",
+			"csignal": "cpp"
 		},
 		"C_Cpp.default.cppStandard": "c++17"
 	}

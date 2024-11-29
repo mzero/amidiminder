@@ -566,6 +566,19 @@ class MidiMinder {
 };
 
 
+void checkCommand() {
+  std::string contents = Files::readUserFile(Args::rulesFilePath);
+  ConnectionRules rules;
+  if (!parseRules(contents, rules))
+    throw Msg::runtime_error("Rules had parse errors.");
+
+  Msg::output("Parsed {} rule(s).", rules.size());
+  if (Args::detail())
+    for (auto& r : rules)
+      Msg::detail("    {}", r);
+}
+
+
 void sendResetCommand() {
   IPC::Client client;
   IPC::Options opts;
@@ -688,13 +701,6 @@ int main(int argc, char *argv[]) {
         // should never happen, handled in Args::parse()
         break;
 
-      case Args::Command::Check: {
-        std::string contents;
-        ConnectionRules rules;
-        ::readRules(Args::rulesFilePath, contents, rules);
-        break;
-      }
-
       case Args::Command::Daemon: {
         exitPrefix = "Fatal: ";
         MidiMinder mm;
@@ -702,6 +708,7 @@ int main(int argc, char *argv[]) {
         break;
       }
 
+      case Args::Command::Check:      checkCommand();         break;
       case Args::Command::Reset:      sendResetCommand();     break;
       case Args::Command::Load:       sendLoadCommand();      break;
       case Args::Command::Save:       sendSaveCommand();      break;

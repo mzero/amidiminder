@@ -64,8 +64,8 @@ NOTES
 
 ## other
 
-[] improve output of check command
- [] fix CPP_FLAGS for debugging to -Og
+[x] improve output of check command
+[] fix CPP_FLAGS for debugging to -Og
 [x] group subcommands in Args to make help more clear
 [x] print rules when loading profile?
 [] ? case insensitive client and port name matches

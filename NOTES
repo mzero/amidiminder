@@ -54,7 +54,7 @@ NOTES
         - in particular, we want MidiMinder to destruct, and it's Server
           to destruct so that the control socket gets removed.
 
-[] Parse errors should be based on fmt
+[x] Parse errors should be based on fmt
 
 
 ## aconnect functionality

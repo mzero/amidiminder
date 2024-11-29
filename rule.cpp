@@ -1,7 +1,6 @@
 #include "rule.h"
 
 #include <regex>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -192,16 +191,12 @@ ConnectionRule::format(fmt::format_context& ctx) const {
 
 namespace {
 
-  using Error = std::ostringstream;
-
-  std::string errormsg(const std::ostream& o) {
-    auto e = dynamic_cast<const Error*>(&o);
-    return e ? e->str() : "parse error";
-  }
-
-  class Parse : public std::runtime_error {
+  class ParseError : public std::runtime_error {
     public:
-      Parse(const std::ostream& o) : std::runtime_error(errormsg(o)) { }
+      template <typename... T>
+      ParseError(const char* format, const T&... args)
+        : std::runtime_error(fmt::format(format, args...))
+        { }
   };
 
   ClientSpec parseClientSpec(const std::string& s) {
@@ -210,13 +205,13 @@ namespace {
     static const std::regex clientRE(
       "(\\*)|\"([^\"]+)\"|([^*\"].*)");
     if (!std::regex_match(s, m, clientRE))
-      throw Parse(Error() << "malformed client '" << s << "'");
+      throw ParseError("malformed client '{}'", s);
 
     if (m.str(1).size())  return ClientSpec::wildcard();
     if (m.str(2).size())  return ClientSpec::exact(m.str(2));
     if (m.str(3).size())  return ClientSpec::partial(m.str(3));
 
-    throw Parse(Error() << "parseClientSpec match failure with '" << s << "'");
+    throw ParseError("parseClientSpec match failure with '{}'", s);
       // shouldn't ever happen!
   }
 
@@ -226,14 +221,14 @@ namespace {
     static const std::regex portRE(
       "(\\*)|\"([^\"]+)\"|(\\d+)|([^*\"].*)");
     if (!std::regex_match(s, m, portRE))
-      throw Parse(Error() << "malformed port '" << s << "'");
+      throw ParseError("malformed port '{}'", s);
 
     if (m.str(1).size())  return PortSpec::wildcard();
     if (m.str(2).size())  return PortSpec::exact(m.str(2));
     if (m.str(3).size())  return PortSpec::numeric(std::stoi(m.str(3)));
     if (m.str(4).size())  return PortSpec::partial(m.str(4));
 
-    throw Parse(Error() << "parsePortSpec match failure with '" << s << "'");
+    throw ParseError("parsePortSpec match failure with '{}'", s);
       // shouldn't ever happen!
   }
 
@@ -246,14 +241,14 @@ namespace {
       if      (s == ".hw")    type = SND_SEQ_PORT_TYPE_HARDWARE;
       else if (s == ".app")   type = SND_SEQ_PORT_TYPE_APPLICATION;
       else
-        throw Parse(Error() << "invalid port type '" << s << "'");
+        throw ParseError("invalid port type '{}'", s);
 
       return AddressSpec(ClientSpec::wildcard(), PortSpec::type(type));
     }
 
     static const std::regex addressRE("([^:.]*)(:([^:.]*))?");
     if (!std::regex_match(s, m, addressRE))
-      throw Parse(Error() << "malformed address '" << s << "'");
+      throw ParseError("malformed address '{}'", s);
 
     ClientSpec cs = parseClientSpec(m.str(1));
     PortSpec ps =
@@ -267,7 +262,7 @@ namespace {
 
     static const std::regex ruleRE("(.*?)\\s+(-+(?:x-+)?>|<-+(?:x-+)?>?)\\s+(.*)");
     if (!std::regex_match(s, m, ruleRE))
-      throw Parse(Error() << "malformed rule '" << s << "'");
+      throw ParseError("malformed rule '{}'", s);
 
     AddressSpec left = parseAddressSpec(m.str(1));
     AddressSpec right = parseAddressSpec(m.str(3));
@@ -275,7 +270,7 @@ namespace {
     ConnectionRules rules;
     std::string type = m.str(2);
     if (type.empty())
-      throw Parse(Error() << "parseConnectionRule match failure with '" << s << "'");
+      throw ParseError("parseConnectionRule match failure with '{}'", s);
         // should never happen, because ruleRE ensures at least one character
 
     bool blocking = type.find('x') != std::string::npos;
@@ -309,13 +304,13 @@ namespace {
     try {
       r = parseConnectionRule(rule);
     }
-    catch (Parse& p) {
+    catch (const ParseError& p) {
       if (expect_failure) return r;
       throw;
     }
 
     if (expect_failure)
-      throw Parse(Error() << "was not expected to parse");
+      throw ParseError("was not expected to parse");
     return r;
   }
 
@@ -330,7 +325,7 @@ bool parseRules(std::istream& input, ConnectionRules& rules) {
       auto newRules = parseLine(line);
       rules.insert(rules.end(), newRules.begin(), newRules.end());
     }
-    catch (Parse& p) {
+    catch (const ParseError& p) {
       Msg::error("Parse error on line {}: {}", lineNo, p.what());
       good = false;
     }

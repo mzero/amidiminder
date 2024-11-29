@@ -16,12 +16,8 @@ namespace {
     auto path = Files::controlSocketPath();
 
     int err = remove(path.c_str());
-    if (err == -1 && (errno != 0 && errno != ENOENT)) {
-      auto errStr = strerror(errno);
-      std::cerr << "Couldn't remove socket path " << path
-        << ", " << errStr << std::endl;
-      std::exit(1);
-    }
+    if (err == -1 && (errno != 0 && errno != ENOENT))
+      throw Msg::system_error("Couldn't remove socket {}", path);
   }
 
   int makeSocket(bool server) {
@@ -31,11 +27,8 @@ namespace {
     int sockType = server ? (SOCK_STREAM | SOCK_NONBLOCK) : SOCK_STREAM;
 
     int sockFD = socket(AF_UNIX, sockType, 0);
-    if (sockFD == -1) {
-      auto errStr = strerror(errno);
-      std::cerr << "Couldn't create IPC socket, " << errStr << std::endl;
-      std::exit(1);
-    }
+    if (sockFD == -1)
+      throw Msg::system_error("Couldn't create IPC socket");
 
     auto path = Files::controlSocketPath();
 
@@ -44,25 +37,15 @@ namespace {
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path) - 1);
-    if (path.length() > sizeof(addr.sun_path) - 1) {
-        std::cerr << "Socket path is too long " << path << std::endl;
-        std::exit(1);
-    }
+    if (path.length() > sizeof(addr.sun_path) - 1)
+      throw Msg::runtime_error("Socket path is too long: {}", path);
 
     if (server) {
-      if (bind(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0) {
-        auto errStr = strerror(errno);
-        std::cerr << "Couldn't bind socket to path " << path
-          << ", " << errStr << std::endl;
-        std::exit(1);
-      }
+      if (bind(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0)
+        throw Msg::system_error("Couldn't bind socket to path {}", path);
 
-      if (listen(sockFD, 2) != 0) {   // don't need a long backlog
-        auto errStr = strerror(errno);
-        std::cerr << "Couldn't listen to socket path " << path
-          << ", " << errStr << std::endl;
-        std::exit(1);
-      }
+      if (listen(sockFD, 2) != 0)   // don't need a long backlog
+        throw Msg::system_error("Couldn't listen to socket path {}", path);
     }
     else {
       if (connect(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0) {
@@ -75,9 +58,9 @@ namespace {
           "\n"
           "(While trying to connect to the socket path:\n"
           "    " << path << "\n"
-          "    got the error: " << errStr << ")\n" <<
-          "\n" << std::endl;
-        std::exit(1);
+          "    got the error: " << errStr << ")\n";
+        std::cerr.flush();
+        throw Msg::runtime_error("");
       }
     }
 
@@ -236,9 +219,7 @@ namespace IPC {
         return {};
       }
 
-      auto errStr = strerror(errno);
-      std::cerr << "Accepting a connection failed, " << errStr << std::endl;
-      std::exit(1);
+      throw Msg::system_error("Accepting a connection");
     }
 
     return Connection(connFD);

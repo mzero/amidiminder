@@ -17,15 +17,6 @@ namespace {
 
   std::string controlSocketPath;
 
-
-  void errCheck(int err, const char* op, const std::string& arg) {
-    if (err < 0) {
-      auto errStr = ::strerror(errno); // grab it before anything changes it
-      std::cerr << op << " " << arg << ": " << errStr << std::endl;
-      std::exit(1);
-    }
-  }
-
   std::string directory(
       const char* envVar,
       const char* defaultPath,
@@ -46,12 +37,12 @@ namespace {
         (useDefault ? " (defaulted)" : ""));
 
       struct stat statbuf;
-      errCheck(stat(dirPath.c_str(), &statbuf), "Checking", dirPath);
+      auto e = stat(dirPath.c_str(), &statbuf);
+      if (e < 0)
+        throw Msg::system_error("Checking directory {}", dirPath);
 
-      if ((statbuf.st_mode & S_IFMT) != S_IFDIR) {
-        std::cerr << dirPath << " exists, but it is not a directory" << std::endl;
-        std::exit(1);
-      }
+      if ((statbuf.st_mode & S_IFMT) != S_IFDIR)
+        throw Msg::runtime_error("Checking directory {}: not a directory", dirPath);
     }
 
     return dirPath;
@@ -89,23 +80,19 @@ namespace Files {
     struct stat statbuf;
     auto err = stat(path.c_str(), &statbuf);
     if (err < 0 && errno == ENOENT) return false;
-    errCheck(err, "Checking", path);
+    if (err != 0)
+      throw Msg::system_error("Checking for {}", path);
 
-    if ((statbuf.st_mode & S_IFMT) != S_IFREG) {
-      std::cerr << path << " exists, but it is not a file" << std::endl;
-      std::exit(1);
-    }
+    if ((statbuf.st_mode & S_IFMT) != S_IFREG)
+      throw Msg::runtime_error("Checking for {}: not a regular file", path);
 
     return true;
   }
 
   std::string readFile(const std::string& path) {
     std::ifstream file(path);
-    if (!file.good()) {
-      std::string errStr = ::strerror(errno);
-      std::cerr << "Could not read " << path << ", " << errStr << std::endl;
-      std::exit(1);
-    }
+    if (!file.good())
+      throw Msg::system_error("Could not read {}", path);
 
     std::stringstream ss;
     ss << file.rdbuf();
@@ -116,11 +103,8 @@ namespace Files {
     std::string tempPath = path + ".save";
 
     std::ofstream file(tempPath);
-    if (!file.good()) {
-      std::string errStr = ::strerror(errno);
-      std::cerr << "Could not write " << tempPath << ", " << errStr << std::endl;
-      std::exit(1);
-    }
+    if (!file.good())
+      throw Msg::system_error("Could not write {}", tempPath);
 
     file << contents;
     file.flush();
@@ -130,12 +114,8 @@ namespace Files {
     file.close();
 
     int err = std::rename(tempPath.c_str(), path.c_str());
-    if (err != 0) {
-      std::string errStr = ::strerror(errno);
-      std::cerr << "Could not rename " << tempPath << " to " << path
-        << ", " << errStr << std::endl;
-      std::exit(1);
-    }
+    if (err != 0)
+      throw Msg::system_error("Could not rename {} to {}", tempPath, path);
   }
 
   std::string readUserFile(const std::string& path) {

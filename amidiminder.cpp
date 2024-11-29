@@ -58,10 +58,8 @@ namespace {
     std::string newContents = Files::readFile(filePath);
 
     ConnectionRules newRules;
-    if (!parseRules(newContents, newRules)) {
-      Msg::error("Parse error reading rules file {}", filePath);
-      std::exit(1);
-    }
+    if (!parseRules(newContents, newRules))
+      throw Msg::runtime_error("Parse error reading rules file {}", filePath);
 
     contents.swap(newContents);
     rules.swap(newRules);
@@ -287,11 +285,8 @@ class MidiMinder {
       resetConnectionsHard();
 
       int epollFD = epoll_create1(0);
-      if (epollFD == -1) {
-        auto e = errno;
-        Msg::error("Fatal, epoll_create failed: {}", strerror(e));
-        std::exit(1);
-      }
+      if (epollFD == -1)
+        throw Msg::system_error("epoll_create failed");
 
       seq.scanFDs([epollFD](int fd){ addFDToEpoll(epollFD, fd, FDSource::Seq); });
       server.scanFDs([epollFD](int fd){ addFDToEpoll(epollFD, fd, FDSource::Server); });
@@ -300,10 +295,9 @@ class MidiMinder {
         struct epoll_event evt;
         int nfds = epoll_wait(epollFD, &evt, 1, -1);
         if (nfds == -1) {
-          auto e = errno;
-          Msg::error("Fatal, epoll_wait failed: {}", strerror(e));
-          exit(1);
-        };
+          if (errno == EINTR) continue;   // this was a signal
+          else                throw Msg::system_error("epoll_wait failed");
+        }
         if (nfds == 0)
           continue;
 
@@ -570,7 +564,7 @@ void sendLoadCommand() {
   std::string newContents = Files::readUserFile(Args::rulesFilePath);
   ConnectionRules newRules;
   if (!parseRules(newContents, newRules))
-    std::exit(1);
+    throw Msg::runtime_error("Did not load rules due to errors.");
 
   IPC::Client client;
   client.sendCommand("load");
@@ -653,29 +647,38 @@ int main(int argc, char *argv[]) {
   if (!Args::parse(argc, argv))
     return Args::exitCode;
 
+  const char* exitPrefix = "";
 
-  switch (Args::command) {
-    case Args::Command::Help:
-      // should never happen, handled in Args::parse()
-      break;
+  try {
+    switch (Args::command) {
+      case Args::Command::Help:
+        // should never happen, handled in Args::parse()
+        break;
 
-    case Args::Command::Check: {
-      std::string contents;
-      ConnectionRules rules;
-      ::readRules(Args::rulesFilePath, contents, rules);
-      break;
+      case Args::Command::Check: {
+        std::string contents;
+        ConnectionRules rules;
+        ::readRules(Args::rulesFilePath, contents, rules);
+        break;
+      }
+
+      case Args::Command::Daemon: {
+        exitPrefix = "Fatal: ";
+        MidiMinder mm;
+        mm.run();
+        break;
+      }
+
+      case Args::Command::Reset:      sendResetCommand();     break;
+      case Args::Command::Load:       sendLoadCommand();      break;
+      case Args::Command::Save:       sendSaveCommand();      break;
+      case Args::Command::Status:     sendStatusCommand();    break;
     }
-
-    case Args::Command::Daemon: {
-      MidiMinder mm;
-      mm.run();
-      break;
-    }
-
-    case Args::Command::Reset:      sendResetCommand();     break;
-    case Args::Command::Load:       sendLoadCommand();      break;
-    case Args::Command::Save:       sendSaveCommand();      break;
-    case Args::Command::Status:     sendStatusCommand();    break;
+  }
+  catch (const std::exception& e) {
+    if (strlen(e.what()) > 0)
+      Msg::error("{}{}", exitPrefix, e.what());
+    return 1;
   }
 
   return 0;

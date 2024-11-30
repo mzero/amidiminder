@@ -1,11 +1,47 @@
 #include "seq.h"
 
+#include <string_view>
 #include <vector>
 
 #include "msg.h"
 
 
 const Address Address::null;
+
+Address::Address(const snd_seq_addr_t& a, unsigned int f, unsigned int t,
+    const std::string& c, const std::string& p)
+  : valid(true), addr(a), caps(f), types(t), client(c), port(p), portLong(p),
+    primarySender(false), primaryDest(false)
+{
+  static const std::string whitespace = " _";
+  std::string_view trimmed(portLong);
+
+  while (true) {
+    if (trimmed.size() > 0
+        && whitespace.find(trimmed[0]) != whitespace.npos) {
+      trimmed.remove_prefix(1);
+      continue;
+    }
+    if (trimmed.size() > client.size()
+                          // not >= as we want there to be something left
+        && trimmed.substr(0, client.size()) == client) {
+      trimmed.remove_prefix(client.size());
+      continue;
+    }
+    break;
+  }
+  while (true) {
+    if (trimmed.size() > 0
+        && whitespace.find(trimmed[trimmed.size()-1]) != whitespace.npos) {
+      trimmed.remove_suffix(1);
+      continue;
+    }
+    break;
+  }
+
+  if (trimmed.size() > 0)
+    port = trimmed;
+}
 
 void Seq::begin() {
   if (seq) return;

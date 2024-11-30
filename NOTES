@@ -9,11 +9,12 @@ NOTES
 [x] major clean up and refactor of MidiMinder class
 [x] add connection logic test
 
-[] tidy port names in observed rules
+[x] tidy port names
     - if client name is a prefix of the port, remove it and make partial match
 
 [] man pages
     [] need more examples at the end of amidiminder-profile.5
+    [] explain port name shortening and when to use exact match
     [] ? symlink all the user commands, like:
             amidiminder-load(1) -> amidiminder(1)
 

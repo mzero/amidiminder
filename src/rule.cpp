@@ -119,8 +119,9 @@ bool PortSpec::matchAsDest(const Address& a) const {
 bool PortSpec::match(const Address& a, bool primaryFlag) const {
   switch (kind) {
     case Defaulted:   return primaryFlag;
-    case Partial:     return a.port.find(port) != std::string::npos;
-    case Exact:       return a.port == port;
+    case Partial:     return a.port.find(port) != std::string::npos
+                              || a.portLong == port; // just in case...
+    case Exact:       return a.port == port || a.portLong == port;
     case Numeric:     return a.addr.port == portNum;
     case Type:        return a.types & typeFlag;
     case Wildcard:    return true;

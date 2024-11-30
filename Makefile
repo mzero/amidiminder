@@ -9,7 +9,7 @@ MKDIR_P ?= mkdir -p
 
 BUILD_DIR ?= ./build
 
-all: bin
+all: bin format-man-pages
 bin: $(BUILD_DIR)/$(TARGET)
 
 deb:

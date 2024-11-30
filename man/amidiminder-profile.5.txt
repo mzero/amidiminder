@@ -112,6 +112,7 @@ SYNTAX
 
               (a) by partial name      client-name     Monsta
               (b) by full exact name   "client-name"   "Launchpad Pro"
+                                       'client-name'   'Launchpad Pro'
               (c) by wildcard          *               *
 
        (a)    A  client  can  be specified by any part of its name. Spaces are
@@ -139,6 +140,7 @@ SYNTAX
               (a) by default      client               Digitakt
               (b) by name         client:port-name     Launch Pad:DAW
               (c) by exact name   client:"port-name"   Launch Pad:"Live Port"
+                                  client:'port-name'   Launch Pad:'Live Port'
               (d) by number       client:number        Launch Pad:1
               (e) by wildcard     client:*             Launch Pad:*
 

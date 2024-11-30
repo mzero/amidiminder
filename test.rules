@@ -8,12 +8,18 @@
 *x --> test                         # FAIL something after the *
 "test client" --> test              # PASS
 "test client --> test               # FAIL no closing quote
+'test client' --> test              # PASS
+test'client --> test                # PASS internal apostrophe
+'test client --> test               # FAIL no closing quote
 test two --> test                   # PASS
   test three --> test               # PASS indented
 test:* --> thing                    # PASS
 test:*3 --> thing                   # FAIL something after the *
 test:"time port" --> thing          # PASS
 test:"time port --> thing           # FAIL no closing quote
+test:'time port' --> thing          # PASS
+test:time'port --> thing            # PASS internal apostrophe
+test:'time port --> thing           # FAIL no closing quote
 test:time --> thing                 # PASS
 test:time two --> thing             # PASS
 :: --> thing                        # FAIL too many colons

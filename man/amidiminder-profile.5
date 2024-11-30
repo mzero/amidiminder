@@ -120,6 +120,7 @@ l lI lB x.
 
 (a) by partial name     | client-name             | Monsta
 (b) by full exact name  | \fB"\fIclient-name\fB"  | "Launchpad Pro"
+                        | \fB'\fIclient-name\fI'  | 'Launchpad Pro'
 (c) by wildcard         | \fB*                    | *
 .TE
 .TP
@@ -153,6 +154,7 @@ l lI lB x.
 (a) by default    | client                      | Digitakt
 (b) by name       | client\fB:\fIport-name      | Launch Pad:DAW
 (c) by exact name | client\fB:"\fIport-name\fB" | Launch Pad:"Live Port"
+                  | client\fB:'\fIport-name\fI' | Launch Pad:'Live Port'
 (d) by number     | client\fB:\fInumber         | Launch Pad:1
 (e) by wildcard   | client\fB:*                 | Launch Pad:*
 .TE

@@ -203,13 +203,14 @@ namespace {
     std::smatch m;
 
     static const std::regex clientRE(
-      "(\\*)|\"([^\"]+)\"|([^*\"].*)");
+      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|([^*\"'].*)");
     if (!std::regex_match(s, m, clientRE))
       throw ParseError("malformed client '{}'", s);
 
     if (m.str(1).size())  return ClientSpec::wildcard();
     if (m.str(2).size())  return ClientSpec::exact(m.str(2));
-    if (m.str(3).size())  return ClientSpec::partial(m.str(3));
+    if (m.str(3).size())  return ClientSpec::exact(m.str(3));
+    if (m.str(4).size())  return ClientSpec::partial(m.str(4));
 
     throw ParseError("parseClientSpec match failure with '{}'", s);
       // shouldn't ever happen!
@@ -219,14 +220,15 @@ namespace {
     std::smatch m;
 
     static const std::regex portRE(
-      "(\\*)|\"([^\"]+)\"|(\\d+)|([^*\"].*)");
+      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|(\\d+)|([^*\"'].*)");
     if (!std::regex_match(s, m, portRE))
       throw ParseError("malformed port '{}'", s);
 
     if (m.str(1).size())  return PortSpec::wildcard();
     if (m.str(2).size())  return PortSpec::exact(m.str(2));
-    if (m.str(3).size())  return PortSpec::numeric(std::stoi(m.str(3)));
-    if (m.str(4).size())  return PortSpec::partial(m.str(4));
+    if (m.str(3).size())  return PortSpec::exact(m.str(3));
+    if (m.str(4).size())  return PortSpec::numeric(std::stoi(m.str(4)));
+    if (m.str(5).size())  return PortSpec::partial(m.str(5));
 
     throw ParseError("parsePortSpec match failure with '{}'", s);
       // shouldn't ever happen!

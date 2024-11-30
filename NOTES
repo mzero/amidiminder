@@ -15,21 +15,22 @@ NOTES
 [] man pages
     [] need more examples at the end of amidiminder-profile.5
     [] explain port name shortening and when to use exact match
-    [] ? symlink all the user commands, like:
-            amidiminder-load(1) -> amidiminder(1)
+
+[] sample rules files
+
+[] systemd service
+    [] ? get systemctl reload to call amidiminder reset - or send SIGHUP
+    [] hardening features
 
 ## aconnect functionality
 
 [] connect & disconnect
 [] list
+    [] move verbose port details (-p) option to the list command
+        [] recode Seq::outputAddrDetails to use fmt... or???
 
 ## other
 
-[] fix CPP_FLAGS for debugging to -Og
-[] ? case insensitive client and port name matches
-[] ? get systemctl reload to call amidiminder reset - or send SIGHUP
-[] move verbose port details (-p) option to the list command
-    [] recode Seq::outputAddrDetails to use fmt... or???
 [] ? move -v and -q flags to daemon only... only place really used
 
 
@@ -48,9 +49,13 @@ NOTES
     (or just ignore the ALSA Seq connection error) - this would ensure no
     disruption of connections when switching profiles where a connection is
     in both the old and new profile. Really may not be worth the effort!
+[] make connection-logic-test something that could be used during packaging
+    - needs to not write files, nor use ALSA
 
 [-] optimize saving observedRules
     - no longer really needed, as never saved more than once per event
+
+[] ? case insensitive client and port name matches
 
 
 

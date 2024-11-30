@@ -37,10 +37,6 @@ CPPFLAGS += -fstack-protector-strong -Wformat -Werror=format-security -Wall -ped
 
 LDFLAGS += $(addprefix -l,$(LIBS))
 
-ifeq ($(DEBUG),yes)
-	CPPFLAGS += -DDEBUG -ggdb -O0
-endif
-
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: src/%.cpp

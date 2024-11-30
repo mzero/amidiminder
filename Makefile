@@ -22,7 +22,7 @@ install:
 
 SRCS := amidiminder.cpp amidiminder-commands.cpp amidiminder-tests.cpp
 SRCS +=	args.cpp files.cpp ipc.cpp main.cpp msg.cpp rule.cpp seq.cpp
-INCS :=
+INCS := .
 LIBS := stdc++ asound fmt
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -43,7 +43,7 @@ endif
 
 
 # c++ source
-$(BUILD_DIR)/%.cpp.o: %.cpp
+$(BUILD_DIR)/%.cpp.o: src/%.cpp
 	$(MKDIR_P) $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 

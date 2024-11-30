@@ -30,6 +30,12 @@ int main(int argc, char *argv[]) {
       case Args::Command::Load:     MidiMinder::sendLoadCommand();      break;
       case Args::Command::Save:     MidiMinder::sendSaveCommand();      break;
       case Args::Command::Status:   MidiMinder::sendStatusCommand();    break;
+
+      case Args::Command::ConnectionLogicTest: {
+        MidiMinder mm;
+        mm.connectionLogicTest();
+        break;
+      }
     }
   }
   catch (const std::exception& e) {

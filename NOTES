@@ -7,7 +7,7 @@ NOTES
 ## general
 
 [x] major clean up and refactor of MidiMinder class
-[] add tests of connection observation logic
+[x] add connection logic test
 
 [] tidy port names in observed rules
     - if client name is a prefix of the port, remove it and make partial match

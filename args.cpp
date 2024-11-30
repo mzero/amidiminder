@@ -79,6 +79,10 @@ namespace Args {
     daemonApp->add_flag("-p,--port-details", outputPortDetails, "output verbose details of each port");
 
 
+    CLI::App *cltApp = app.add_subcommand("connection-logic-test", "");
+    cltApp->group(""); // hide this command
+    cltApp->parse_complete_callback([](){ command = Command::ConnectionLogicTest; });
+
     try {
         app.parse(argc, argv);
         if (command == Command::Help) {

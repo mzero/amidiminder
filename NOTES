@@ -20,10 +20,10 @@ NOTES
     [x] command logging reception in IPC
     [x] support command options
 
-[] new observed connection/disconnection logic
-    [] correctly adjusting observed rules if needed
+[x] new observed connection/disconnection logic
+    [x] correctly adjusting observed rules if needed
     [x] improve messages to the log on adding / removing observed rules
-    [] checking for rule consistency
+    [x] checking for rule consistency
     [x] expected disconnect optimization
     [-] optimize saving observedRules
         - no longer really needed, as never saved more than once per event

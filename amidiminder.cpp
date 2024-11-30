@@ -71,13 +71,24 @@ namespace {
         Msg::detail("    {}", r);
   }
 
-  ConnectionRules::const_iterator
+  enum class Found {
+    NoRule,
+    ConnectRule,
+    DisallowRule,
+  };
+
+  std::pair<Found, ConnectionRules::const_iterator>
   findRule(const ConnectionRules& rules,
     const Address& sender, const Address& dest)
   {
     auto r = std::find_if(rules.rbegin(), rules.rend(),
       [&](const ConnectionRule& r){ return r.match(sender, dest); });
-    return r == rules.rend() ? rules.end() : std::next(r).base();
+    auto i = r == rules.rend() ? rules.end() : std::next(r).base();
+    auto f =
+      i == rules.end()
+        ? Found::NoRule
+        : (r->isBlockingRule() ? Found::DisallowRule: Found::ConnectRule);
+    return {f, i};
   }
 
   enum class FDSource : uint32_t {
@@ -501,30 +512,58 @@ class MidiMinder {
 
       activeConnections.insert(conn);
 
-      auto oRule = findRule(observedRules, sender, dest);
-      if (oRule == observedRules.end())    ; // just continue onward
-      else if (!oRule->isBlockingRule())    return; // already known
-      else {
-        observedRules.erase(oRule);
-        saveObserved();
-        // and continue onward
+      auto [oFind, oRule] = findRule(observedRules, sender, dest);
+      auto [pFind, pRule] = findRule(profileRules, sender , dest);
+
+      bool removeObsRule = false;
+      bool addNewObsRule = false;
+
+      switch (oFind) {
+        case Found::NoRule:
+          if (pFind == Found::ConnectRule)
+            Msg::output("    already have a profile rule {}", *pRule);
+          else
+            addNewObsRule = true;
+          break;
+
+        case Found::ConnectRule:
+          Msg::output("    already have an observed rule {}", *oRule);
+          if (pFind == Found::ConnectRule) {
+            Msg::output("    removing, as also have a profile rule {}", *pRule);
+            removeObsRule = true;
+          }
+          break;
+
+        case Found::DisallowRule:
+          Msg::output("    removing observed disallow rule {}", *oRule);
+          removeObsRule = true;
+          switch (pFind) {
+            case Found::NoRule:
+              Msg::output("    no expected profile rule found");
+              addNewObsRule = true;
+              break;
+            case Found::ConnectRule:
+              break;
+            case Found::DisallowRule:
+              Msg::output("    also have a profile disallow rule {}", *pRule);
+              addNewObsRule = true;
+          }
       }
 
-      auto pRule = findRule(profileRules, sender , dest);
-      if (pRule == profileRules.end())     ; // just continue onward
-      else if (!pRule->isBlockingRule())    return; // already known
-      else                                  ; // just continue ownard
+      if (removeObsRule)
+        observedRules.erase(oRule);
 
-      // At this point, no rule would add this connection,
-      // so add an observed rule for it.
-      ConnectionRule c = ConnectionRule::exact(sender, dest);
-      observedRules.push_back(c);
-      saveObserved();
+      if (addNewObsRule) {
+        ConnectionRule c = ConnectionRule::exact(sender, dest);
+        observedRules.push_back(c);
+        Msg::output("    adding observed rule {}", c);
+      }
+
+      if (removeObsRule || addNewObsRule)
+        saveObserved();
     }
 
     void delConnection(const snd_seq_connect_t& conn) {
-      // TODO: did we expect this disconnection? do nothing, we made it
-
       auto i = activeConnections.find(conn);
       if (i == activeConnections.end())
         // don't know anything about this connection
@@ -536,27 +575,65 @@ class MidiMinder {
       if (!sender || !dest)
         return;
 
-      Msg::output("Observed connection: {} --> {}", sender, dest);
+      Msg::output("Observed disconnection: {} --> {}", sender, dest);
 
-      auto oRule = findRule(observedRules, sender, dest);
-      if (oRule == observedRules.end())    ; // just continue onward
-      else if (oRule->isBlockingRule())     return; // already blocked
-      else {
-        observedRules.erase(oRule);
-        saveObserved();
-        // and continue onward
+      auto [oFind, oRule] = findRule(observedRules, sender, dest);
+      auto [pFind, pRule] = findRule(profileRules, sender , dest);
+
+      bool removeObsRule = false;
+      bool addNewObsRule = false;
+
+      switch (oFind) {
+        case Found::NoRule:
+          switch (pFind) {
+            case Found::NoRule:
+              Msg::output("    no rules found, doing nothing");
+              break;
+            case Found::ConnectRule:
+              addNewObsRule = true;
+              break;
+            case Found::DisallowRule:
+              Msg::output("    already have a profile rule {}", *pRule);
+              break;
+          }
+          break;
+
+        case Found::ConnectRule:
+          Msg::output("    removing observed rule {}", *oRule);
+          removeObsRule = true;
+          if (pFind == Found::ConnectRule) {
+            Msg::output("    also have a profile rule {}", *pRule);
+            addNewObsRule = true;
+          }
+          break;
+
+        case Found::DisallowRule:
+          Msg::output("    already have an observed rule {}", *oRule);
+          switch (pFind) {
+            case Found::NoRule:
+              Msg::output("    but no profile rule, so removing");
+              removeObsRule = true;
+              break;
+            case Found::ConnectRule:
+              break;
+            case Found::DisallowRule:
+              Msg::output("    removing, as also have a profile rule {}", *pRule);
+              removeObsRule = true;
+          }
+          break;
       }
 
-      auto pRule = findRule(profileRules, sender , dest);
-      if (pRule == profileRules.end())   return; // no rule would ever add it
-      else if (pRule->isBlockingRule())   return; // already known
-      else                                ; // just continue onward
+      if (removeObsRule)
+        observedRules.erase(oRule);
 
-      // At this point there is a profileRule that would make this connection,
-      // so add an observed rule to block it.
-      ConnectionRule c = ConnectionRule::exactBlock(sender, dest);
-      observedRules.push_back(c);
-      saveObserved();
+      if (addNewObsRule) {
+        ConnectionRule c = ConnectionRule::exactBlock(sender, dest);
+        observedRules.push_back(c);
+        Msg::output("    adding observed rule {}", c);
+      }
+
+      if (removeObsRule || addNewObsRule)
+        saveObserved();
     }
 
     void readRules() {

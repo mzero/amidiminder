@@ -3,33 +3,11 @@ NOTES
 
 # TODO
 
-## state and profiles
-
-[x] file locations in code somewhere
-    [x] handle "-" to mean stdin/stdout
-    [x] safe file write code (write to .save, rename)
-
-[x] reorg
-    [x] replace commtest command with a status command
-    [x] hard and soft resets
-        [x] user optinos on the reset command
-
-
-[x] command line and daemon communication
-    [x] save command
-    [x] command logging reception in IPC
-    [x] support command options
-
-[x] new observed connection/disconnection logic
-    [x] correctly adjusting observed rules if needed
-    [x] improve messages to the log on adding / removing observed rules
-    [x] checking for rule consistency
-    [x] expected disconnect optimization
-    [-] optimize saving observedRules
-        - no longer really needed, as never saved more than once per event
-
 
 ## general
+
+[x] major clean up and refactor of MidiMinder class
+[] add tests of connection observation logic
 
 [] tidy port names in observed rules
     - if client name is a prefix of the port, remove it and make partial match
@@ -39,24 +17,6 @@ NOTES
     [] ? symlink all the user commands, like:
             amidiminder-load(1) -> amidiminder(1)
 
-[x] error handling
-    [x] switch to throwing errors on fatal system (and Seq) errors
-    [x] review all error messages
-        [x] leading case
-        [x] wording
-    [x] handle socket errors in the IPC code intellegently
-        [x] client wants to report and exit
-        [x] server wants to report and discard (aborting the command in progress)
-        [x] calls to write in ipc.cpp should have the return value checked
-    [x] when user commands can't find the socket - tell user to start the daemon
-        - this should work nicely for sendStatusCommand()
-    [x] std::exit(1) points should be throws, caught in main()
-        - in particular, we want MidiMinder to destruct, and it's Server
-          to destruct so that the control socket gets removed.
-
-[x] Parse errors should be based on fmt
-
-
 ## aconnect functionality
 
 [] connect & disconnect
@@ -64,10 +24,7 @@ NOTES
 
 ## other
 
-[x] improve output of check command
 [] fix CPP_FLAGS for debugging to -Og
-[x] group subcommands in Args to make help more clear
-[x] print rules when loading profile?
 [] ? case insensitive client and port name matches
 [] ? get systemctl reload to call amidiminder reset - or send SIGHUP
 [] move verbose port details (-p) option to the list command
@@ -90,6 +47,9 @@ NOTES
     (or just ignore the ALSA Seq connection error) - this would ensure no
     disruption of connections when switching profiles where a connection is
     in both the old and new profile. Really may not be worth the effort!
+
+[-] optimize saving observedRules
+    - no longer really needed, as never saved more than once per event
 
 
 

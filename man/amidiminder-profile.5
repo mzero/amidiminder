@@ -22,7 +22,7 @@ unplugged and re-plugged, or even if the whole system restarts.
 .SS ALSA Sequencer structure
 Each device or application that wants to have MIDI ports, registers with ALSA
 as a "client". This client has a name, chosen by the device or application,
-and a number, assigned by ALSA. As the number isn't predicable, profiles only
+and a number, assigned by ALSA. As the number isn't predictable, profiles only
 refer to client names.
 .PP
 Each client can have one or more ports, and these ports can be \fIin\fR ports,
@@ -32,7 +32,7 @@ Applications often have separate in ports and out ports.
 .PP
 Like clients, the ports also have both a name supplied by the device or
 application, and a number supplied by ALSA. Here, the numbers are stable, and
-predictable, and so in profiles rules can refere to ports by either name or
+predictable, and so in profiles rules can refer to ports by either name or
 number.
 .PP
 Connections are unidirectional, from one in port to one out port.
@@ -194,7 +194,7 @@ A connection rule consists of a port, a connector, and another port.  There
 are three types of connector:
 .TP
 .IR "portA " --> " portB"
-Specifies a connection fron \fIportA\fR to \fIportB\fR.
+Specifies a connection from \fIportA\fR to \fIportB\fR.
 .TP
 .IR "portA " <-- " portB"
 Specifies a connection in the other direction, from \fIportB\fR to \fIportA\fR

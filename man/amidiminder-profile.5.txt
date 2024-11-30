@@ -24,7 +24,7 @@ CONCEPTS
        Each device or application that wants to  have  MIDI  ports,  registers
        with  ALSA  as a "client". This client has a name, chosen by the device
        or application, and a number, assigned by ALSA.  As  the  number  isn't
-       predicable, profiles only refer to client names.
+       predictable, profiles only refer to client names.
 
        Each  client  can  have  one  or  more ports, and these ports can be in
        ports, supplying MIDI data, out ports (receiving MIDI)  data,  or  they
@@ -34,7 +34,7 @@ CONCEPTS
 
        Like clients, the ports also have both a name supplied by the device or
        application, and a number supplied by ALSA. Here, the numbers are  sta‐
-       ble,  and  predictable, and so in profiles rules can refere to ports by
+       ble,  and  predictable,  and so in profiles rules can refer to ports by
        either name or number.
 
        Connections are unidirectional, from one in port to one out port.
@@ -178,7 +178,7 @@ SYNTAX
        There are three types of connector:
 
        portA --> portB
-              Specifies a connection fron portA to portB.
+              Specifies a connection from portA to portB.
 
        portA <-- portB
               Specifies  a  connection  in  the other direction, from portB to

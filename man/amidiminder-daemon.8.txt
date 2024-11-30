@@ -58,7 +58,7 @@ DESCRIPTION
 OPTIONS
        -v, --verbose
               Increases  output message verbosity. Can be applied twice, which
-              increasee output to debugging level.
+              increase output to debugging level.
 
        -q, --quiet
               Suppress all output except errors, and basic logging to know the
@@ -92,7 +92,7 @@ ENVIRONMENT
               Note: If the system  configuration  is  changed  such  that  the
               amidiminder daemon is launched with a non-default value for this
               variable, it must also be set the same way when using any of the
-              control coammands.
+              control commands.
 
 
 FILES

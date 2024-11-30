@@ -66,7 +66,7 @@ COMMANDS
 
               --hard
                    Resync all connections and ports from the ALSA Seq  system.
-                   This  should  never  be necissary, but misbehaving software
+                   This  should  never  be necessary, but misbehaving software
                    might cause the daemon to be out of sync with  reality.  If
                    you find you need this, please contact the author.
 
@@ -80,7 +80,7 @@ COMMANDS
               The exit status of the command is 0 if the file is a valid  pro‐
               file, and 1 if there are any syntax errors.
 
-       status Connects  to  the daemon, retreives some status information, and
+       status Connects  to  the daemon, retrieves some status information, and
               outputs it.  This is a good way to check that the daemon  is  up
               and running.
 
@@ -93,8 +93,8 @@ ENVIRONMENT
 
               Note:  If the system configuration is changed such that the dae‐
               mon is launched with a non-default value for this  variable,  it
-              must  also  be  set  the  same way when using any of the control
-              coammands.
+              must also be set the same way when using any of the control com‐
+              mands.
 
 
 FILES

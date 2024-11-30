@@ -12,15 +12,18 @@ NOTES
 [x] tidy port names
     - if client name is a prefix of the port, remove it and make partial match
 
-[] man pages
-    [] need more examples at the end of amidiminder-profile.5
-    [] explain port name shortening and when to use exact match
+[x] man pages
+    [x] need more examples at the end of amidiminder-profile.5
+    [x] explain port name shortening and when to use exact match
 
-[] sample rules files
+[x] sample rules files
 
 [] systemd service
     [] ? get systemctl reload to call amidiminder reset - or send SIGHUP
     [] hardening features
+
+[] packaging
+    [] install rules/* into /usr/share/doc/amidiminder/examples
 
 ## aconnect functionality
 

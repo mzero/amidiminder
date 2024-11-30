@@ -173,20 +173,43 @@ SYNTAX
        specifications.
 
 
+   Note about port names
+       ALSA port names often have the client  name  repeated,  sometimes  more
+       than once.  Here are some examples:
+
+              Pure Data:Pure Data Midi-In
+              Midihub MH-1Z109TZ:Midihub MH-1Z109TZ MIDI 1
+              nanoKONTROL:nanoKONTROL nanoKONTROL _ CTRL
+
+       These  long port names are difficult to read, and provide no useful ex‐
+       tra information since the client is always listed as  well.  Therefore,
+       amidiminder  shortens  these port names down by removing leading copies
+       of the client name and whitespace.
+
+       Client               Full Port Name                   Shortened Name
+
+       Pure Data            Pure Data Midi-In                Midi-In
+       Midihub MH-1Z109TZ   Midihub MH-1Z109TZ MIDI 1        MIDI 1
+       nanoKONTROL          nanoKONTROL nanoKONTROL _ CTRL   CTRL
+
+       In rules, names will be matched against this shortened port name.   Ex‐
+       act matches are matched against both the short, and original long name.
+
+
    Connection rules
-       A connection rule consists of a port, a connector,  and  another  port.
+       A  connection  rule  consists of a port, a connector, and another port.
        There are three types of connector:
 
        portA --> portB
               Specifies a connection from portA to portB.
 
        portA <-- portB
-              Specifies  a  connection  in  the other direction, from portB to
+              Specifies a connection in the other  direction,  from  portB  to
               portA
 
        portA <-> portB
-              This is just a short hand for specifying both rules  above.  As‐
-              suming  both ports are in and out ports, the this will cause two
+              This  is  just a short hand for specifying both rules above. As‐
+              suming both ports are in and out ports, the this will cause  two
               connections to be made, one in each direction.
 
        Note: In the forms above, any number of hyphens (-) are accepted in the
@@ -194,18 +217,32 @@ SYNTAX
 
 
    Disallow rules
-       A  disallow  rule  has exactly the same form as a connection rule, only
+       A disallow rule has exactly the same form as a  connection  rule,  only
        the connector has an x added in the arrow:
               portA -x-> portB
               portA <-x- portB
               portA <-x-> portB
 
-       These rules will keep a connection from being  made  when  prior  rules
+       These  rules  will  keep  a connection from being made when prior rules
        (including wildcard rules) would have made one.
 
 
+EXAMPLES
+       The directory /usr/share/amidiminder/examples/ contains several  useful
+       examples of profile files.
+
+       example.rules
+              — a concise summary of rule forms by example
+
+       generic.rules
+              — a profile to connect any hardware to any software
+
+       looper.rules
+              — an example for a live performance with software and hardware
+
+
 SEE ALSO
-       amidiminder(1), amidiminder-daemon(8),
+       amidiminder(1), amidiminder-daemon(8)
 
 
 

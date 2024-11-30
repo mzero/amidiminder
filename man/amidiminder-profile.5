@@ -189,6 +189,34 @@ l lB x.
 Note that there is no client specification, nor a colon (\fB:\fR) with these
 specifications.
 
+.SS Note about port names
+ALSA port names often have the client name repeated, sometimes more than once.
+Here are some examples:
+.IP
+Pure Data:Pure Data Midi-In
+.br
+Midihub MH-1Z109TZ:Midihub MH-1Z109TZ MIDI 1
+.br
+nanoKONTROL:nanoKONTROL nanoKONTROL _ CTRL
+.PP
+These long port names are difficult to read, and provide no useful extra
+information since the client is always listed as well. Therefore,
+\fBamidiminder\fR shortens these port names down by removing leading copies of
+the client name and whitespace.
+.TS
+tab(|) nospaces;
+l l l x
+l l lB x.
+Client               | Full Port Name                 | Shortened Name
+
+Pure Data            | Pure Data Midi-In              | Midi-In
+Midihub MH-1Z109TZ   | Midihub MH-1Z109TZ MIDI 1      | MIDI 1
+nanoKONTROL          | nanoKONTROL nanoKONTROL _ CTRL | CTRL
+.TE
+.PP
+In rules, names will be matched against this shortened port name.
+Exact matches are matched against both the short, and original long name.
+
 .SS Connection rules
 A connection rule consists of a port, a connector, and another port.  There
 are three types of connector:
@@ -221,6 +249,19 @@ connector has an \fBx\fR added in the arrow:
 These rules will keep a connection from being made when prior rules (including
 wildcard rules) would have made one.
 
+.SH EXAMPLES
+The directory \fB/usr/share/amidiminder/examples/\fR contains several useful
+examples of profile files.
+.TP
+.B example.rules
+\(em a concise summary of rule forms by example
+.TP
+.B generic.rules
+\(em a profile to connect any hardware to any software
+.TP
+.B looper.rules
+\(em an example for a live performance with software and hardware
+
 .SH SEE ALSO
 .BR amidiminder (1),
-.BR amidiminder-daemon (8),
+.BR amidiminder-daemon (8)

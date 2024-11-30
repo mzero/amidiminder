@@ -1,5 +1,6 @@
 #include "amidiminder.h"
 
+#include <algorithm>
 #include <csignal>
 #include <sstream>
 #include <sys/epoll.h>

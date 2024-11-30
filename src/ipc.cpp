@@ -169,7 +169,7 @@ namespace IPC {
 
   SocketError::SocketError(const char* what)
     : std::system_error(errno, std::generic_category(), what)
-    { };
+    { }
 
 
   Client::Client() : Socket(makeSocket(false))  { }

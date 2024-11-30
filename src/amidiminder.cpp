@@ -157,8 +157,11 @@ namespace {
 
   volatile std::sig_atomic_t caughtSignal = 0;
 
-  void signal_handler(int signal)
-    { caughtSignal = signal; }
+  void signal_handler(int signal) {
+    caughtSignal = signal;
+    if (signal != SIGHUP)
+      std::signal(signal, SIG_DFL);
+  }
 
 }
 

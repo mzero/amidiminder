@@ -1,9 +1,52 @@
-# Rules for connecting up controllers to bicycle
+### Examples of profile rules
 
-nanoKEY2 --> bicycle
-nanoKONTROL --> bicycle
+# amidiminder watches ALSA MIDI system. When a port is added, the rules in this
+# file are scanned to automatically connect it up if possible.
 
-bicycle <-- Launchpad Pro MK3
-bicycle <-- Launchpad Pro MK3:2
+# amidiminder also watches for connections made by other tools like aconnect
+# or aconnectgui.  If those ports are disconnected (accidentally unplug a
+# USB MIDI device, say) then amidiminder will remember that it had been
+# manually connected before. When the port returns (plug it back in), then
+# the previously made connection will be restored.
 
-bicycle:synths --> Circuit
+# See man pages for more details:
+#     amidiminder(1)            -- user commands to load & save profiles
+#     amidiminder-profile(5)    -- syntax of rules & profiles
+#     amidiminder-daemon(8)     -- how the daemon works
+
+###
+### Example Rules
+###
+
+# Note: Anything after a # is a comment.
+
+nanoKEY2 --> Circuit
+  # Will connect from the first output on nanoKEY2 to the first input on Circuit
+  # The names are the names of the client, and can be partial matches
+
+Circuit <-- nanoKEY2
+  # Same thing. Use which ever direction makes sense for you.
+
+Circuit <-> nanoKEY2
+  # Just a shortcut for both of the above.
+
+Launchpad Pro:1 --> PreenFM
+bicycle:synths --> PreenFM
+  # If a device (or software) has more than one port, you can specify the
+  # port by number or by name
+
+Launchpad Pro --> .app
+  # '.hw' and '.app' match any hardware or application port, respectively
+
+Launchpad Pro:* --> Pure Data
+  # Ports can be wildcard which will match all ports, not just the first
+
+Launchpad Pro:2 -x-> Pure Data
+  # This is a blocking rule, and it will block a wildcard match from earlier
+  # in the file. It will not block rules that follow.
+
+"Launchpad Pro":* <-x-> *
+  # Putting a name (client or port) in quotes will make it match exactly.
+  # This can occasionally be useful if you have devices that are very
+  # similarly named.
+

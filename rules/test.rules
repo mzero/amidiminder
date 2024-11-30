@@ -1,6 +1,12 @@
-# Parsing Tests
-# Run this with:
+### Parsing Tests
+
+# This profile isn't intended as a useful profile. 
+# It is a test of the rules parser.
+
+# Run this test with:
 #     amidiminder check test.rules
+
+# The comments on each line tell the check command for what to expect.
 
     # hi there                      # PASS indented comment
 

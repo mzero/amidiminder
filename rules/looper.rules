@@ -1,0 +1,34 @@
+### Looper software rules
+
+# This profile is an example of connecting some hardware MIDI devices
+# to a piece of software called "bicycle" (a MIDI looper).
+
+bicycle:control <-- nanoKEY2
+bicycle:control <-- Erae Touch
+   # These connect my controllers to the software. Sometimes I
+   # use the nanoKEY2 keyboard, sometimes I use the Erae surface
+   # to play notes. These rules connect both, so which ever is
+   # plugged in gets connected.
+
+bicycle:control <-> Launchpad Pro:MIDI
+   # Connects the Launchpad to the software, and vice-versa.
+   # This allows buttons on the Launchpad to control the
+   # software, and the software to control the lights on the
+   # Launchpad.
+   #
+   # The Launchpad presents three MIDI ports, and we want the one
+   # that is just plain MIDI from the unit.
+
+bicycle:synth --> MicroMonsta
+bicycle:synth --> Hydrasynth
+bicycle:synth --> Midihub:1
+   # Connects the music output of the software to my synths. The
+   # last line connects to a MIDI interface, which has four
+   # distinct MIDI outputs, numbered from 0. Here we connect to
+   # the second one.
+
+Faderfox --> Midihub:3
+   # Lastly, connect a hardware control surface with knobs to the
+   # fourth output of the MIDI interface. This is just hardware
+   # to hardware connection, used to adjust the parameters of my
+   # reverb unit, connected to the MIDI interface.

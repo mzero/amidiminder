@@ -28,6 +28,8 @@ NOTES
 
 [x] packaging
     [x] install rules/* into /usr/share/doc/amidiminder/examples
+    [x] move home to /run/amidiminder thanks to pulse audio!
+
 
 ## aconnect functionality
 

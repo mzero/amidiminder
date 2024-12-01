@@ -66,6 +66,8 @@ NOTES
 
 [] ? case insensitive client and port name matches
 
+[] ? some way to be graceful about aseqdump - we shouldn't be saving
+    those connections as observed rules
 
 
 # MAJOR THEMES

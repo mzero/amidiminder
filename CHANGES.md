@@ -4,9 +4,7 @@ This file summarizes the changes made with each release of the code.
 
 -----------
 
-# 0.80 - pending
-
-## Major new things:
+# 0.80 - 2024-12-01
 
 * Profile files
   * no longer a single file in /etc
@@ -23,12 +21,15 @@ This file summarizes the changes made with each release of the code.
   This is much improved over the old, complex, wildcard rule logic, and now
   almost always does exactly what you want.
 
-## Minor new things:
+* Proper packaging
+  * deb file packaging
+  * systemd service overhaul
+    * use runtime and state directories as supplied by systemd
+    * security hardening
+    * proper reload support
+  * man pages
+  * example rules files in /usr/share/doc/amidiminder/examples
 
-* systemd update
-  * use runtime and state directories as supplied by systemd
-
-* man pages
 
 -----------
 

@@ -23,6 +23,8 @@ NOTES
     [x] hardening features
 
 [x] exiting because of a signal shouldn't cause an exit code of failure (1)
+[x] not cleaning all connections at start up
+    - resetConnectionsHard should't use knownPort()
 
 [x] packaging
     [x] install rules/* into /usr/share/doc/amidiminder/examples

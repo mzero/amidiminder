@@ -337,8 +337,8 @@ void MidiMinder::resetConnectionsHard() {
   activeConnections.clear();
     // a little afraid to disconnect connections while scanning them!
   seq.scanConnections([&](auto c){
-    const Address& sender = knownPort(c.sender);
-    const Address& dest = knownPort(c.dest);
+    const Address& sender = seq.address(c.sender);
+    const Address& dest = seq.address(c.dest);
     if (sender && dest) // check if it's a connection we would manage
       doomed.push_back(c);
   });

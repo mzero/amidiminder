@@ -204,7 +204,8 @@ void MidiMinder::run() {
         break;
       }
       default:
-        throw Msg::runtime_error("Interrupted by signal {}", caughtSignal);
+        Msg::output("Exiting on signal {}", caughtSignal);
+        return;
     }
 
     struct epoll_event evt;

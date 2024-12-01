@@ -22,6 +22,8 @@ NOTES
     [x] ? get systemctl reload to call amidiminder reset - or send SIGHUP
     [x] hardening features
 
+[x] exiting because of a signal shouldn't cause an exit code of failure (1)
+
 [x] packaging
     [x] install rules/* into /usr/share/doc/amidiminder/examples
 

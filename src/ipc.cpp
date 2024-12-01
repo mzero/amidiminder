@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <sys/un.h>
 #include <unistd.h>
 
@@ -43,8 +44,10 @@ namespace {
       throw Msg::runtime_error("Socket path is too long: {}", path);
 
     if (server) {
+      auto oldmask = umask(0007); // allow group access (usually audio)
       if (bind(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0)
         throw Msg::system_error("Couldn't bind socket to path {}", path);
+      umask(oldmask);
 
       if (listen(sockFD, 2) != 0)   // don't need a long backlog
         throw Msg::system_error("Couldn't listen to socket path {}", path);

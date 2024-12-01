@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+      
+# create a user to run as
+if [ "$1" = "configure" ]; then
+  adduser --system  --home /var/lib/misc --gecos "amidiminder daemon" \
+          --no-create-home --disabled-password --ingroup audio \
+          --quiet amidiminder || true
+
+fi
+
+#DEBHELPER#

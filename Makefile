@@ -16,9 +16,8 @@ deb:
 	dpkg-buildpackage -b --no-sign
 
 install:
-	$(MKDIR_P) $(DESTDIR)$(BINARY_DIR) $(DESTDIR)$(CONF_DIR)
+	$(MKDIR_P) $(DESTDIR)$(BINARY_DIR)
 	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET) $(DESTDIR)$(BINARY_DIR)/
-	$(INSTALL_DATA) $(TARGET).rules $(DESTDIR)$(CONF_DIR)/
 
 SRCS := amidiminder.cpp amidiminder-commands.cpp amidiminder-tests.cpp
 SRCS +=	args.cpp files.cpp ipc.cpp main.cpp msg.cpp rule.cpp seq.cpp
@@ -55,7 +54,7 @@ deb-clean:
 	dh clean
 
 test: $(BUILD_DIR)/$(TARGET)
-	$(BUILD_DIR)/$(TARGET) check test.rules && echo PASS || echo FAIL
+	$(BUILD_DIR)/$(TARGET) check rules/test.rules && echo PASS || echo FAIL
 
 
 # test shell with runtime and state directories in /tmp

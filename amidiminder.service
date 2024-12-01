@@ -11,5 +11,29 @@ StateDirectory=amidiminder
 Restart=always
 RestartSec=1
 
+User=amidiminder
+Group=audio
+#PrivateNetwork=yes
+#NoNewPrivileges=yes
+#PrivateTmp=yes
+#ProtectSystem=strict
+#ProtectControlGroups=yes
+#ProtectKernelModules=yes
+#ProtectKernelTunables=yes
+#RestrictAddressFamilies=AF_UNIX
+#SystemCallArchitectures=native
+#RestrictNamespaces=yes
+#RestrictSUIDSGID=yes
+#MemoryDenyWriteExecute=yes
+#LockPersonality=yes
+#ProtectHostname=yes
+#ProtectKernelLogs=true
+#PrivateUsers=yes
+#InaccessibleDirectories=/home
+#LimitNPROC=1
+#DeviceAllow=/dev/snd/seq rw
+#DevicePolicy=strict
+#ProtectProc=invisible
+
 [Install]
 WantedBy=multi-user.target

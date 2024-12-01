@@ -10,7 +10,7 @@ Rules-Requires-Root: no
 Package: amidiminder
 Architecture: any
 Multi-Arch: foreign
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}, adduser
 Description: ALSA MIDI connection minder
  Watches for new MIDI ports (both from hardware devices and from applications),
  and uses a rules configuration file to automatically make connections.

@@ -18,12 +18,12 @@ NOTES
 
 [x] sample rules files
 
-[] systemd service
-    [] ? get systemctl reload to call amidiminder reset - or send SIGHUP
-    [] hardening features
+[x] systemd service
+    [x] ? get systemctl reload to call amidiminder reset - or send SIGHUP
+    [x] hardening features
 
-[] packaging
-    [] install rules/* into /usr/share/doc/amidiminder/examples
+[x] packaging
+    [x] install rules/* into /usr/share/doc/amidiminder/examples
 
 ## aconnect functionality
 

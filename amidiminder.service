@@ -5,6 +5,7 @@ After=sound.target
 
 [Service]
 ExecStart=/usr/bin/amidiminder daemon
+ExecReload=/usr/bin/amidiminder reset --keep --hard
 EnvironmentFile=/etc/environment
 RuntimeDirectory=amidiminder
 StateDirectory=amidiminder
@@ -13,6 +14,7 @@ RestartSec=1
 
 User=amidiminder
 Group=audio
+
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict

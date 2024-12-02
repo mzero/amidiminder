@@ -8,6 +8,12 @@ NOTES
 
 [] connect & disconnect
 [] list
+    [] sort ports - name & type
+    [] sort connections
+    [] port display in columns based on client and port name widths
+    [] all ports option (includes system ports)
+    [] ports only, connections only options
+    [] ? simple text versions (without formatting)
     [] move verbose port details (-p) option to the list command
         [] recode Seq::outputAddrDetails to use fmt... or???
 

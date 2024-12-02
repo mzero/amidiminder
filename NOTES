@@ -4,33 +4,6 @@ NOTES
 # TODO
 
 
-## general
-
-[x] major clean up and refactor of MidiMinder class
-[x] add connection logic test
-
-[x] tidy port names
-    - if client name is a prefix of the port, remove it and make partial match
-
-[x] man pages
-    [x] need more examples at the end of amidiminder-profile.5
-    [x] explain port name shortening and when to use exact match
-
-[x] sample rules files
-
-[x] systemd service
-    [x] ? get systemctl reload to call amidiminder reset - or send SIGHUP
-    [x] hardening features
-
-[x] exiting because of a signal shouldn't cause an exit code of failure (1)
-[x] not cleaning all connections at start up
-    - resetConnectionsHard should't use knownPort()
-
-[x] packaging
-    [x] install rules/* into /usr/share/doc/amidiminder/examples
-    [x] move home to /run/amidiminder thanks to pulse audio!
-
-
 ## aconnect functionality
 
 [] connect & disconnect

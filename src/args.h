@@ -16,6 +16,8 @@ namespace Args {
 
     Status,
 
+    List,
+
     ConnectionLogicTest,
   };
   extern Command command;

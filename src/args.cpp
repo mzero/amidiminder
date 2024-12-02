@@ -65,6 +65,10 @@ namespace Args {
     statusApp->parse_complete_callback([](){ command = Command::Status; });
     statusApp->group(userGroup);
 
+    CLI::App *listApp = app.add_subcommand("list", "list ports and connections");
+    listApp->parse_complete_callback([](){ command = Command::List; });
+    listApp->group(userGroup);
+
     CLI::App *helpApp = app.add_subcommand("help");
     helpApp->group(userGroup);
     helpApp->description(app.get_help_ptr()->get_description());

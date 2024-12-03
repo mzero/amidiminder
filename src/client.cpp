@@ -1,5 +1,6 @@
 #include "client.h"
 
+#include <fmt/format.h>
 #include <functional>
 #include <map>
 #include <set>
@@ -60,13 +61,22 @@ namespace Client {
       }
     });
 
+    std::string::size_type cw = 1;
+    std::string::size_type pw = 1;
+    for (const auto& p : ports) {
+      cw = std::max(cw, p.client.size());
+      pw = std::max(pw, p.port.size());
+    }
     Msg::output("Ports:");
     for (const auto& p : ports)
-      Msg::output("    {}", p);
+      Msg::output("    {:{cw}} : {:{pw}} [{}:{}]",
+        p.client, p.port, p.addr.client, p.addr.port,
+        fmt::arg("cw", cw), fmt::arg("pw", pw));
+      //Msg::output("    {}", p);
 
     Msg::output("Connections:");
     for (const auto& c : connections) {
-          Msg::output("    {} --> {}", c.sender, c.dest);
+      Msg::output("    {} --> {}", c.sender, c.dest);
     }
   }
 

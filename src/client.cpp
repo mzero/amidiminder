@@ -34,17 +34,26 @@ namespace {
     }
   };
 
-}
-namespace Client {
-
-  void listCommand() {
+  struct SeqState {
     Seq seq;
-    seq.begin();
 
     std::map<snd_seq_addr_t, Address> addrMap;
     std::set<Address, lexicalAddressLess> ports;
     std::set<Connection, lexicalConnectionLess> connections;
 
+    std::size_t numPorts;
+    std::size_t numConnections;
+
+    std::string::size_type clientWidth;
+    std::string::size_type portWidth;
+
+    SeqState()  { seq.begin(); refresh(); }
+    ~SeqState() { seq.end(); }
+
+    void refresh();
+  };
+
+  void SeqState::refresh() {
     seq.scanPorts([&](const snd_seq_addr_t& a) {
       auto address = seq.address(a);
       if (address) {
@@ -61,21 +70,33 @@ namespace Client {
       }
     });
 
-    std::string::size_type cw = 1;
-    std::string::size_type pw = 1;
+    numPorts = ports.size();
+    numConnections = connections.size();
+
+    clientWidth = 0;
+    portWidth = 0;
     for (const auto& p : ports) {
-      cw = std::max(cw, p.client.size());
-      pw = std::max(pw, p.port.size());
+      clientWidth = std::max(clientWidth, p.client.size());
+      portWidth = std::max(portWidth, p.port.size());
     }
+  }
+}
+
+
+namespace Client {
+
+  void listCommand() {
+    SeqState s;
+
     Msg::output("Ports:");
-    for (const auto& p : ports)
+    for (const auto& p : s.ports)
       Msg::output("    {:{cw}} : {:{pw}} [{}:{}]",
         p.client, p.port, p.addr.client, p.addr.port,
-        fmt::arg("cw", cw), fmt::arg("pw", pw));
+        fmt::arg("cw", s.clientWidth), fmt::arg("pw", s.portWidth));
       //Msg::output("    {}", p);
 
     Msg::output("Connections:");
-    for (const auto& c : connections) {
+    for (const auto& c : s.connections) {
       Msg::output("    {} --> {}", c.sender, c.dest);
     }
   }

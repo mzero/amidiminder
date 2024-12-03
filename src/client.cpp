@@ -108,4 +108,8 @@ namespace Client {
   }
 
 
+  void viewCommand() {
+    listCommand();
+  }
+
 }

@@ -69,6 +69,10 @@ namespace Args {
     listApp->parse_complete_callback([](){ command = Command::List; });
     listApp->group(userGroup);
 
+    CLI::App *viewApp = app.add_subcommand("view", "interactive viewer");
+    viewApp->parse_complete_callback([](){ command = Command::View; });
+    viewApp->group(userGroup);
+
     CLI::App *helpApp = app.add_subcommand("help");
     helpApp->group(userGroup);
     helpApp->description(app.get_help_ptr()->get_description());

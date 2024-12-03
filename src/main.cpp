@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
       case Args::Command::Status:   MidiMinder::sendStatusCommand();    break;
 
       case Args::Command::List:     Client::listCommand();              break;
+      case Args::Command::View:     Client::viewCommand();              break;
 
       case Args::Command::ConnectionLogicTest: {
         MidiMinder mm;

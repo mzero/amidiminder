@@ -17,6 +17,7 @@ namespace Args {
     Status,
 
     List,
+    View,
 
     ConnectionLogicTest,
   };

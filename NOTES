@@ -8,10 +8,10 @@ NOTES
 
 [] connect & disconnect
 [] list
-    [] sort ports - name
-        [] sort by type??
-    [] sort connections
-    [] port display in columns based on client and port name widths
+    [x] sort ports - name
+    [] group ports by type??
+    [x] sort connections
+    [x] port display in columns based on client and port name widths
     [] all ports option (includes system ports)
     [] ports only, connections only options
     [] ? simple text versions (without formatting)

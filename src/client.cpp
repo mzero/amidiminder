@@ -38,8 +38,8 @@ namespace {
     Seq seq;
 
     std::map<snd_seq_addr_t, Address> addrMap;
-    std::set<Address, lexicalAddressLess> ports;
-    std::set<Connection, lexicalConnectionLess> connections;
+    std::vector<Address> ports;
+    std::vector<Connection> connections;
 
     std::size_t numPorts;
     std::size_t numConnections;
@@ -54,21 +54,27 @@ namespace {
   };
 
   void SeqState::refresh() {
+    ports.clear();
+    connections.clear();
+
     seq.scanPorts([&](const snd_seq_addr_t& a) {
       auto address = seq.address(a);
       if (address) {
         addrMap[a] = address;
-        ports.insert(address);
+        ports.push_back(address);
       }
     });
+    std::sort(ports.begin(), ports.end(), lexicalAddressLess());
+
     seq.scanConnections([&](const snd_seq_connect_t& c) {
       auto si = addrMap.find(c.sender);
       auto di = addrMap.find(c.dest);
       if (si != addrMap.end() && di != addrMap.end()) {
         Connection conn = {si->second, di->second};
-        connections.insert(conn);
+        connections.push_back(conn);
       }
     });
+    std::sort(connections.begin(), connections.end(), lexicalConnectionLess());
 
     numPorts = ports.size();
     numConnections = connections.size();

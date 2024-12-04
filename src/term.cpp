@@ -9,7 +9,7 @@
 
 namespace {
   volatile std::sig_atomic_t pendingResize = false;
-  void sigwinch_handler(int signal) { pendingResize = true; }
+  void sigwinch_handler(int /* signal */) { pendingResize = true; }
 }
 
 Term::Term() {

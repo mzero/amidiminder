@@ -33,7 +33,8 @@ CPPFLAGS += -Wdate-time -D_FORTIFY_SOURCE=2
 CPPFLAGS += -std=c++17
 CPPFLAGS += -MMD -MP
 CPPFLAGS += -O2
-CPPFLAGS += -fstack-protector-strong -Wformat -Werror=format-security -Wall -pedantic
+CPPFLAGS += -fstack-protector-strong -Wformat -Werror=format-security
+CPPFLAGS += -Wall -Wextra -pedantic
 
 LDFLAGS += $(addprefix -l,$(LIBS))
 

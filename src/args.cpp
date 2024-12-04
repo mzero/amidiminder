@@ -26,7 +26,7 @@ namespace Args {
     app.require_subcommand(0, 1);
 
     auto vFlag = app.add_flag("-v,--verbose", [](auto n){ verbosity = n + 1; }, "Increase level of verbosity");
-    auto qFlag = app.add_flag("-q,--quiet",   [](auto _){ verbosity = 0; },     "Quiet all normal output");
+    auto qFlag = app.add_flag("-q,--quiet",   [](auto  ){ verbosity = 0; },     "Quiet all normal output");
     qFlag->excludes(vFlag);
     vFlag->option_text(" ");  // no need to spam the help with excludes info
     qFlag->option_text(" ");

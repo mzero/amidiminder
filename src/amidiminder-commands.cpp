@@ -30,7 +30,9 @@ void MidiMinder::sendResetCommand() {
   client.sendCommandAndOptions("reset", opts);
 }
 
-void MidiMinder::handleResetCommand(IPC::Connection& conn, const IPC::Options& opts) {
+void MidiMinder::handleResetCommand(
+  IPC::Connection& /* conn */, const IPC::Options& opts)
+{
   bool keepObserved = false;
   bool resetHard = false;
   for (auto& o : opts) {

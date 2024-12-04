@@ -20,9 +20,8 @@ install:
 	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET) $(DESTDIR)$(BINARY_DIR)/
 
 SRCS := amidiminder.cpp amidiminder-commands.cpp amidiminder-tests.cpp
-SRCS +=	args.cpp client.cpp files.cpp ipc.cpp main.cpp msg.cpp rule.cpp seq.cpp
-SRCS += term.cpp
-INCS := .
+SRCS +=	args.cpp client.cpp client-view.cpp files.cpp ipc.cpp main.cpp msg.cpp
+SRCS += rule.cpp seq.cpp seqsnapshot.cpp term.cpp
 LIBS := stdc++ asound fmt
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

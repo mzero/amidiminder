@@ -18,6 +18,17 @@ NOTES
     [] move verbose port details (-p) option to the list command
         [] recode Seq::outputAddrDetails to use fmt... or???
 
+[] view
+    [] refresh if ALSA Seq has updates
+    [] control-l to repaint
+    [] actually connect & disconnect
+    [] massive code clean up
+    [] turn off debugging
+
+[] term
+    [] get rid of "good"
+    [] ? unicode detection
+
 ## other
 
 [] ? move -v and -q flags to daemon only... only place really used

@@ -50,16 +50,16 @@ namespace {
   constexpr const char* boxCornerBR     = utf8 ? "\xe2\x94\x98" : "+"; // U+2518
 
   enum class Mode {
-    menu,
+    Menu,
 
-    pickSender,
-    pickDest,
-    confirmConnection,
+    PickSender,
+    PickDest,
+    ConfirmConnection,
 
-    pickConnection,
-    confirmDisconnection,
+    PickConnection,
+    ConfirmDisconnection,
 
-    quit,
+    Quit,
   };
 
   struct View {
@@ -68,13 +68,11 @@ namespace {
 
     View(Term& t) : term(t) { }
 
-    std::size_t portsRow;
-    std::size_t connectionsRow;
-    std::size_t promptRow;
+    std::size_t topRowPorts;
+    std::size_t topRowConnections;
+    std::size_t topRowPrompt;
 
     void layout();
-
-    Mode mode;
 
     std::size_t selectedSender;
     std::size_t selectedDest;
@@ -83,15 +81,20 @@ namespace {
     std::string message;
     void setMessage(const std::string&);
 
-    bool portsDirty = false;
-    bool connectionsDirty = false;
-    bool promptDirty = false;
+    bool dirtyPorts = false;
+    bool dirtyConnections = false;
+    bool dirtyPrompt = false;
 
     void drawPorts();
     void drawConnections();
     void drawPrompt();
 
     void render();
+
+
+    Mode mode;
+    Mode priorMode();
+    void gotoMode(Mode);
 
     void handleEvent(const Term::Event& ev);
     bool handleGlobalEvent(const Term::Event& ev);
@@ -100,63 +103,58 @@ namespace {
     bool handleConnectionPickerEvent(const Term::Event& ev);
     bool handleConfirmEvent(const Term::Event& ev);
 
-    void backup(bool);
-
-    void run();
-
     void debugMessage(const std::string&);
-
+    void run();
   };
 
 
   void View::layout() {
-    auto portsH = 2 + seqState.ports.size() + 1;     // incl. border rows
-    auto connectionsH = 2 + seqState.connections.size() + 1;
-    auto promptH = 2; // prompt and message
+    auto portsHeight       = 2 + seqState.ports.size() + 1;
+    auto connectionsHeight = 2 + seqState.connections.size() + 1;
+    auto promptHeight      = 2;
 
-    promptRow = term.rows() + 1 - promptH;
-    connectionsRow = promptRow - connectionsH;
-    portsRow = connectionsRow - portsH;
+    topRowPrompt = term.rows() + 1 - promptHeight;
+    topRowConnections = topRowPrompt - connectionsHeight;
+    topRowPorts = topRowConnections - portsHeight;
 
-    portsDirty = true;
-    connectionsDirty = true;
-    promptDirty = true;
+    dirtyPorts = true;
+    dirtyConnections = true;
+    dirtyPrompt = true;
 
     term.clearDisplay();
   }
 
   void View::render() {
-
-    if (portsDirty)       drawPorts();
-    if (connectionsDirty) drawConnections();
-    if (promptDirty)      drawPrompt();
+    if (dirtyPorts)       drawPorts();
+    if (dirtyConnections) drawConnections();
+    if (dirtyPrompt)      drawPrompt();
 
     std::cout.flush();
-    portsDirty = connectionsDirty = promptDirty = false;
+    dirtyPorts = dirtyConnections = dirtyPrompt = false;
   }
 
   void View::drawPorts() {
     bool picking = false;
     bool confirming = false;
-    size_t s1 = seqState.numPorts;
-    size_t s2 = seqState.numPorts;
-    size_t inv = seqState.numPorts;
+    size_t s1 = seqState.ports.size();
+    size_t s2 = seqState.ports.size();
+    size_t inv = seqState.ports.size();
     auto func = &Address::canBeSender;
 
     switch (mode) {
-      case Mode::pickSender:
+      case Mode::PickSender:
         picking = true;
         s1 = selectedSender;
         inv = selectedSender;
         break;
-      case Mode::pickDest:
+      case Mode::PickDest:
         picking = true;
         s1 = selectedSender;
         s2 = selectedDest;
         inv = selectedDest;
         func = &Address::canBeDest;
         break;
-      case Mode::confirmConnection:
+      case Mode::ConfirmConnection:
         confirming = true;
         s1 = selectedSender;
         s2 = selectedDest;
@@ -164,11 +162,11 @@ namespace {
       default:
         break;
     }
-    int y = portsRow;
+    int y = topRowPorts;
 
     term.clearLine(y++);
-    fmt::print("{}{} Ports ", boxCornerTL, boxHorizontal);
-    for (auto i = seqState.clientWidth + seqState.portWidth + 15; i; --i)
+    std::cout << boxCornerTL << boxHorizontal << " Ports ";
+    for (auto i = seqState.clientWidth + seqState.portWidth + 15; i > 0; --i)
       std::cout << boxHorizontal;
     term.clearLine(y++);
     std::cout << boxVertical;
@@ -191,7 +189,7 @@ namespace {
 
       fmt::print(" {:{cw}} : {:{pw}} [{:3}:{}] {}{}",
         p.client, p.port, p.addr.client, p.addr.port,
-        (isS1 | isS2) ? "    " : "",
+        (isS1 | isS2) ? "    " : "",  // shifts over the arrow is selected
         (isS1 | isS2) ? SeqSnapshot::dirStr(isS1, isS2)
                       : SeqSnapshot::addressDirStr(p),
         fmt::arg("cw", seqState.clientWidth), fmt::arg("pw", seqState.portWidth));
@@ -201,14 +199,14 @@ namespace {
   }
 
   void View::drawConnections() {
-    bool picking = mode == Mode::pickConnection;
-    bool confirming = mode == Mode::confirmDisconnection;
+    bool picking = mode == Mode::PickConnection;
+    bool confirming = mode == Mode::ConfirmDisconnection;
 
-    int y = connectionsRow;
+    int y = topRowConnections;
 
     term.clearLine(y++);
     std::cout << boxCornerTL << boxHorizontal << " Connections ";
-    for (auto i = 2*(seqState.clientWidth + seqState.portWidth) - 4; i; --i)
+    for (auto i = 2*(seqState.clientWidth + seqState.portWidth) - 4; i > 0; --i)
       std::cout << boxHorizontal;
     term.clearLine(y++);
     std::cout << boxVertical;
@@ -220,10 +218,12 @@ namespace {
       term.clearLine(y);
       std::cout << boxVertical << ' ';
 
-      if (picking && index == selectedConnection) std::cout << Term::Style::inverse;
-      if (confirming)
-        std::cout << (index == selectedConnection ? Term::Style::bold : Term::Style::dim);
-
+      if (picking && index == selectedConnection)
+                                          std::cout << Term::Style::inverse;
+      if (confirming) {
+        if (index == selectedConnection)  std::cout << Term::Style::bold;
+        else                              std::cout << Term::Style::dim;
+      }
       fmt::print("{}{} {} --> {}",
         picking ? label : ' ',
         picking ? ')' : ' ',
@@ -237,77 +237,77 @@ namespace {
     const char* line1 = "";
 
     switch (mode) {
-      case Mode::menu:
+      case Mode::Menu:
         line1 = "Q)uit, C)connect, D)isconnect";
         break;
 
-      case Mode::pickSender:
+      case Mode::PickSender:
         line1 = "Use arrows to pick a sender and hit return, or type a letter";
         break;
 
-      case Mode::pickDest:
+      case Mode::PickDest:
         line1 = "Now pick a dest the same way";
         break;
 
-      case Mode::confirmConnection:
+      case Mode::ConfirmConnection:
         line1 = "Confirm with return, or cancel with ESC";
         break;
 
-      case Mode::pickConnection: {
+      case Mode::PickConnection: {
         line1 = "Use arrows to pick a connection and hit return, or type a letter";
         break;
       }
 
-      case Mode::confirmDisconnection:{
+      case Mode::ConfirmDisconnection:{
         line1 = "Confirm with return, or cancel with ESC";
         break;
       }
 
-      case Mode::quit:
+      case Mode::Quit:
         line1 = "Quitting...";
         break;
     }
-    term.clearLine(promptRow);
+    term.clearLine(topRowPrompt);
     std::cout << "  >> " << line1;
-    term.clearLine(promptRow + 1);
+    term.clearLine(topRowPrompt + 1);
     if (message.length() > 0)
       std::cout << "  ** " << message;
-    term.moveCursor(promptRow, 1);
+    term.moveCursor(topRowPrompt, 1);
   }
 
   void View::setMessage(const std::string& s) {
     message = s;
-    promptDirty = true;
+    dirtyPrompt = true;
   }
 
-  void View::backup(bool fully = false) {
-    switch (mode) {
-      case Mode::menu:        break;
-      case Mode::pickSender:
-        mode = Mode::menu;
-        portsDirty = true;
-        break;
-      case Mode::pickDest:
-        mode = Mode::pickSender;
-        portsDirty = true;
-        break;
-      case Mode::confirmConnection:
-        mode = Mode::pickDest;
-        portsDirty = true;
-        break;
-      case Mode::pickConnection:
-        mode = Mode::menu;
-        connectionsDirty = true;
-        break;
-      case Mode::confirmDisconnection:
-        mode = Mode::pickConnection;
-        connectionsDirty = true;
-        break;
-      default:
-        mode = Mode::menu;
+  void View::gotoMode(Mode newMode) {
+    Mode modes[] = {mode, newMode};
+    for (auto m : modes) {
+      switch(m) {
+        case Mode::Menu:                  break;
+        case Mode::PickSender:
+        case Mode::PickDest:
+        case Mode::ConfirmConnection:     dirtyPorts = true; break;
+        case Mode::PickConnection:
+        case Mode::ConfirmDisconnection:  dirtyConnections = true; break;
+        case Mode::Quit:                  break;
+      }
     }
-    if (fully) mode = Mode::menu;
-    promptDirty = true;
+    dirtyPrompt = true;
+    mode = newMode;
+  }
+
+  Mode View::priorMode() {
+    switch (mode) {
+      case Mode::Menu:                    return Mode::Menu;
+      case Mode::PickSender:              return Mode::Menu;
+      case Mode::PickDest:                return Mode::PickSender;
+      case Mode::ConfirmConnection:       return Mode::PickDest;
+      case Mode::PickConnection:          return Mode::Menu;
+      case Mode::ConfirmDisconnection:    return Mode::PickConnection;
+      case Mode::Quit:                    return Mode::Quit;
+    }
+    return mode; // never reached, appeases the compiler
   }
 
   bool View::handleGlobalEvent(const Term::Event& ev) {
@@ -315,11 +315,15 @@ namespace {
       case Term::EventType::Char: {
         switch (ev.character) {
           case '\x03':      // control-c
-            mode = Mode::quit;
+            gotoMode(Mode::Quit);
+            return true;
+
+          case '\x0c':      // control-l  - like in vi!
+            layout();
             return true;
 
           case '\x1b':      // escape
-            backup(true);
+            gotoMode(Mode::Menu);
             return true;
 
           default:
@@ -331,7 +335,7 @@ namespace {
       case Term::EventType::Key: {
         switch (ev.key) {
           case Term::Key::Left:
-            backup();
+            gotoMode(priorMode());
             return true;
           default:
             break;
@@ -355,25 +359,25 @@ namespace {
       switch (ev.character) {
         case 'C':
         case 'c':
-          mode = Mode::pickSender;
-          promptDirty = portsDirty = true;
+          gotoMode(Mode::PickSender);
+          dirtyPrompt = dirtyPorts = true;
           return true;
 
         case 'D':
         case 'd':
         case 'X':
         case 'x':
-          mode = Mode::pickConnection;
-          promptDirty = connectionsDirty = true;
+          gotoMode(Mode::PickConnection);
+          dirtyPrompt = dirtyConnections = true;
           return true;
 
         case 'Q':
         case 'q':
-          mode = Mode::quit;
+          gotoMode(Mode::Quit);
           return true;
 
         case 'R':
-        case 'r':
+        case 'r':     // hidden command, should never be needed
           seqState.refresh();
           layout();
           return true;
@@ -387,30 +391,28 @@ namespace {
     using FilterFunc = bool (Address::*)() const;
     FilterFunc filter;
     const char* typeString;
-
     Mode nextMode;
 
-    promptDirty = true;
-    portsDirty = true;
-
     switch (mode) {
-      case Mode::pickSender:
+      case Mode::PickSender:
         selector = &selectedSender;
         filter = &Address::canBeSender;
         typeString = "sender";
-        nextMode = Mode::pickDest;
+        nextMode = Mode::PickDest;
         break;
 
-      case Mode::pickDest:
+      case Mode::PickDest:
         selector = &selectedDest;
         filter = &Address::canBeDest;
         typeString = "destination";
-        nextMode = Mode::confirmConnection;
+        nextMode = Mode::ConfirmConnection;
         break;
 
       default:
         return false;
     }
+
+    dirtyPorts = true;
 
     switch (ev.type) {
       case Term::EventType::Char: {
@@ -423,10 +425,10 @@ namespace {
               || ev.character == '\t')  pick = *selector;
         else                            return false;
 
-        if (0 <= pick && pick < seqState.numPorts) {
+        if (pick < seqState.ports.size()) {
           if ((seqState.ports[pick].*filter)()) {
             *selector = pick;
-            mode = nextMode;
+            gotoMode(nextMode);
             return true;
           }
           else {
@@ -459,8 +461,7 @@ namespace {
   }
 
  bool View::handleConnectionPickerEvent(const Term::Event& ev) {
-    promptDirty = true;
-    connectionsDirty = true;
+    dirtyConnections = true;
 
     switch (ev.type) {
       case Term::EventType::Char: {
@@ -473,9 +474,9 @@ namespace {
               || ev.character == '\t')  pick = selectedConnection;
         else                            return false;
 
-        if (0 <= pick && pick < seqState.numConnections) {
+        if (pick < seqState.connections.size()) {
           selectedConnection = pick;
-          mode = Mode::confirmDisconnection;
+          gotoMode(Mode::ConfirmDisconnection);
           return true;
         }
         return false;
@@ -489,8 +490,8 @@ namespace {
           default:
             return false;
         }
-        if (pick >= seqState.numConnections)
-          pick = seqState.numConnections - 1;
+        if (pick >= seqState.connections.size())
+          pick = seqState.connections.size() - 1;
         selectedConnection = pick;
         return true;
       }
@@ -507,14 +508,14 @@ namespace {
       if (ev.character == '\r' || ev.character == '\t') {
 
         switch (mode) {
-          case Mode::confirmConnection: {
+          case Mode::ConfirmConnection: {
             setMessage(fmt::format("Would connect {} --> {}",
               seqState.ports[selectedSender],
               seqState.ports[selectedDest]));
             break;
           }
 
-          case Mode::confirmDisconnection: {
+          case Mode::ConfirmDisconnection: {
             auto& conn = seqState.connections[selectedConnection];
             setMessage(fmt::format("Would disconnect {} -x-> {}",
               conn.sender, conn.dest));
@@ -524,8 +525,8 @@ namespace {
           default:
             return false;
         }
-        mode = Mode::menu;
-        seqState.refresh();
+        gotoMode(Mode::Menu);
+        seqState.refresh();   // FIXME: remove once Seq events are handled
         layout();
         return true;
       }
@@ -542,29 +543,29 @@ namespace {
     }
 
     switch (mode) {
-      case Mode::menu:
+      case Mode::Menu:
         handled = handleMenuEvent(ev);
         if (handled) debugMessage("handled in handleMenuEvent");
         break;
 
-      case Mode::pickSender:
-      case Mode::pickDest:
+      case Mode::PickSender:
+      case Mode::PickDest:
         handled = handlePortPickerEvent(ev);
         if (handled) debugMessage("handled in handlePortPickerEvent");
         break;
 
-      case Mode::pickConnection:
+      case Mode::PickConnection:
         handled = handleConnectionPickerEvent(ev);
         if (handled) debugMessage("handled in handleConnectionPickerEvent");
         break;
 
-      case Mode::confirmConnection:
-      case Mode::confirmDisconnection:
+      case Mode::ConfirmConnection:
+      case Mode::ConfirmDisconnection:
         handled = handleConfirmEvent(ev);
         if (handled) debugMessage("handled in handleConfirmEvent");
         break;
 
-      case Mode::quit:
+      case Mode::Quit:
         return;
     }
 
@@ -590,24 +591,26 @@ namespace {
   }
 
   void View::debugMessage(const std::string& s) {
-    static size_t i = 0;
-    static int n = 1;
+    const size_t debugAreaHeight = 15;
+    static size_t row = 1;
+    static int messageNumber = 1;
 
-    term.clearLine(i + 1);
-    fmt::print("{:3}: {}", n, s);
-    i = (i + 1) % 15;
-    n += 1;
+    term.clearLine(row);
+    fmt::print("{:3}: {}", messageNumber, s);
+    row = (row  % debugAreaHeight) + 1;
+    term.clearLine(row); // clear the next line so the current one stands out
+    messageNumber += 1;
   }
 
   void View::run() {
-    mode = Mode::menu;
+    mode = Mode::Menu;
     selectedSender = 0;
     selectedDest = 0;
     selectedConnection = 0;
 
     layout();
 
-    while (mode != Mode::quit) {
+    while (mode != Mode::Quit) {
       render();
 
       Term::Event ev = term.getEvent();

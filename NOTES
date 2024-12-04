@@ -20,10 +20,12 @@ NOTES
 
 [] view
     [] refresh if ALSA Seq has updates
-    [] control-l to repaint
+    [x] control-l to repaint
     [] actually connect & disconnect
     [] massive code clean up
     [] turn off debugging
+    [] shift-tab same as left arrow
+    [] adjust selections on SeqSnapshot refresh
 
 [] term
     [] get rid of "good"

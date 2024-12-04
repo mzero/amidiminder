@@ -47,9 +47,6 @@ void SeqSnapshot::refresh() {
   });
   std::sort(connections.begin(), connections.end(), lexicalConnectionLess());
 
-  numPorts = ports.size();
-  numConnections = connections.size();
-
   clientWidth = 0;
   portWidth = 0;
   for (const auto& p : ports) {

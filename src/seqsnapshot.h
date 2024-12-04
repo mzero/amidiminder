@@ -17,9 +17,6 @@ struct SeqSnapshot {
   std::vector<Address> ports;
   std::vector<Connection> connections;
 
-  std::size_t numPorts;
-  std::size_t numConnections;
-
   std::string::size_type clientWidth;
   std::string::size_type portWidth;
 

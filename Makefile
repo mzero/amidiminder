@@ -22,6 +22,7 @@ install:
 SRCS := amidiminder.cpp amidiminder-commands.cpp amidiminder-tests.cpp
 SRCS +=	args.cpp client.cpp client-view.cpp files.cpp ipc.cpp main.cpp msg.cpp
 SRCS += rule.cpp seq.cpp seqsnapshot.cpp term.cpp
+INCS := .
 LIBS := stdc++ asound fmt
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)

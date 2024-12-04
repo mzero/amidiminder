@@ -45,7 +45,7 @@ $(BUILD_DIR)/%.cpp.o: src/%.cpp
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	$(CC) $(OBJS) -o $@ $(LDFLAGS) 2>&1 | tee $(BUILD_DIR)/link_out
 
-.PHONY: clean test deb deb-clean
+.PHONY: clean test deb deb-clean tars
 
 clean:
 	$(RM) -r $(BUILD_DIR)
@@ -86,6 +86,12 @@ $(MANFORMATED): %.txt : %
 
 format-man-pages: $(MANFORMATED)
 
+
+# tar files for Debian package
+
+tars: 
+	cd .. && tar -cJvf amidiminder_0.80.orig.tar.xz --exclude=debian --exclude=build amidiminder_0.80
+	tar -cJvf ../amidiminder_0.80-1.debian.tar.xz debian/
 
 # dependencies
 

@@ -21,6 +21,7 @@ install:
 
 SRCS := amidiminder.cpp amidiminder-commands.cpp amidiminder-tests.cpp
 SRCS +=	args.cpp client.cpp files.cpp ipc.cpp main.cpp msg.cpp rule.cpp seq.cpp
+SRCS += term.cpp
 INCS := .
 LIBS := stdc++ asound fmt
 

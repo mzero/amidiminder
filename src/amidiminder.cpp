@@ -148,11 +148,8 @@ namespace {
     evt.events = EPOLLIN | EPOLLERR;
     evt.data.u32 = (uint32_t)src;
 
-    if (epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &evt) != 0) {
-      auto e = errno;
-      Msg::error("Failed adding to epoll: {}", strerror(e));
-      exit(1);
-    }
+    if (epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &evt) != 0)
+      throw Msg::system_error("Failed adding to epoll");
   }
 
   volatile std::sig_atomic_t caughtSignal = 0;

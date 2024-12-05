@@ -25,6 +25,8 @@ struct SeqSnapshot {
 
   void refresh();
 
+  bool hasConnectionBetween(const Address& sender, const Address& dest) const;
+
   static const char* dirStr(bool sender, bool dest);
   static const char* addressDirStr(const Address&);
 };

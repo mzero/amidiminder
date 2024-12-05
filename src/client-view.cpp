@@ -238,7 +238,7 @@ namespace {
 
     switch (mode) {
       case Mode::Menu:
-        line1 = "Q)uit, C)connect, D)isconnect";
+        line1 = "Q)uit, C)onnect, D)isconnect";
         break;
 
       case Mode::PickSender:
@@ -249,16 +249,13 @@ namespace {
         line1 = "Now pick a dest the same way";
         break;
 
-      case Mode::ConfirmConnection:
-        line1 = "Confirm with return, or cancel with ESC";
-        break;
-
       case Mode::PickConnection: {
         line1 = "Use arrows to pick a connection and hit return, or type a letter";
         break;
       }
 
-      case Mode::ConfirmDisconnection:{
+      case Mode::ConfirmConnection:
+      case Mode::ConfirmDisconnection: {
         line1 = "Confirm with return, or cancel with ESC";
         break;
       }
@@ -509,15 +506,23 @@ namespace {
 
         switch (mode) {
           case Mode::ConfirmConnection: {
-            setMessage(fmt::format("Would connect {} --> {}",
-              seqState.ports[selectedSender],
-              seqState.ports[selectedDest]));
+            auto& sender = seqState.ports[selectedSender];
+            auto& dest   = seqState.ports[selectedDest];
+            if (seqState.hasConnectionBetween(sender, dest)) {
+              setMessage(fmt::format("Already connected: {} --> {}",
+                sender, dest));
+            }
+            else {
+              seqState.seq.connect(sender.addr, dest.addr);
+              setMessage(fmt::format("Connected {} --> {}", sender, dest));
+            }
             break;
           }
 
           case Mode::ConfirmDisconnection: {
             auto& conn = seqState.connections[selectedConnection];
-            setMessage(fmt::format("Would disconnect {} -x-> {}",
+            seqState.seq.disconnect({conn.sender.addr, conn.dest.addr});
+            setMessage(fmt::format("Disconnected {} -x-> {}",
               conn.sender, conn.dest));
             break;
           }

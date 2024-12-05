@@ -56,6 +56,15 @@ void SeqSnapshot::refresh() {
 }
 
 
+bool SeqSnapshot::hasConnectionBetween(
+  const Address& sender, const Address& dest) const
+{
+  return std::any_of(connections.begin(), connections.end(),
+    [&](const auto& c){
+      return c.sender.addr == sender.addr && c.dest.addr == dest.addr;
+     });
+}
+
 const char* SeqSnapshot::dirStr(bool sender, bool dest) {
   if (sender) {
     if (dest)   return "<->";

@@ -25,7 +25,8 @@ NOTES
     [x] massive code clean up
     [] turn off debugging
     [] shift-tab same as left arrow
-    [] adjust selections on SeqSnapshot refresh
+    [x] adjust selections on SeqSnapshot refresh
+        [x] handle empty ports and connections
     [] undo
 
 [] term

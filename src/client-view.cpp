@@ -102,6 +102,8 @@ namespace {
     bool dirtyConnections = false;
     bool dirtyPrompt = false;
 
+    void drawHeader(const char* title, size_t row, size_t contentWidth);
+
     void drawPorts();
     void drawConnections();
     void drawPrompt();
@@ -126,8 +128,13 @@ namespace {
 
 
   void View::layout() {
-    auto portsHeight       = 2 + seqState.ports.size() + 1;
-    auto connectionsHeight = 2 + seqState.connections.size() + 1;
+    auto numPorts = seqState.ports.size();
+    auto numConnections = seqState.connections.size();
+    if (numPorts == 0) numPorts = 1;
+    if (numConnections == 0) numConnections = 1;
+
+    auto portsHeight       = 2 + numPorts + 1;
+    auto connectionsHeight = 2 + numConnections + 1;
     auto promptHeight      = 2;
 
     topRowPrompt = term.rows() + 1 - promptHeight;
@@ -137,6 +144,11 @@ namespace {
     dirtyPorts = true;
     dirtyConnections = true;
     dirtyPrompt = true;
+
+    if (selectedSender >= numPorts)   selectedSender = numPorts - 1;
+    if (selectedDest >= numPorts)     selectedDest = numPorts - 1;
+    if (selectedConnection >= numConnections)
+        selectedConnection = numConnections - 1;
 
     term.clearDisplay();
   }
@@ -148,6 +160,18 @@ namespace {
 
     std::cout.flush();
     dirtyPorts = dirtyConnections = dirtyPrompt = false;
+  }
+
+  void View::drawHeader(const char* title, size_t row, size_t contentWidth) {
+    if (contentWidth < 40) contentWidth = 40;
+
+    term.clearLine(row);
+    std::cout << boxCornerTL;
+    for (auto i = contentWidth; i > 1; --i) std::cout << boxHorizontal;
+    term.moveCursor(row, 3);
+    std::cout << ' ' << title << ' ';
+    term.clearLine(row+1);
+    std::cout << boxVertical;
   }
 
   void View::drawPorts() {
@@ -179,17 +203,14 @@ namespace {
       default:
         break;
     }
-    int y = topRowPorts;
 
-    term.clearLine(y++);
-    std::cout << boxCornerTL << boxHorizontal << " Ports ";
-    for (auto i = seqState.clientWidth + seqState.portWidth + 15; i > 0; --i)
-      std::cout << boxHorizontal;
-    term.clearLine(y++);
-    std::cout << boxVertical;
+    drawHeader("Ports", topRowPorts,
+      seqState.clientWidth + seqState.portWidth + 20);
 
+    int y = topRowPorts + 2;
     char label = 'a';
     size_t index = 0;
+
     for (auto& p : seqState.ports) {
       term.clearLine(y);
       std::cout << boxVertical << ' ';
@@ -213,21 +234,21 @@ namespace {
 
       y++, label++, index++;
     }
+    if (index == 0) {
+      term.clearLine(y);
+      std::cout << boxVertical << ' '
+        << Term::Style::dim << "   -- no ports --";
+    }
   }
 
   void View::drawConnections() {
     bool picking = mode == Mode::PickConnection;
     bool confirming = mode == Mode::ConfirmDisconnection;
 
-    int y = topRowConnections;
+    drawHeader("Connections", topRowConnections,
+      2*(seqState.clientWidth + seqState.portWidth) + 28);
 
-    term.clearLine(y++);
-    std::cout << boxCornerTL << boxHorizontal << " Connections ";
-    for (auto i = 2*(seqState.clientWidth + seqState.portWidth) - 4; i > 0; --i)
-      std::cout << boxHorizontal;
-    term.clearLine(y++);
-    std::cout << boxVertical;
-
+    int y = topRowConnections + 2;
     char label = 'a';
     size_t index = 0;
 
@@ -247,6 +268,11 @@ namespace {
         c.sender, c.dest);
 
       y++, label++, index++;
+    }
+    if (index == 0) {
+      term.clearLine(y);
+      std::cout << boxVertical << ' '
+        << Term::Style::dim << "   -- no connections --";
     }
   }
 
@@ -373,16 +399,20 @@ namespace {
       switch (ev.character) {
         case 'C':
         case 'c':
-          gotoMode(Mode::PickSender);
-          dirtyPrompt = dirtyPorts = true;
+          if (seqState.ports.empty())
+            setMessage("Connecting nothingness // Yields nothingness");
+          else
+            gotoMode(Mode::PickSender);
           return true;
 
         case 'D':
         case 'd':
         case 'X':
         case 'x':
-          gotoMode(Mode::PickConnection);
-          dirtyPrompt = dirtyConnections = true;
+          if (seqState.connections.empty())
+            setMessage("Everything is disconnected // Be at peace");
+          else
+            gotoMode(Mode::PickConnection);
           return true;
 
         case 'Q':
@@ -548,8 +578,6 @@ namespace {
             return false;
         }
         gotoMode(Mode::Menu);
-        seqState.refresh();   // FIXME: remove once Seq events are handled
-        layout();
         return true;
       }
     }
@@ -661,6 +689,7 @@ namespace {
           if (seqState.checkIfNeedsRefresh()) {
             seqState.refresh();
             layout();
+            gotoMode(Mode::Menu);
           }
           break;
 

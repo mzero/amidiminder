@@ -27,7 +27,6 @@ Term::Term() {
   if (err != 0) throw std::system_error(errno, std::generic_category(), "getting term attr");
   _original_termios = t;
   cfmakeraw(&t);
-  t.c_iflag |= ISIG;
   t.c_cc[VMIN] = 0;
   t.c_cc[VTIME] = 1;
   err = tcsetattr(STDOUT_FILENO, TCSAFLUSH, &t);
@@ -59,6 +58,8 @@ Term::~Term() {
 
   tcsetattr(STDOUT_FILENO, TCSAFLUSH, &_original_termios);
 }
+
+void Term::scanFDs(std::function<void(int)> fn) { fn(STDIN_FILENO); }
 
 void Term::fetchWindowSize() {
   struct winsize w;

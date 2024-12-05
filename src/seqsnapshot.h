@@ -24,6 +24,7 @@ struct SeqSnapshot {
   ~SeqSnapshot() { seq.end(); }
 
   void refresh();
+  bool checkIfNeedsRefresh();
 
   bool hasConnectionBetween(const Address& sender, const Address& dest) const;
 

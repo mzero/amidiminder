@@ -1,7 +1,9 @@
 #include "client.h"
 
 #include <fmt/format.h>
+#include <sys/epoll.h>
 
+#include "msg.h"
 #include "seqsnapshot.h"
 #include "term.h"
 
@@ -61,6 +63,21 @@ namespace {
 
     Quit,
   };
+
+  enum class FDSource : uint32_t {
+    Signal,
+    Seq,
+    Term,
+  };
+
+  void addFDToEpoll(int epollFD, int fd, FDSource src) {
+    struct epoll_event evt;
+    evt.events = EPOLLIN | EPOLLERR;
+    evt.data.u32 = (uint32_t)src;
+
+    if (epoll_ctl(epollFD, EPOLL_CTL_ADD, fd, &evt) != 0)
+      throw Msg::system_error("Failed adding to epoll");
+  }
 
   struct View {
     Term& term;
@@ -613,19 +630,55 @@ namespace {
     selectedDest = 0;
     selectedConnection = 0;
 
+    int epollFD = epoll_create1(0);
+    if (epollFD == -1)
+      throw Msg::system_error("epoll_create failed");
+
+    seqState.seq.scanFDs(
+      [&](int fd){ addFDToEpoll(epollFD, fd, FDSource::Seq); });
+    term.scanFDs(
+      [&](int fd){ addFDToEpoll(epollFD, fd, FDSource::Term); });
+
     layout();
 
     while (mode != Mode::Quit) {
       render();
 
-      Term::Event ev = term.getEvent();
-      if (ev.type == Term::EventType::None) continue;
+      struct epoll_event evt;
+      int nfds = epoll_wait(epollFD, &evt, 1, -1);
+      if (nfds == -1) {
+        if (errno == EINTR)
+          evt.data.u32 = uint32_t(FDSource::Signal);
+        else
+          throw Msg::system_error("epoll_wait failed");
+      }
+      if (nfds == 0)
+        continue;
 
-      setMessage("");
-      handleEvent(ev);
-      debugMessage(fmt::format("in mode {}", int(mode)));
+      int et = -1;
+      switch ((FDSource)evt.data.u32) {
+        case FDSource::Seq:
+          if (seqState.checkIfNeedsRefresh()) {
+            seqState.refresh();
+            layout();
+          }
+          break;
+
+        case FDSource::Signal:
+          // only caught signal is window resize, handled here
+        case FDSource::Term: {
+          Term::Event ev = term.getEvent();
+          if (ev.type == Term::EventType::None) continue;
+          et = int(ev.type);
+          setMessage("");
+          handleEvent(ev);
+          break;
+        }
+      }
+
+      debugMessage(fmt::format("in mode {}, after fd={} fdsource={} ev.type={}",
+        int(mode), evt.data.fd, evt.data.u32, et));
     }
-
   }
 }
 

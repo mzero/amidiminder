@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <sstream>
 #include <termios.h>
 
@@ -12,6 +13,8 @@ class Term {
 
     int rows() const { return _rows; };
     int cols() const { return _cols; };
+
+    void scanFDs(std::function<void(int)> fn);
 
   private:
     bool _good;

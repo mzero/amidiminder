@@ -19,7 +19,7 @@ NOTES
         [] recode Seq::outputAddrDetails to use fmt... or???
 
 [] view
-    [] refresh if ALSA Seq has updates
+    [x] refresh if ALSA Seq has updates
     [x] control-l to repaint
     [x] actually connect & disconnect
     [x] massive code clean up

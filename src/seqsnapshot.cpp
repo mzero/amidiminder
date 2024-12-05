@@ -55,6 +55,28 @@ void SeqSnapshot::refresh() {
   }
 }
 
+bool SeqSnapshot::checkIfNeedsRefresh() {
+  bool needsRefresh = false;
+
+  while (snd_seq_event_t* ev = seq.eventInput())
+    switch (ev->type) {
+      case SND_SEQ_EVENT_CLIENT_START:
+      case SND_SEQ_EVENT_CLIENT_EXIT:
+      case SND_SEQ_EVENT_CLIENT_CHANGE:
+      case SND_SEQ_EVENT_PORT_START:
+      case SND_SEQ_EVENT_PORT_EXIT:
+      case SND_SEQ_EVENT_PORT_CHANGE:
+      case SND_SEQ_EVENT_PORT_SUBSCRIBED:
+      case SND_SEQ_EVENT_PORT_UNSUBSCRIBED:
+        needsRefresh = true;
+        break;
+      default:
+        break;
+    }
+
+  return needsRefresh;
+}
+
 
 bool SeqSnapshot::hasConnectionBetween(
   const Address& sender, const Address& dest) const

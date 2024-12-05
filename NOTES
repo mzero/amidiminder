@@ -24,14 +24,11 @@ NOTES
     [x] actually connect & disconnect
     [x] massive code clean up
     [x] turn off debugging
-    [] shift-tab same as left arrow
     [x] adjust selections on SeqSnapshot refresh
         [x] handle empty ports and connections
     [] undo
+    [] man page
 
-[] term
-    [] ? get rid of "good"
-    [] ? unicode detection
 
 ## other
 
@@ -63,6 +60,8 @@ NOTES
 
 [] ? some way to be graceful about aseqdump - we shouldn't be saving
     those connections as observed rules
+
+[] ? unicode detection in Term
 
 
 # MAJOR THEMES

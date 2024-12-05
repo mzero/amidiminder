@@ -1,4 +1,5 @@
 #include "seqsnapshot.h"
+#include <algorithm>
 
 namespace {
   using Connection = SeqSnapshot::Connection;

@@ -23,7 +23,7 @@ NOTES
     [x] control-l to repaint
     [x] actually connect & disconnect
     [x] massive code clean up
-    [] turn off debugging
+    [x] turn off debugging
     [] shift-tab same as left arrow
     [x] adjust selections on SeqSnapshot refresh
         [x] handle empty ports and connections

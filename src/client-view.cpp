@@ -588,38 +588,38 @@ namespace {
     bool handled = false;
 
     if (handleGlobalEvent(ev)) {
-      if (handled) debugMessage("handled in handleGlobalEvent");
+      // debugMessage("handled in handleGlobalEvent");
       return;
     }
 
     switch (mode) {
       case Mode::Menu:
         handled = handleMenuEvent(ev);
-        if (handled) debugMessage("handled in handleMenuEvent");
+        // if (handled) debugMessage("handled in handleMenuEvent");
         break;
 
       case Mode::PickSender:
       case Mode::PickDest:
         handled = handlePortPickerEvent(ev);
-        if (handled) debugMessage("handled in handlePortPickerEvent");
+        // if (handled) debugMessage("handled in handlePortPickerEvent");
         break;
 
       case Mode::PickConnection:
         handled = handleConnectionPickerEvent(ev);
-        if (handled) debugMessage("handled in handleConnectionPickerEvent");
+        // if (handled) debugMessage("handled in handleConnectionPickerEvent");
         break;
 
       case Mode::ConfirmConnection:
       case Mode::ConfirmDisconnection:
         handled = handleConfirmEvent(ev);
-        if (handled) debugMessage("handled in handleConfirmEvent");
+        // if (handled) debugMessage("handled in handleConfirmEvent");
         break;
 
       case Mode::Quit:
         return;
     }
 
-    if (!handled) {
+    if (false && !handled) {
       switch (ev.type) {
         case Term::EventType::Char:
           debugMessage(fmt::format("Unassigned character {:?}", ev.character));
@@ -705,8 +705,9 @@ namespace {
         }
       }
 
-      debugMessage(fmt::format("in mode {}, after fd={} fdsource={} ev.type={}",
-        int(mode), evt.data.fd, evt.data.u32, et));
+      if (false)
+        debugMessage(fmt::format("in mode {}, after fd={} fdsource={} ev.type={}",
+          int(mode), evt.data.fd, evt.data.u32, et));
     }
   }
 }

@@ -89,10 +89,9 @@ format-man-pages: $(MANFORMATED)
 
 # tar files for Debian package
 
-tars: 
-	cd .. && tar -cJvf amidiminder_0.80.orig.tar.xz --exclude=debian --exclude=build amidiminder_0.80
+tars: deb-clean
+	cd .. && tar -cJvf amidiminder_0.80.orig.tar.xz --exclude=debian amidiminder_0.80
 	tar -cJvf ../amidiminder_0.80-1.debian.tar.xz debian/
-	@[ ! -d debian/.debhelper ] || { echo '\n\adebhelper files found! Run "make deb-clean" and try again' ; false ; }
 
 # dependencies
 

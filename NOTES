@@ -19,7 +19,7 @@ NOTES
     [x] client listings
     [x] move verbose port details (-p) option to the list command
         [x] recode Seq::outputAddrDetails to use fmt... or???
-    [] man page update
+    [x] man page update
 
 [] view
     [x] refresh if ALSA Seq has updates
@@ -30,7 +30,7 @@ NOTES
     [x] adjust selections on SeqSnapshot refresh
         [x] handle empty ports and connections
     [] undo
-    [] man page
+    [x] man page
 
 
 ## other

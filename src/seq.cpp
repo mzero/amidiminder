@@ -1,5 +1,6 @@
 #include "seq.h"
 
+#include <sstream>
 #include <string_view>
 #include <vector>
 
@@ -311,7 +312,48 @@ fmt::formatter<snd_seq_event_t>::format(
   }
 }
 
+std::string Address::capsString() const {
+  std::vector<const char*> capStrs;
+  if (caps & SND_SEQ_PORT_CAP_READ)           capStrs.push_back("read");
+  if (caps & SND_SEQ_PORT_CAP_WRITE)          capStrs.push_back("write");
+  if (caps & SND_SEQ_PORT_CAP_SYNC_READ)      capStrs.push_back("sync read");
+  if (caps & SND_SEQ_PORT_CAP_SYNC_WRITE)     capStrs.push_back("sync write");
+  if (caps & SND_SEQ_PORT_CAP_DUPLEX)         capStrs.push_back("duplex");
+  if (caps & SND_SEQ_PORT_CAP_SUBS_READ)      capStrs.push_back("subs read");
+  if (caps & SND_SEQ_PORT_CAP_SUBS_WRITE)     capStrs.push_back("subs write");
+  if (caps & SND_SEQ_PORT_CAP_NO_EXPORT)      capStrs.push_back("no export");
 
+  std::ostringstream out;
+  int count = 0;
+  for (auto& s : capStrs)
+    out << (count++ ? ", " : "") << s;
+  return out.str();
+}
+
+std::string Address::typeString() const {
+  std::vector<const char*> typeStrs;
+  if (types & SND_SEQ_PORT_TYPE_SPECIFIC)     typeStrs.push_back("specific");
+  if (types & SND_SEQ_PORT_TYPE_MIDI_GENERIC) typeStrs.push_back("midi generic");
+  if (types & SND_SEQ_PORT_TYPE_MIDI_GM)      typeStrs.push_back("midi gm");
+  if (types & SND_SEQ_PORT_TYPE_MIDI_GS)      typeStrs.push_back("midi gs");
+  if (types & SND_SEQ_PORT_TYPE_MIDI_XG)      typeStrs.push_back("midi xg");
+  if (types & SND_SEQ_PORT_TYPE_MIDI_MT32)    typeStrs.push_back("midi mt32");
+  if (types & SND_SEQ_PORT_TYPE_MIDI_GM2)     typeStrs.push_back("midi gm2");
+  if (types & SND_SEQ_PORT_TYPE_SYNTH)        typeStrs.push_back("synth");
+  if (types & SND_SEQ_PORT_TYPE_DIRECT_SAMPLE)typeStrs.push_back("direct sample");
+  if (types & SND_SEQ_PORT_TYPE_SAMPLE)       typeStrs.push_back("sample");
+  if (types & SND_SEQ_PORT_TYPE_HARDWARE)     typeStrs.push_back("hardware");
+  if (types & SND_SEQ_PORT_TYPE_SOFTWARE)     typeStrs.push_back("software");
+  if (types & SND_SEQ_PORT_TYPE_SYNTHESIZER)  typeStrs.push_back("synthesizer");
+  if (types & SND_SEQ_PORT_TYPE_PORT)         typeStrs.push_back("port");
+  if (types & SND_SEQ_PORT_TYPE_APPLICATION)  typeStrs.push_back("application");
+
+  std::ostringstream out;
+  int count = 0;
+  for (auto& s : typeStrs)
+    out << (count++ ? ", " : "") << s;
+  return out.str();
+}
 
 void Seq::outputAddrDetails(std::ostream& out, const snd_seq_addr_t& addr) {
   int serr;
@@ -337,49 +379,8 @@ void Seq::outputAddrDetails(std::ostream& out, const snd_seq_addr_t& addr) {
 
   std::string pName = snd_seq_port_info_get_name(port);
 
-  auto pCap = snd_seq_port_info_get_capability(port);
-  std::vector<const char*> pCapStrs;
-  if (pCap & SND_SEQ_PORT_CAP_READ)           pCapStrs.push_back("read");
-  if (pCap & SND_SEQ_PORT_CAP_WRITE)          pCapStrs.push_back("write");
-  if (pCap & SND_SEQ_PORT_CAP_SYNC_READ)      pCapStrs.push_back("sync read");
-  if (pCap & SND_SEQ_PORT_CAP_SYNC_WRITE)     pCapStrs.push_back("sync write");
-  if (pCap & SND_SEQ_PORT_CAP_DUPLEX)         pCapStrs.push_back("duplex");
-  if (pCap & SND_SEQ_PORT_CAP_SUBS_READ)      pCapStrs.push_back("subs read");
-  if (pCap & SND_SEQ_PORT_CAP_SUBS_WRITE)     pCapStrs.push_back("subs write");
-  if (pCap & SND_SEQ_PORT_CAP_NO_EXPORT)      pCapStrs.push_back("no export");
-
-  auto pType = snd_seq_port_info_get_type(port);
-  std::vector<const char*> pTypeStrs;
-  if (pType & SND_SEQ_PORT_TYPE_SPECIFIC)     pTypeStrs.push_back("specific");
-  if (pType & SND_SEQ_PORT_TYPE_MIDI_GENERIC) pTypeStrs.push_back("midi generic");
-  if (pType & SND_SEQ_PORT_TYPE_MIDI_GM)      pTypeStrs.push_back("midi gm");
-  if (pType & SND_SEQ_PORT_TYPE_MIDI_GS)      pTypeStrs.push_back("midi gs");
-  if (pType & SND_SEQ_PORT_TYPE_MIDI_XG)      pTypeStrs.push_back("midi xg");
-  if (pType & SND_SEQ_PORT_TYPE_MIDI_MT32)    pTypeStrs.push_back("midi mt32");
-  if (pType & SND_SEQ_PORT_TYPE_MIDI_GM2)     pTypeStrs.push_back("midi gm2");
-  if (pType & SND_SEQ_PORT_TYPE_SYNTH)        pTypeStrs.push_back("synth");
-  if (pType & SND_SEQ_PORT_TYPE_DIRECT_SAMPLE)pTypeStrs.push_back("direct sample");
-  if (pType & SND_SEQ_PORT_TYPE_SAMPLE)       pTypeStrs.push_back("sample");
-  if (pType & SND_SEQ_PORT_TYPE_HARDWARE)     pTypeStrs.push_back("hardware");
-  if (pType & SND_SEQ_PORT_TYPE_SOFTWARE)     pTypeStrs.push_back("software");
-  if (pType & SND_SEQ_PORT_TYPE_SYNTHESIZER)  pTypeStrs.push_back("synthesizer");
-  if (pType & SND_SEQ_PORT_TYPE_PORT)         pTypeStrs.push_back("port");
-  if (pType & SND_SEQ_PORT_TYPE_APPLICATION)  pTypeStrs.push_back("application");
-
   out << "[" << std::dec << int(addr.client) << ":" << int(addr.port) << "] "
     << cName << ":" << pName << std::endl;
   out << "    client type: " << cTypeStr << std::endl;
-
-  out << "    port caps:   ";
-  int count = 0;
-  for (auto& s : pCapStrs)
-    out << (count++ ? ", " : "") << s;
-  out << std::endl;
-
-  out << "    port types:  ";
-  count = 0;
-  for (auto& s : pTypeStrs)
-    out << (count++ ? ", " : "") << s;
-  out << std::endl;
 }
 

@@ -9,14 +9,16 @@ NOTES
 [] connect & disconnect
 [] list
     [x] sort ports - name
-    [] group ports by type??
+    [] ? group ports by type??
     [x] sort connections
     [x] port display in columns based on client and port name widths
     [] all ports option (includes system ports)
-    [] ports only, connections only options
-    [] ? simple text versions (without formatting)
-    [] move verbose port details (-p) option to the list command
-        [] recode Seq::outputAddrDetails to use fmt... or???
+    [x] ports only, connections only options
+    [x] simple text versions (without formatting) --plain
+    [] client listings
+    [x] move verbose port details (-p) option to the list command
+        [x] recode Seq::outputAddrDetails to use fmt... or???
+    [] man page update
 
 [] view
     [x] refresh if ALSA Seq has updates

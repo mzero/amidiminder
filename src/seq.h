@@ -32,6 +32,8 @@ class Address {
       { return valid && addr.client == a.client && addr.port == a.port; }
 
     fmt::format_context::iterator format(fmt::format_context&) const;
+    std::string capsString() const;
+    std::string typeString() const;
 
     bool valid;
     snd_seq_addr_t addr;

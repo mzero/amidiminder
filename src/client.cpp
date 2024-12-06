@@ -23,11 +23,16 @@ namespace Client {
       }
       else {
         std::cout << "Ports:\n";
-        for (const auto& p : s.ports)
+        for (const auto& p : s.ports) {
           fmt::print("    {:{cw}} : {:{pw}} [{:3}:{}] {}\n",
             p.client, p.port, p.addr.client, p.addr.port,
             SeqSnapshot::addressDirStr(p),
             fmt::arg("cw", s.clientWidth), fmt::arg("pw", s.portWidth));
+          if (Args::listDetails) {
+            fmt::print("        {}\n", p.typeString());
+            fmt::print("        {}\n\n", p.capsString());
+          }
+        }
       }
     }
 

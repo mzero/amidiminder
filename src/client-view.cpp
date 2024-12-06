@@ -707,7 +707,7 @@ namespace {
 
       if (false)
         debugMessage(fmt::format("in mode {}, after fd={} fdsource={} ev.type={}",
-          int(mode), evt.data.fd, evt.data.u32, et));
+          int(mode), +evt.data.fd, +evt.data.u32, et));
     }
   }
 }

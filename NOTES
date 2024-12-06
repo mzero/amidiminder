@@ -15,7 +15,7 @@ NOTES
     [] all ports option (includes system ports)
     [x] ports only, connections only options
     [x] simple text versions (without formatting) --plain
-    [] client listings
+    [x] client listings
     [x] move verbose port details (-p) option to the list command
         [x] recode Seq::outputAddrDetails to use fmt... or???
     [] man page update

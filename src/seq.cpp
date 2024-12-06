@@ -52,6 +52,10 @@ void Seq::begin() {
   serr = snd_seq_open(&seq, "default", SND_SEQ_OPEN_DUPLEX, 0);
   if (errFatal(serr, "open sequencer")) return;
 
+  int ret = snd_seq_client_id(seq);
+  if (errFatal(ret, "client id")) return;
+  seqClient = ret;
+
   serr = snd_seq_set_client_name(seq, "amidiminder");
   if (errFatal(serr, "name sequencer")) return;
 
@@ -75,14 +79,14 @@ void Seq::end() {
 }
 
 
-std::string Seq::clientName(const snd_seq_addr_t& addr) {
-  if (addr.client == SND_SEQ_CLIENT_SYSTEM) return "";
+std::string Seq::clientName(client_id_t c) {
+  if (c == SND_SEQ_CLIENT_SYSTEM) return "";
 
   int serr;
 
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
-  serr = snd_seq_get_any_client_info(seq, addr.client, client);
+  serr = snd_seq_get_any_client_info(seq, c, client);
   if (serr == -ENOENT) return {}; // client has already exited!
   if (errCheck(serr, "get client info")) return "";
 
@@ -143,6 +147,20 @@ snd_seq_event_t* Seq::eventInput() {
   return ev;
 }
 
+void Seq::scanClients(std::function<void(const client_id_t)> func) {
+  snd_seq_client_info_t *client;
+  snd_seq_client_info_alloca(&client);
+
+  snd_seq_client_info_set_client(client, -1);
+  while (snd_seq_query_next_client(seq, client) >= 0) {
+    auto clientId = snd_seq_client_info_get_client(client);
+    if (clientId == SND_SEQ_CLIENT_SYSTEM) continue;
+
+    func(clientId);
+  }
+}
+
+
 void Seq::scanPorts(std::function<void(const snd_seq_addr_t&)> func) {
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
@@ -153,6 +171,7 @@ void Seq::scanPorts(std::function<void(const snd_seq_addr_t&)> func) {
   snd_seq_client_info_set_client(client, -1);
   while (snd_seq_query_next_client(seq, client) >= 0) {
     auto clientId = snd_seq_client_info_get_client(client);
+    if (clientId == SND_SEQ_CLIENT_SYSTEM) continue;
 
     // Note: The ALSA docs imply that the ports will be scanned
     // in numeric order. A review of the kernel code found that
@@ -355,32 +374,36 @@ std::string Address::typeString() const {
   return out.str();
 }
 
-void Seq::outputAddrDetails(std::ostream& out, const snd_seq_addr_t& addr) {
+std::string Seq::clientDetails(client_id_t c) {
   int serr;
 
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
-  serr = snd_seq_get_any_client_info(seq, addr.client, client);
-  if (errCheck(serr, "get client info")) return;
+  serr = snd_seq_get_any_client_info(seq, c, client);
+  if (errCheck(serr, "get client info")) return "???";
 
-  snd_seq_client_type_t cType = snd_seq_client_info_get_type(client);
+  std::ostringstream out;
+
+  auto cType = snd_seq_client_info_get_type(client);
   std::string cTypeStr;
   switch (cType) {
-    case SND_SEQ_KERNEL_CLIENT:   cTypeStr = "kernel";    break;
-    case SND_SEQ_USER_CLIENT:     cTypeStr = "user";      break;
-    default:                      cTypeStr = "???";
+    case SND_SEQ_KERNEL_CLIENT: {
+      auto card = snd_seq_client_info_get_card(client);
+      out << "kernel(card=" << card << ")";
+      break;
+    }
+    case SND_SEQ_USER_CLIENT: {
+      auto pid = snd_seq_client_info_get_pid(client);
+      out << "user(pid=" << pid << ")";
+      break;
+    }
+    default:
+      out << "unknown type";
   }
-  std::string cName = snd_seq_client_info_get_name(client);
 
-  snd_seq_port_info_t *port;
-  snd_seq_port_info_alloca(&port);
-  serr = snd_seq_get_any_port_info(seq, addr.client, addr.port, port);
-  if (errCheck(serr, "get port info")) return;
+  // There are other info fields, but they don't see particularly useful
+  // for printing out in a listing
 
-  std::string pName = snd_seq_port_info_get_name(port);
-
-  out << "[" << std::dec << int(addr.client) << ":" << int(addr.port) << "] "
-    << cName << ":" << pName << std::endl;
-  out << "    client type: " << cTypeStr << std::endl;
+  return out.str();
 }
 

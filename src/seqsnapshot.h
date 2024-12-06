@@ -8,12 +8,19 @@
 struct SeqSnapshot {
   Seq seq;
 
+  struct Client {
+    client_id_t id;
+    std::string name;
+    std::string details;
+  };
+
   struct Connection {
     Address sender;
     Address dest;
   };
 
   std::map<snd_seq_addr_t, Address> addrMap;
+  std::vector<Client> clients;
   std::vector<Address> ports;
   std::vector<Connection> connections;
 

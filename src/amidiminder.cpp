@@ -238,7 +238,7 @@ void MidiMinder::handleSeqEvent(snd_seq_event_t& ev) {
 
   switch (ev.type) {
     case SND_SEQ_EVENT_CLIENT_START: {
-      std::string name = seq.clientName(ev.data.addr);
+      std::string name = seq.clientName(ev.data.addr.client);
       if (name.find("Client-", 0) == 0) {
         // Should use .starts_with(), but that is only in C++20
 

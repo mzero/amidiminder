@@ -46,6 +46,7 @@ class Address {
     bool primaryDest;
 };
 
+using client_id_t = unsigned char;
 
 class Seq {
   public:
@@ -55,13 +56,14 @@ class Seq {
     void end();
     operator bool() const { return seq; }
 
-    std::string clientName(const snd_seq_addr_t&);
+    std::string clientName(client_id_t);
     Address address(const snd_seq_addr_t&);
 
     void scanFDs(std::function<void(int)>);
     snd_seq_event_t * eventInput();
       // if nullptr is returned, sleep and call again...
 
+    void scanClients(std::function<void(client_id_t)>);
     void scanPorts(std::function<void(const snd_seq_addr_t&)>);
     void scanConnections(std::function<void(const snd_seq_connect_t&)>);
     void connect(const snd_seq_addr_t& sender, const snd_seq_addr_t& dest);
@@ -72,6 +74,7 @@ class Seq {
 
   private:
     snd_seq_t *seq = nullptr;
+    client_id_t seqClient;
     int evtPort;
 
   public:
@@ -79,7 +82,8 @@ class Seq {
     static void outputConnect(std::ostream&, const snd_seq_connect_t&);
     static void outputEvent(std::ostream& out, const snd_seq_event_t& ev);
 
-    void outputAddrDetails(std::ostream&, const snd_seq_addr_t&);
+    std::string clientDetails(client_id_t);
+    bool isThisClient(client_id_t c) { return c == seqClient; }
 };
 
 

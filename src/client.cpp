@@ -14,6 +14,24 @@ namespace Client {
     if (!Args::listClients && !Args::listPorts && !Args::listConnections)
       Args::listPorts = Args::listConnections = true;
 
+    if (Args::listClients) {
+      if (Args::listPlain) {
+        for (const auto& c : s.clients)
+          std::cout << c.name << '\n';
+      }
+      else {
+        std::cout << "Clients:\n";
+        for (const auto& c : s.clients) {
+          fmt::print("    {:{cw}} [{:3}]",
+            c.name, c.id,
+            fmt::arg("cw", s.clientWidth));
+          if (Args::listDetails)
+            std::cout << " : " << c.details;
+          std::cout << '\n';
+        }
+      }
+    }
+
     if (Args::listPorts) {
       if (Args::listPlain) {
         for (const auto& p : s.ports)

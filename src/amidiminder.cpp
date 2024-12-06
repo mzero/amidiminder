@@ -333,7 +333,8 @@ void MidiMinder::resetConnectionsHard() {
   seq.scanConnections([&](auto c){
     const Address& sender = seq.address(c.sender);
     const Address& dest = seq.address(c.dest);
-    if (sender && dest) // check if it's a connection we would manage
+    if (sender.mindable && dest.mindable)
+      // check if it's a connection we would manage
       doomed.push_back(c);
   });
   for (auto& c : doomed) {
@@ -384,7 +385,7 @@ void MidiMinder::addPort(const snd_seq_addr_t& addr, bool fromReset ) {
   if (knownPort(addr)) return;
 
   Address a = seq.address(addr);
-  if (!a) return;
+  if (!a.mindable) return;
 
   bool foundPrimarySender = false;
   bool foundPrimaryDest = false;

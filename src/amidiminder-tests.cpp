@@ -41,12 +41,12 @@ namespace {
 }
 
 void MidiMinder::connectionLogicTest() {
-  Address portA({ 150, 0 },
+  Address portA({ 150, 0 }, true,
     SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE,
     SND_SEQ_PORT_TYPE_HARDWARE,
     "Controller", "out");
 
-  Address portB({ 200, 0 },
+  Address portB({ 200, 0 }, true,
     SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE,
     SND_SEQ_PORT_TYPE_HARDWARE,
     "Synthesizer", "in");

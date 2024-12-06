@@ -31,14 +31,14 @@ void SeqSnapshot::refresh() {
   connections.clear();
 
   seq.scanClients([&](client_id_t c) {
-    if (seq.isThisClient(c)) return;
+    if (!seq.isMindableClient(c)) return;
     Client client = { c, seq.clientName(c), seq.clientDetails(c) };
     clients.push_back(client);
   });
 
   seq.scanPorts([&](const snd_seq_addr_t& a) {
     auto address = seq.address(a);
-    if (address) {
+    if (address.mindable) {
       addrMap[a] = address;
       ports.push_back(address);
     }

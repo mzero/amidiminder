@@ -9,9 +9,11 @@
 
 const Address Address::null;
 
-Address::Address(const snd_seq_addr_t& a, unsigned int f, unsigned int t,
+Address::Address(
+    const snd_seq_addr_t& a, bool m, unsigned int f, unsigned int t,
     const std::string& c, const std::string& p)
-  : valid(true), addr(a), caps(f), types(t), client(c), port(p), portLong(p),
+  : valid(true), mindable(m), addr(a), caps(f), types(t),
+    client(c), port(p), portLong(p),
     primarySender(false), primaryDest(false)
 {
   static const std::string whitespace = " _";
@@ -43,6 +45,7 @@ Address::Address(const snd_seq_addr_t& a, unsigned int f, unsigned int t,
   if (trimmed.size() > 0)
     port = trimmed;
 }
+
 
 void Seq::begin() {
   if (seq) return;
@@ -95,8 +98,6 @@ std::string Seq::clientName(client_id_t c) {
 
 
 Address Seq::address(const snd_seq_addr_t& addr) {
-  if (addr.client == SND_SEQ_CLIENT_SYSTEM) return {};
-
   int serr;
 
   snd_seq_client_info_t *client;
@@ -111,14 +112,16 @@ Address Seq::address(const snd_seq_addr_t& addr) {
   if (errCheck(serr, "get port info")) return {};
 
   auto caps = snd_seq_port_info_get_capability(port);
-  if (caps & SND_SEQ_PORT_CAP_NO_EXPORT) return {};
-  if (!(caps & (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE)))
-    return {};
 
   auto types = snd_seq_port_info_get_type(port);
 
+  bool mindable =
+    isMindableClient(addr.client)
+    && !(caps & SND_SEQ_PORT_CAP_NO_EXPORT)
+    && (caps & (SND_SEQ_PORT_CAP_SUBS_READ | SND_SEQ_PORT_CAP_SUBS_WRITE));
+
   return
-    Address(addr, caps, types,
+    Address(addr, mindable, caps, types,
             snd_seq_client_info_get_name(client),
             snd_seq_port_info_get_name(port));
 }
@@ -147,19 +150,20 @@ snd_seq_event_t* Seq::eventInput() {
   return ev;
 }
 
-void Seq::scanClients(std::function<void(const client_id_t)> func) {
+void Seq::scanClients(std::function<void(client_id_t)> func) {
   snd_seq_client_info_t *client;
   snd_seq_client_info_alloca(&client);
 
   snd_seq_client_info_set_client(client, -1);
   while (snd_seq_query_next_client(seq, client) >= 0) {
     auto clientId = snd_seq_client_info_get_client(client);
-    if (clientId == SND_SEQ_CLIENT_SYSTEM) continue;
-
     func(clientId);
   }
 }
 
+bool Seq::isMindableClient(client_id_t c) const {
+  return c != SND_SEQ_CLIENT_SYSTEM && c != seqClient;
+}
 
 void Seq::scanPorts(std::function<void(const snd_seq_addr_t&)> func) {
   snd_seq_client_info_t *client;
@@ -171,7 +175,6 @@ void Seq::scanPorts(std::function<void(const snd_seq_addr_t&)> func) {
   snd_seq_client_info_set_client(client, -1);
   while (snd_seq_query_next_client(seq, client) >= 0) {
     auto clientId = snd_seq_client_info_get_client(client);
-    if (clientId == SND_SEQ_CLIENT_SYSTEM) continue;
 
     // Note: The ALSA docs imply that the ports will be scanned
     // in numeric order. A review of the kernel code found that

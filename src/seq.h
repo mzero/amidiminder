@@ -14,7 +14,7 @@ class Address {
     Address()
       : valid(false), addr{0, 0}
       { }
-    Address(const snd_seq_addr_t& a, unsigned int f, unsigned int t,
+    Address(const snd_seq_addr_t& a, bool m, unsigned int f, unsigned int t,
         const std::string& c, const std::string& p);
 
     // allow copying
@@ -36,6 +36,7 @@ class Address {
     std::string typeString() const;
 
     bool valid;
+    bool mindable;
     snd_seq_addr_t addr;
     unsigned int caps;
     unsigned int types;
@@ -84,6 +85,7 @@ class Seq {
 
     std::string clientDetails(client_id_t);
     bool isThisClient(client_id_t c) { return c == seqClient; }
+    bool isMindableClient(client_id_t c) const;
 };
 
 

@@ -18,7 +18,15 @@ namespace Args {
   bool keepObserved = false;
   bool resetHard = false;
 
+  bool listClients = false;
+  bool listPorts = false;
+  bool listConnections = false;
+
+  bool listPlain = false;
+  bool listDetails = false;
+
   int exitCode = 0;
+
 
   bool parse(int argc, char* argv[]) {
     CLI::App app{appDescription};
@@ -65,11 +73,22 @@ namespace Args {
     statusApp->parse_complete_callback([](){ command = Command::Status; });
     statusApp->group(userGroup);
 
-    CLI::App *listApp = app.add_subcommand("list", "list ports and connections");
+    CLI::App *listApp = app.add_subcommand("list", "List ports and connections");
     listApp->parse_complete_callback([](){ command = Command::List; });
     listApp->group(userGroup);
+    listApp->add_flag("--clients",        listClients,      "Output a list of clients");
+    listApp->add_flag("-p,--ports",       listPorts,        "Output a list of ports");
+    listApp->add_flag("-c,--connections", listConnections,  "Output a list of connections");
+    auto plainFlag = listApp->add_flag("--plain", listPlain,
+      "Output only the names of the items");
+    auto detailFlag = listApp->add_flag("--details", listDetails,
+      "Include all ALSA details");
+    plainFlag->excludes(detailFlag);
+    plainFlag->option_text(" ");  // no need to spam the help with excludes info
+    detailFlag->option_text(" ");
+    listApp->footer("Ports and connections are listed if no output is explicitly specified.");
 
-    CLI::App *viewApp = app.add_subcommand("view", "interactive viewer");
+    CLI::App *viewApp = app.add_subcommand("view", "Interactive viewer");
     viewApp->parse_complete_callback([](){ command = Command::View; });
     viewApp->group(userGroup);
 
@@ -84,7 +103,6 @@ namespace Args {
     CLI::App *daemonApp = app.add_subcommand("daemon", "Run the minder service");
     daemonApp->group(systemGroup);
     daemonApp->parse_complete_callback([](){ command = Command::Daemon; });
-    daemonApp->add_flag("-p,--port-details", outputPortDetails, "output verbose details of each port");
 
 
     CLI::App *cltApp = app.add_subcommand("connection-logic-test", "");

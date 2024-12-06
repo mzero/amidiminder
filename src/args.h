@@ -30,8 +30,6 @@ namespace Args {
   inline bool detail()  { return verbosity >= 2; }
   inline bool debug()   { return verbosity >= 3; }
 
-  // Minder command options
-  extern bool outputPortDetails;
 
   // Check command options
   extern std::string rulesFilePath;
@@ -39,6 +37,15 @@ namespace Args {
   // Reset command options
   extern bool keepObserved;
   extern bool resetHard;
+
+  // List command options
+  extern bool listClients;
+  extern bool listPorts;
+  extern bool listConnections;
+
+  extern bool listPlain;
+  extern bool listDetails;
+
 
   extern int exitCode;
   bool parse(int argc, char* argv[]);

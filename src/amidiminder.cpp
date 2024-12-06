@@ -274,9 +274,6 @@ void MidiMinder::handleSeqEvent(snd_seq_event_t& ev) {
       break;
 
     case SND_SEQ_EVENT_PORT_START: {
-      if (Args::outputPortDetails) {
-        seq.outputAddrDetails(std::cout, ev.data.addr);
-      }
       addPort(ev.data.addr);
       break;
     }
@@ -346,8 +343,6 @@ void MidiMinder::resetConnectionsHard() {
 
   activePorts.clear();
   seq.scanPorts([&](auto p){
-    if (Args::outputPortDetails)
-      seq.outputAddrDetails(std::cout, p);
     this->addPort(p, true);
   });
 }

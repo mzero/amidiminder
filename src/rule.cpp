@@ -319,6 +319,9 @@ namespace {
 
 }
 
+AddressSpec AddressSpec::parse(const std::string& s) {
+  return parseAddressSpec(s);
+}
 
 bool parseRules(std::istream& input, ConnectionRules& rules) {
   int lineNo = 1;

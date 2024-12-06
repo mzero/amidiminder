@@ -85,6 +85,8 @@ class AddressSpec {
 
     fmt::format_context::iterator format(fmt::format_context&) const;
 
+    static AddressSpec parse(const std::string&);
+
   private:
     ClientSpec client;
     PortSpec port;

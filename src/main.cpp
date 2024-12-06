@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
 
       case Args::Command::List:     Client::listCommand();              break;
       case Args::Command::View:     Client::viewCommand();              break;
+      case Args::Command::Connect:     Client::connectCommand();        break;
+      case Args::Command::Disconnect:  Client::disconnectCommand();     break;
 
       case Args::Command::ConnectionLogicTest: {
         MidiMinder mm;

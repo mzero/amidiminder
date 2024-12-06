@@ -18,6 +18,8 @@ namespace Args {
 
     List,
     View,
+    Connect,
+    Disconnect,
 
     ConnectionLogicTest,
   };
@@ -49,6 +51,9 @@ namespace Args {
 
   extern bool listNumericSort;
 
+  // Connect and Disconnect args
+  extern std::string portSender;
+  extern std::string portDest;
 
   extern int exitCode;
   bool parse(int argc, char* argv[]);

@@ -28,6 +28,9 @@ namespace Args {
 
   bool listNumericSort = false;
 
+  std::string portSender;
+  std::string portDest;
+
   int exitCode = 0;
 
 
@@ -96,6 +99,18 @@ namespace Args {
     CLI::App *viewApp = app.add_subcommand("view", "Interactive viewer");
     viewApp->parse_complete_callback([](){ command = Command::View; });
     viewApp->group(userGroup);
+
+    CLI::App *connectApp = app.add_subcommand("connect", "Connect two ports");
+    connectApp->parse_complete_callback([](){ command = Command::Connect; });
+    connectApp->add_option("sender", portSender, "Sender port");
+    connectApp->add_option("dest", portDest, "Destination port");
+    connectApp->group(userGroup);
+
+    CLI::App *disconnectApp = app.add_subcommand("disconnect", "Connect two ports");
+    disconnectApp->parse_complete_callback([](){ command = Command::Disconnect; });
+    disconnectApp->add_option("sender", portSender, "Sender port");
+    disconnectApp->add_option("dest", portDest, "Destination port");
+    disconnectApp->group(userGroup);
 
     CLI::App *helpApp = app.add_subcommand("help");
     helpApp->group(userGroup);

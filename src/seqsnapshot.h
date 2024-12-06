@@ -19,19 +19,21 @@ struct SeqSnapshot {
     Address dest;
   };
 
+  bool includeAllItems = false;
+  bool numericSort = false;
+
   std::map<snd_seq_addr_t, Address> addrMap;
   std::vector<Client> clients;
   std::vector<Address> ports;
   std::vector<Connection> connections;
 
-  std::string::size_type clientWidth;
-  std::string::size_type portWidth;
+  std::string::size_type clientWidth = 0;
+  std::string::size_type portWidth = 0;
 
   SeqSnapshot()  { seq.begin(); }
   ~SeqSnapshot() { seq.end(); }
 
-  void refresh(bool allItems = false);
-  void refreshAll() { refresh(true); }
+  void refresh();
   bool checkIfNeedsRefresh();
 
   bool hasConnectionBetween(const Address& sender, const Address& dest) const;

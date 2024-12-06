@@ -2,48 +2,68 @@
 #include <algorithm>
 
 namespace {
+  using Client = SeqSnapshot::Client;
   using Connection = SeqSnapshot::Connection;
 
-  struct lexicalAddressLess {
-    bool operator()(const Address& a, const Address& b) const {
-      if (!a.valid || !b.valid) return b.valid;
-        // in this case, a < b iff a is invalid, and b is valid.
+  bool lexicalClientLess(const Client& a, const Client& b) {
+    if (a.name != b.name) return a.name < b.name;
+    else                  return a.id < b.id;
+  }
 
-      if (a.client != b.client) return a.client < b.client;
+  bool lexicalAddressLess(const Address& a, const Address& b) {
+    if (!a.valid || !b.valid) return b.valid;
+      // in this case, a < b iff a is invalid, and b is valid.
 
-      return a.port < b.port;
-    }
-  };
+    if (a.client != b.client) return a.client < b.client;
+    return a.port < b.port;
+  }
 
-  struct lexicalConnectionLess {
-    bool operator()(const Connection& a, const Connection& b) const {
-      lexicalAddressLess cmp;
-      if (cmp(a.sender, b.sender)) return true;
-      if (cmp(b.sender, a.sender)) return false;
-      return cmp(a.dest, b.dest);
-    }
+  bool lexicalConnectionLess(const Connection& a, const Connection& b) {
+    if (lexicalAddressLess(a.sender, b.sender)) return true;
+    if (lexicalAddressLess(b.sender, a.sender)) return false;
+    return lexicalAddressLess(a.dest, b.dest);
+  }
+
+
+  bool numericClientLess(const Client& a, const Client& b)
+    { return a.id < b.id; }
+
+  bool numericAddressLess(const Address& a, const Address& b) {
+    if (a.addr.client == b.addr.client) return a.addr.port < b.addr.port;
+    else                                return a.addr.client < b.addr.client;
+  }
+
+  bool numericConnectionLess(const Connection& a, const Connection& b) {
+    if (numericAddressLess(a.sender, b.sender)) return true;
+    if (numericAddressLess(b.sender, a.sender)) return false;
+    return numericAddressLess(a.dest, b.dest);
   };
 }
 
-void SeqSnapshot::refresh(bool allItems) {
+void SeqSnapshot::refresh() {
   clients.clear();
   ports.clear();
   connections.clear();
 
   seq.scanClients([&](client_id_t c) {
-    if (!allItems && !seq.isMindableClient(c)) return;
-    Client client = { c, seq.clientName(c), seq.clientDetails(c) };
-    clients.push_back(client);
+    if (includeAllItems || seq.isMindableClient(c)) {
+      Client client = { c, seq.clientName(c), seq.clientDetails(c) };
+      clients.push_back(client);
+    }
   });
+
+  std::sort(clients.begin(), clients.end(),
+    numericSort ? numericClientLess : lexicalClientLess);
 
   seq.scanPorts([&](const snd_seq_addr_t& a) {
     auto address = seq.address(a);
-    if (allItems || address.mindable) {
+    if (includeAllItems || address.mindable) {
       addrMap[a] = address;
       ports.push_back(address);
     }
   });
-  std::sort(ports.begin(), ports.end(), lexicalAddressLess());
+  std::sort(ports.begin(), ports.end(),
+    numericSort ? numericAddressLess : lexicalAddressLess);
 
   seq.scanConnections([&](const snd_seq_connect_t& c) {
     auto si = addrMap.find(c.sender);
@@ -53,7 +73,8 @@ void SeqSnapshot::refresh(bool allItems) {
       connections.push_back(conn);
     }
   });
-  std::sort(connections.begin(), connections.end(), lexicalConnectionLess());
+  std::sort(connections.begin(), connections.end(),
+    numericSort ? numericConnectionLess : lexicalConnectionLess);
 
   clientWidth = 0;
   portWidth = 0;

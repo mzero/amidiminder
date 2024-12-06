@@ -47,6 +47,8 @@ namespace Args {
   extern bool listPlain;
   extern bool listDetails;
 
+  extern bool listNumericSort;
+
 
   extern int exitCode;
   bool parse(int argc, char* argv[]);

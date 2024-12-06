@@ -9,6 +9,7 @@ NOTES
 [] connect & disconnect
 [] list
     [x] sort ports - name
+    [x] numeric sort options
     [] ? group ports by type??
     [x] sort connections
     [x] port display in columns based on client and port name widths

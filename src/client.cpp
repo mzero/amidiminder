@@ -10,7 +10,9 @@ namespace Client {
 
   void listCommand() {
     SeqSnapshot s;
-    s.refresh(Args::listAll);
+    s.includeAllItems = Args::listAll;
+    s.numericSort = Args::listNumericSort;
+    s.refresh();
 
     if (!Args::listClients && !Args::listPorts && !Args::listConnections)
       Args::listPorts = Args::listConnections = true;

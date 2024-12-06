@@ -58,6 +58,22 @@ void SeqSnapshot::refresh() {
   seq.scanPorts([&](const snd_seq_addr_t& a) {
     auto address = seq.address(a);
     if (includeAllItems || address.mindable) {
+      // Compute primary port status. See comment in amidiminder.cpp for
+      // details and caveats about this computation.
+
+      bool foundPrimarySender = false;
+      bool foundPrimaryDest = false;
+      for (auto& p : ports) {
+        if (p.addr.client == a.client) {
+          foundPrimarySender = foundPrimarySender || p.primarySender;
+          foundPrimaryDest   = foundPrimaryDest   || p.primaryDest;
+        }
+        if (foundPrimarySender && foundPrimaryDest)
+          break;
+      }
+      address.primarySender = !foundPrimarySender && address.canBeSender();
+      address.primaryDest   = !foundPrimaryDest   && address.canBeDest();
+
       addrMap[a] = address;
       ports.push_back(address);
     }

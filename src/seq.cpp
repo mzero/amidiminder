@@ -83,8 +83,6 @@ void Seq::end() {
 
 
 std::string Seq::clientName(client_id_t c) {
-  if (c == SND_SEQ_CLIENT_SYSTEM) return "";
-
   int serr;
 
   snd_seq_client_info_t *client;
@@ -369,6 +367,9 @@ std::string Address::typeString() const {
   if (types & SND_SEQ_PORT_TYPE_SYNTHESIZER)  typeStrs.push_back("synthesizer");
   if (types & SND_SEQ_PORT_TYPE_PORT)         typeStrs.push_back("port");
   if (types & SND_SEQ_PORT_TYPE_APPLICATION)  typeStrs.push_back("application");
+
+  if (typeStrs.empty())
+    return "system";  // ports for client 0, System, has no type bits set
 
   std::ostringstream out;
   int count = 0;

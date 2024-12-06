@@ -21,7 +21,8 @@ namespace Args {
   bool listClients = false;
   bool listPorts = false;
   bool listConnections = false;
-
+  
+  bool listAll = false;
   bool listPlain = false;
   bool listDetails = false;
 
@@ -79,6 +80,7 @@ namespace Args {
     listApp->add_flag("--clients",        listClients,      "Output a list of clients");
     listApp->add_flag("-p,--ports",       listPorts,        "Output a list of ports");
     listApp->add_flag("-c,--connections", listConnections,  "Output a list of connections");
+    listApp->add_flag("-a,--all",         listAll,          "Include system items");
     auto plainFlag = listApp->add_flag("--plain", listPlain,
       "Output only the names of the items");
     auto detailFlag = listApp->add_flag("--details", listDetails,

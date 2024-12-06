@@ -27,10 +27,11 @@ struct SeqSnapshot {
   std::string::size_type clientWidth;
   std::string::size_type portWidth;
 
-  SeqSnapshot()  { seq.begin(); refresh(); }
+  SeqSnapshot()  { seq.begin(); }
   ~SeqSnapshot() { seq.end(); }
 
-  void refresh();
+  void refresh(bool allItems = false);
+  void refreshAll() { refresh(true); }
   bool checkIfNeedsRefresh();
 
   bool hasConnectionBetween(const Address& sender, const Address& dest) const;

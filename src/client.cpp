@@ -10,6 +10,7 @@ namespace Client {
 
   void listCommand() {
     SeqSnapshot s;
+    s.refresh(Args::listAll);
 
     if (!Args::listClients && !Args::listPorts && !Args::listConnections)
       Args::listPorts = Args::listConnections = true;

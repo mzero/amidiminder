@@ -43,6 +43,7 @@ namespace Args {
   extern bool listPorts;
   extern bool listConnections;
 
+  extern bool listAll;
   extern bool listPlain;
   extern bool listDetails;
 

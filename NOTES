@@ -12,7 +12,7 @@ NOTES
     [] ? group ports by type??
     [x] sort connections
     [x] port display in columns based on client and port name widths
-    [] all ports option (includes system ports)
+    [x] all ports option (includes system ports)
     [x] ports only, connections only options
     [x] simple text versions (without formatting) --plain
     [x] client listings

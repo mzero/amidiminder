@@ -653,6 +653,8 @@ namespace {
   }
 
   void View::run() {
+    seqState.refresh();
+
     mode = Mode::Menu;
     selectedSender = 0;
     selectedDest = 0;

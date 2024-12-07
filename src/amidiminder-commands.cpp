@@ -16,7 +16,7 @@ void MidiMinder::checkCommand() {
     throw Msg::runtime_error("Rules had parse errors.");
 
   Msg::output("Parsed {} rule(s).", rules.size());
-  if (Args::detail())
+  if (Msg::detail())
     for (auto& r : rules)
       Msg::detail("    {}", r);
 }
@@ -80,7 +80,7 @@ void MidiMinder::handleLoadCommand(IPC::Connection& conn) {
   profileRules.swap(newRules);
 
   Msg::output("Loading profile, {} rules.", profileRules.size());
-  if (Args::detail())
+  if (Msg::detail())
     for (auto& r : profileRules)
       Msg::detail("    {}", r);
 

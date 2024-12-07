@@ -5,7 +5,6 @@
 #include <sstream>
 #include <sys/epoll.h>
 
-#include "args.h"
 #include "files.h"
 #include "msg.h"
 
@@ -113,7 +112,7 @@ namespace {
     rules.swap(newRules);
 
     Msg::output("Rules file {} read, {} rules.", filePath, rules.size());
-    if (Args::detail())
+    if (Msg::detail())
       for (auto& r : rules)
         Msg::detail("    {}", r);
   }

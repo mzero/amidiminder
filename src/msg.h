@@ -3,10 +3,14 @@
 #include <fmt/core.h>
 #include <stdexcept>
 
-#include "args.h"
-
 
 namespace Msg {
+
+  extern int verbosity;
+  inline bool quiet()   { return verbosity <= 0; }
+  inline bool output()  { return verbosity >= 1; }
+  inline bool detail()  { return verbosity >= 2; }
+  inline bool debug()   { return verbosity >= 3; }
 
   void voutput(const char *format, fmt::format_args args);
   void vdetail(const char *format, fmt::format_args args);
@@ -15,19 +19,19 @@ namespace Msg {
 
   template <typename... T>
   void output(const char* format, const T&... args) {
-    if (Args::output())
+    if (output())
       voutput(format, fmt::make_format_args(args...));
   }
 
   template <typename... T>
   void detail(const char* format, const T&... args) {
-    if (Args::detail())
+    if (detail())
       vdetail(format, fmt::make_format_args(args...));
   }
 
   template <typename... T>
   void debug(const char* format, const T&... args) {
-    if (Args::debug())
+    if (debug())
       vdebug(format, fmt::make_format_args(args...));
   }
 

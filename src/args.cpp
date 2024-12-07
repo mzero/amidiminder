@@ -1,6 +1,7 @@
 #include "args.h"
 
 #include "ext/CLI11.hpp"
+#include "msg.h"
 
 namespace {
   const auto appDescription = "Maintain MIDI device connections";
@@ -9,8 +10,6 @@ namespace {
 
 namespace Args {
   Command command = Command::Help; // the default command if none given
-
-  int verbosity = 1;
 
   bool outputPortDetails = false;
   std::string rulesFilePath;
@@ -39,8 +38,8 @@ namespace Args {
     app.set_version_flag("--version", appVersion);
     app.require_subcommand(0, 1);
 
-    auto vFlag = app.add_flag("-v,--verbose", [](auto n){ verbosity = n + 1; }, "Increase level of verbosity");
-    auto qFlag = app.add_flag("-q,--quiet",   [](auto  ){ verbosity = 0; },     "Quiet all normal output");
+    auto vFlag = app.add_flag("-v,--verbose", [](auto n){ Msg::verbosity = n + 1; }, "Increase level of verbosity");
+    auto qFlag = app.add_flag("-q,--quiet",   [](auto  ){ Msg::verbosity = 0; },     "Quiet all normal output");
     qFlag->excludes(vFlag);
     vFlag->option_text(" ");  // no need to spam the help with excludes info
     qFlag->option_text(" ");

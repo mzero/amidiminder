@@ -3,6 +3,7 @@
 #include "fmt/format.h"
 
 #include "args.h"
+#include "msg.h"
 #include "seqsnapshot.h"
 
 
@@ -39,7 +40,7 @@ namespace Client {
       if (Args::listPlain) {
         for (const auto& p : s.ports)
           fmt::print("{}:{}\n",
-            p.client, Args::detail() ? p.portLong : p.port);
+            p.client, Msg::detail() ? p.portLong : p.port);
             // hidden use of -v in conjunction of --plain
       }
       else {

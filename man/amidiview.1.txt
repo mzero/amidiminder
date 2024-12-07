@@ -98,11 +98,13 @@ COMMANDS
               both client and port.
 
               These  matching  rules  are the same as used by amidiminder pro‐
-              files. See amidiminder-profile(5) for details.   remove-all  Re‐
-              moves all connections in the system.
+              files. See amidiminder-profile(5) for details.
 
-       Note:  The  flags  -l,  -c, -d, and -x can be used as aliases for list,
-              connect, disconnect, and remove-all  respectively.  These  match
+       remove-all
+              Removes all connections in the system.
+
+       Note:  The flags -l, -c, -d, and -x can be used as  aliases  for  list,
+              connect,  disconnect,  and  remove-all respectively. These match
               the usage of aconnect(1).
 
 

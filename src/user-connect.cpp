@@ -10,8 +10,8 @@
 namespace User {
 
   void connectCommand() {
-    AddressSpec senderSpec = AddressSpec::parse(Args::portSender);
-    AddressSpec destSpec = AddressSpec::parse(Args::portDest);
+    AddressSpec senderSpec = AddressSpec::parse(Args::portSender, true);
+    AddressSpec destSpec = AddressSpec::parse(Args::portDest, true);
 
     SeqSnapshot snap;
     snap.refresh();
@@ -59,8 +59,8 @@ namespace User {
   }
 
   void disconnectCommand() {
-    AddressSpec senderSpec = AddressSpec::parse(Args::portSender);
-    AddressSpec destSpec = AddressSpec::parse(Args::portDest);
+    AddressSpec senderSpec = AddressSpec::parse(Args::portSender, true);
+    AddressSpec destSpec = AddressSpec::parse(Args::portDest, true);
     bool wildcarded = senderSpec.isWildcard() || destSpec.isWildcard();
 
     SeqSnapshot snap;

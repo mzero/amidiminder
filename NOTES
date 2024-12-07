@@ -7,18 +7,18 @@ NOTES
     [x] amidiview.1 man page
     [x] amidiview should default to view command
 
-[] new handling of numbers in rules
+[x] new handling of numbers in rules
     - name:num is partial string match
-    - name:#num is ALSA id match
+    - name:=num is ALSA id match
     - num:num is ALSA id match on both
-    [] num:num should only be allowed on command line
+    [x] num:num should only be allowed on command line
 
 [] amidiview -c, -d, & -x options to mirror aconnect
 
 ## aconnect functionality
 
 [x] connect & disconnect
-    [] support for num:num matches
+    [x] support for num:num matches
 
 [x] list
     [x] sort ports - name

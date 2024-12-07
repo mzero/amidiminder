@@ -46,37 +46,50 @@ _client_ ::=
 _port_ ::=
     _words_                 -- substring find
     '"' _words_ '"'         -- exact match
-    _number_                -- port n
+    '='_number_             -- port n
     "*"                     -- all ports
 
 */
 
 
-ClientSpec::ClientSpec(const std::string& c, bool e)
-  : client(c), exactMatch(e) { }
-
-ClientSpec ClientSpec::exact(const std::string& s)
-  { return ClientSpec(s, true); }
+ClientSpec::ClientSpec(Kind k, const std::string& c, int i)
+  : kind(k), client(c), clientNum(i) { }
 
 ClientSpec ClientSpec::partial(const std::string& s)
-  { return ClientSpec(s, false); }
+  { return ClientSpec(Partial, s, 0); }
+
+ClientSpec ClientSpec::exact(const std::string& s)
+  { return ClientSpec(Exact, s, 0); }
+
+ClientSpec ClientSpec::numeric(int i)
+  { return ClientSpec(Numeric, "", i); }
 
 ClientSpec ClientSpec::wildcard()
-  { return ClientSpec("", false); }
+  { return ClientSpec(Wildcard, "", 0); }
+
 
 bool ClientSpec::match(const Address& a) const {
-  if (exactMatch)   return a.client == client;
-  else              return a.client.find(client) != std::string::npos;
+  switch (kind) {
+    case Partial:   return a.client.find(client) != std::string::npos;
+    case Exact:     return a.client == client;
+    case Numeric:   return a.addr.client == clientNum;
+    case Wildcard:  return true;
+  }
+  return false; // should never happen
 }
 
 bool ClientSpec::isWildcard() const
-  { return !exactMatch && client.empty(); }
+  { return kind == Wildcard; }
 
 fmt::format_context::iterator
 ClientSpec::format(fmt::format_context& ctx) const {
-  if      (exactMatch)      return fmt::format_to(ctx.out(), "\"{}\"", client);
-  else if (client.empty())  return string_to(ctx.out(), "*");
-  else                      return string_to(ctx.out(), client);
+  switch (kind) {
+    case Partial:   return string_to(ctx.out(), client);
+    case Exact:     return fmt::format_to(ctx.out(), "\"{}\"", client);
+    case Numeric:   return fmt::format_to(ctx.out(), "{:d}", clientNum);
+    case Wildcard:  return string_to(ctx.out(), "*");
+  }
+  return ctx.out();
 }
 
 
@@ -227,7 +240,7 @@ namespace {
     std::smatch m;
 
     static const std::regex portRE(
-      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|(\\d+)|([^*\"'].*)");
+      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|=(\\d+)|([^*\"'=].*)");
     if (!std::regex_match(s, m, portRE))
       throw ParseError("malformed port '{}'", s);
 
@@ -241,8 +254,17 @@ namespace {
       // shouldn't ever happen!
   }
 
-  AddressSpec parseAddressSpec(const std::string& s) {
+  AddressSpec parseAddressSpec(const std::string& s, bool allowIDs = false) {
     std::smatch m;
+
+    static const std::regex idsRE("(\\d+):(\\d+)");
+    if (std::regex_match(s, m, idsRE)) {
+      if (!allowIDs)
+        throw ParseError("client-id:port-id matches not allowed here");
+      auto c = ClientSpec::numeric(std::stoi(m.str(1)));
+      auto p = PortSpec::numeric(std::stoi(m.str(2)));
+      return AddressSpec(c, p);
+    }
 
     static const std::regex portTypeRE("\\.\\w+");
     if (std::regex_match(s, m, portTypeRE)) {
@@ -327,8 +349,8 @@ namespace {
 
 }
 
-AddressSpec AddressSpec::parse(const std::string& s) {
-  return parseAddressSpec(s);
+AddressSpec AddressSpec::parse(const std::string& s, bool allowIDs) {
+  return parseAddressSpec(s, allowIDs);
 }
 
 bool parseRules(std::istream& input, ConnectionRules& rules) {

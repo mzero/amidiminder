@@ -1,6 +1,6 @@
 ### Parsing Tests
 
-# This profile isn't intended as a useful profile. 
+# This profile isn't intended as a useful profile.
 # It is a test of the rules parser.
 
 # Run this test with:
@@ -55,3 +55,7 @@ this -x-> *                         # PASS
 this <-x- *                         # PASS
 this <-x-> that                     # PASS
 this --x--> *                       # PASS
+test:3 --> that                     # PASS
+test:=3 --> that                    # PASS
+test:=three --> that                # FAIL bad number
+42:3 --> that                       # FAIL id matches not allowed in rules

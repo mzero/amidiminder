@@ -10,8 +10,9 @@
 
 class ClientSpec {
   public:
-    static ClientSpec exact(const std::string&);
     static ClientSpec partial(const std::string&);
+    static ClientSpec exact(const std::string&);
+    static ClientSpec numeric(int);
     static ClientSpec wildcard();
 
     bool match (const Address&) const;
@@ -23,10 +24,18 @@ class ClientSpec {
     fmt::format_context::iterator format(fmt::format_context&) const;
 
   private:
-    std::string client;
-    bool exactMatch;
+    enum Kind {
+      Partial,
+      Exact,
+      Numeric,
+      Wildcard
+    };
 
-    ClientSpec(const std::string&, bool);
+    Kind kind;
+    std::string client;
+    int clientNum;
+
+    ClientSpec(Kind, const std::string&, int);
 };
 
 class PortSpec {
@@ -88,7 +97,7 @@ class AddressSpec {
 
     fmt::format_context::iterator format(fmt::format_context&) const;
 
-    static AddressSpec parse(const std::string&);
+    static AddressSpec parse(const std::string&, bool allowIDs);
 
   private:
     ClientSpec client;

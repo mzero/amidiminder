@@ -29,9 +29,9 @@ namespace Client {
       proceed = false;
       Msg::error("No ports match the sender: {}", senderSpec);
     }
-    else if (possibleSenders.size() > 1) {
+    else if (possibleSenders.size() > 1 && !senderSpec.isWildcard()) {
       proceed = false;
-      Msg::error("The sender {} matches multiple ports:", senderSpec);
+      Msg::error("The sender {} matches multiple ports, but not a wildcard:", senderSpec);
       for (auto& a : possibleSenders)
         Msg::error("    {}", a);
     }
@@ -40,15 +40,15 @@ namespace Client {
       proceed = false;
       Msg::error("No ports match the destination: {}", destSpec);
     }
-    else if (possibleDests.size() > 1) {
+    else if (possibleDests.size() > 1 && !destSpec.isWildcard()) {
       proceed = false;
-      Msg::error("The destination {} matches multiple ports:", destSpec);
+      Msg::error("The destination {} matches multiple ports, but not a wildcard:", destSpec);
       for (auto& a : possibleDests)
         Msg::error("    {}", a);
     }
 
     if (!proceed)
-      throw Msg::runtime_error("Made no connections.");
+      throw Msg::runtime_error("No connections made");
 
     for (auto& sender : possibleSenders) {
       for (auto& dest : possibleDests) {
@@ -61,6 +61,7 @@ namespace Client {
   void disconnectCommand() {
     AddressSpec senderSpec = AddressSpec::parse(Args::portSender);
     AddressSpec destSpec = AddressSpec::parse(Args::portDest);
+    bool wildcarded = senderSpec.isWildcard() || destSpec.isWildcard();
 
     SeqSnapshot snap;
     snap.refresh();
@@ -73,14 +74,15 @@ namespace Client {
     }
 
     if (candidates.empty())
-      throw Msg::runtime_error("No connections match those ports.");
+      throw Msg::runtime_error("No connections match those ports");
 
-    if (candidates.size() > 1) {
-      Msg::error("Those ports matched {} connections:", candidates.size());
+    if (!wildcarded && candidates.size() > 1) {
+      Msg::error("Matched {} connections, but no wildcards in specification:",
+        candidates.size());
       for (auto& c : candidates) {
         Msg::error("    {} -> {}", c.sender, c.dest);
       }
-      throw Msg::runtime_error("Not disconnecting all of those.");
+      throw Msg::runtime_error("Did not disconnect any");
     }
 
     for (auto& conn : candidates) {

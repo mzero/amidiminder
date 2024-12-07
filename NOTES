@@ -6,8 +6,9 @@ NOTES
 
 ## aconnect functionality
 
-[] connect & disconnect
-[] list
+[x] connect & disconnect
+
+[x] list
     [x] sort ports - name
     [x] numeric sort options
     [] ? group ports by type??
@@ -31,11 +32,6 @@ NOTES
         [x] handle empty ports and connections
     [] undo
     [x] man page
-
-
-## other
-
-[] ? move -v and -q flags to daemon only... only place really used
 
 
 ## future
@@ -65,6 +61,9 @@ NOTES
     those connections as observed rules
 
 [] ? unicode detection in Term
+
+[] ? future possible options for connect/disconnect
+    --force, --interactive, --dry-run
 
 
 # MAJOR THEMES

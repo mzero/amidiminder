@@ -110,8 +110,8 @@ format-man-pages: $(MANFORMATED)
 # tar files for Debian package
 
 tars: deb-clean
-	cd .. && tar -cJvf amidiminder_0.80.orig.tar.xz --exclude=debian amidiminder_0.80
-	tar -cJvf ../amidiminder_0.80-1.debian.tar.xz debian/
+	cd .. && tar -cJvf amidiminder_0.90.orig.tar.xz --exclude=debian amidiminder_0.90
+	tar -cJvf ../amidiminder_0.90-1.debian.tar.xz debian/
 
 # dependencies
 

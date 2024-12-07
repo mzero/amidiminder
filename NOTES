@@ -13,7 +13,7 @@ NOTES
     - num:num is ALSA id match on both
     [x] num:num should only be allowed on command line
 
-[] amidiview -c, -d, & -x options to mirror aconnect
+[x] amidiview -c, -d, & -x options to mirror aconnect
 
 ## aconnect functionality
 

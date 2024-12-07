@@ -8,8 +8,9 @@ NAME
 SYNOPSIS
        amidiview view
        amidiview list [options]
-       amidiview connect [options]
-       amidiview disconnect [options]
+       amidiview connect sender destination
+       amidiview disconnect sender destination
+       amidiview remove-all
 
 
 DESCRIPTION
@@ -79,24 +80,30 @@ COMMANDS
                            *                  *
                      (d)   id:id              128:0
 
-       (a)    This is the most common way to specify a port,  with  with  just
-              the  client  name.   In  this case in matches the client's first
+              (a) This is the most common way to specify  a  port,  with  with
+              just the client name. In this case in matches the client's first
               sender or destination port as needed. The client name can be any
               substring  of  the  full  client name. Put the name in quotes to
               match only the whole client name.
 
-       (b)    The name of the port can be specified, useful for  devices  that
-              have  multiple ports. Again, any substring of the port name will
-              work. Use quotes for exact matches.
+              (b) The name of the port can be specified,  useful  for  devices
+              that  have multiple ports. Again, any substring of the port name
+              will work. Use quotes for exact matches.
 
-       (c)    Wildcards will match all ports on a client, or all ports on  all
-              clients. Using this form can make or break multiple connections.
+              (c) Wildcards will match all ports on a client, or all ports  on
+              all clients.  Using this form can make or break multiple connec‐
+              tions.
 
-       (d)    Alsa  ID  numbers  can be used, but if so, must be used for both
-              client and port.
+              (d) ALSA ID numbers can be used, but if so,  must  be  used  for
+              both client and port.
 
-              These matching rules are the same as used  by  amidiminder  pro‐
-              files. See amidiminder-profile(5)fordetails.
+              These  matching  rules  are the same as used by amidiminder pro‐
+              files. See amidiminder-profile(5) for details.   remove-all  Re‐
+              moves all connections in the system.
+
+       Note:  The  flags  -l,  -c, -d, and -x can be used as aliases for list,
+              connect, disconnect, and remove-all  respectively.  These  match
+              the usage of aconnect(1).
 
 
 SEE ALSO

@@ -37,6 +37,7 @@ namespace Args {
 
     CLI::App *listApp = app.add_subcommand("list", "List ports and connections");
     listApp->parse_complete_callback([](){ command = Command::List; });
+    listApp->alias("-l");
     listApp->add_flag("--clients",        listClients,      "Output a list of clients");
     listApp->add_flag("-p,--ports",       listPorts,        "Output a list of ports");
     listApp->add_flag("-c,--connections", listConnections,  "Output a list of connections");
@@ -53,14 +54,23 @@ namespace Args {
 
     CLI::App *connectApp = app.add_subcommand("connect", "Connect two ports");
     connectApp->parse_complete_callback([](){ command = Command::Connect; });
+    connectApp->alias("-c");
     connectApp->add_option("sender", portSender, "Sender port");
     connectApp->add_option("dest", portDest, "Destination port");
 
     CLI::App *disconnectApp = app.add_subcommand("disconnect", "Disconnect two ports");
     disconnectApp->parse_complete_callback([](){ command = Command::Disconnect; });
+    disconnectApp->alias("-d");
     disconnectApp->add_option("sender", portSender, "Sender port");
     disconnectApp->add_option("dest", portDest, "Destination port");
 
+    CLI::App *removeAllApp = app.add_subcommand("remove-all", "Remove all connections");
+    removeAllApp->parse_complete_callback([](){
+      command = Command::Disconnect;
+      portSender = "*";
+      portDest = "*";
+    });
+    removeAllApp->alias("-x");
 
     CLI::App *helpApp = app.add_subcommand("help");
     helpApp->description(app.get_help_ptr()->get_description());

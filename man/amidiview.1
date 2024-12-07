@@ -4,11 +4,13 @@ amidiview \- MIDI connection tool
 .SH SYNOPSIS
 .B amidiview view
 .br
-.B amidiview list \fR[options]\fB
+.B amidiview list \fR[\fIoptions\fR]\fB
 .br
-.B amidiview connect \fR[options]\fB
+.B amidiview connect \fIsender destination\fR
 .br
-.B amidiview disconnect \fR[options]\fB
+.B amidiview disconnect \fIsender destination\fR
+.br
+.B amidiview remove-all
 
 .SH DESCRIPTION
 .B amidiview
@@ -87,23 +89,33 @@ l lI lB x.
      | \fB*                        | *
 (d)  | id\fB:\fIid                 | 128:0
 .TE
-.IP (a)
-This is the most common way to specify a port, with with just the client name.
-In this case in matches the client's first sender or destination port as
+.IP
+(a) This is the most common way to specify a port, with with just the client
+name. In this case in matches the client's first sender or destination port as
 needed. The client name can be any substring of the full client name. Put
 the name in quotes to match only the whole client name.
-.IP (b)
-The name of the port can be specified, useful for devices that have multiple
+.IP
+(b) The name of the port can be specified, useful for devices that have multiple
 ports. Again, any substring of the port name will work. Use quotes for exact
 matches.
-.IP (c)
-Wildcards will match all ports on a client, or all ports on all clients. Using
-this form can make or break multiple connections.
-.IP (d)
-Alsa ID numbers can be used, but if so, must be used for both client and port.
+.IP
+(c) Wildcards will match all ports on a client, or all ports on all clients.
+Using this form can make or break multiple connections.
+.IP
+(d) ALSA ID numbers can be used, but if so, must be used for both client and
+port.
 
 These matching rules are the same as used by \fBamidiminder\fR profiles. See
-.BR amidiminder-profile (5) for details.
+.BR amidiminder-profile (5)
+for details.
+.TPq
+.B remove-all
+Removes all connections in the system.
+.TP
+.I Note:
+The flags \fB-l\fR, \fB-c\fR, \fB-d\fR, and \fB-x\fR can be used as aliases
+for \fBlist\fR, \fBconnect\fR, \fBdisconnect\fR, and \fBremove-all\fR
+respectively. These match the usage of \fBaconnect\fR(1).
 
 .SH SEE ALSO
 .BR amidiminder-profile (5)

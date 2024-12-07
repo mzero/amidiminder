@@ -4,6 +4,29 @@ This file summarizes the changes made with each release of the code.
 
 -----------
 
+# 0.90 - 2024-12-07
+
+* Split into two commands:
+  * amidiminder - the deamon, and user commands to manage profiles
+  * amidiview - interactive viewer, and command line replacement for aconnect
+
+* Interactive port and connection viewer
+  * terminal graphic user interface
+  * commands to connect and disconnect ports, with undo
+  * dynamically updates view with system changes
+
+* amidiview list command
+  * shows all ports and connections in an easy to read format
+  * has many display options
+
+* amidiview connect/disconnect commands
+  * uses simple port name syntax, inluding defaulting ports if just a client
+    name is used.
+  * can use ALSA ids if you really want
+  * matches aconnect usage
+
+-----------
+
 # 0.80 - 2024-12-01
 
 * Profile files

@@ -3,49 +3,6 @@ NOTES
 
 # TODO
 
-[x] split into two commands
-    [x] amidiview.1 man page
-    [x] amidiview should default to view command
-
-[x] new handling of numbers in rules
-    - name:num is partial string match
-    - name:=num is ALSA id match
-    - num:num is ALSA id match on both
-    [x] num:num should only be allowed on command line
-
-[x] amidiview -c, -d, & -x options to mirror aconnect
-
-## aconnect functionality
-
-[x] connect & disconnect
-    [x] support for num:num matches
-
-[x] list
-    [x] sort ports - name
-    [x] numeric sort options
-    [] ? group ports by type??
-    [x] sort connections
-    [x] port display in columns based on client and port name widths
-    [x] all ports option (includes system ports)
-    [x] ports only, connections only options
-    [x] simple text versions (without formatting) --plain
-    [x] client listings
-    [x] move verbose port details (-p) option to the list command
-        [x] recode Seq::outputAddrDetails to use fmt... or???
-    [x] man page update
-    [x] --long-name flag (and remove dep on msg.h)
-
-[x] view
-    [x] refresh if ALSA Seq has updates
-    [x] control-l to repaint
-    [x] actually connect & disconnect
-    [x] massive code clean up
-    [x] turn off debugging
-    [x] adjust selections on SeqSnapshot refresh
-        [x] handle empty ports and connections
-    [x] undo
-    [x] man page
-
 
 ## future
 
@@ -77,6 +34,8 @@ NOTES
 
 [] ? future possible options for connect/disconnect
     --force, --interactive, --dry-run
+
+[] ? in list command and view command, group ports by type??
 
 
 # MAJOR THEMES

@@ -7,7 +7,7 @@
 #include "rule.h"
 #include "seqsnapshot.h"
 
-namespace Client {
+namespace User {
 
   void connectCommand() {
     AddressSpec senderSpec = AddressSpec::parse(Args::portSender);

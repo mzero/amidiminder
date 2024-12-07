@@ -714,7 +714,7 @@ namespace {
   }
 }
 
-namespace Client {
+namespace User {
 
   void viewCommand() {
     Term term;

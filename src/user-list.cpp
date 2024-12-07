@@ -7,7 +7,7 @@
 #include "seqsnapshot.h"
 
 
-namespace Client {
+namespace User {
 
   void listCommand() {
     SeqSnapshot s;

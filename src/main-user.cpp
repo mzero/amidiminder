@@ -17,10 +17,10 @@ int main(int argc, char *argv[]) {
         // should never happen, handled in Args::parse()
         break;
 
-      case Args::Command::List:     Client::listCommand();              break;
-      case Args::Command::View:     Client::viewCommand();              break;
-      case Args::Command::Connect:     Client::connectCommand();        break;
-      case Args::Command::Disconnect:  Client::disconnectCommand();     break;
+      case Args::Command::List:     User::listCommand();              break;
+      case Args::Command::View:     User::viewCommand();              break;
+      case Args::Command::Connect:     User::connectCommand();        break;
+      case Args::Command::Disconnect:  User::disconnectCommand();     break;
     }
   }
   catch (const std::exception& e) {

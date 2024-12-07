@@ -6,8 +6,8 @@
 
   * Using `aconnect` to reconnect your devices and your software gets old quick.
   * If you power cycle a synth... you've got to `aconnect` it again.
-  * Bandmate "helps" by unplugging a USB cord to untanlge and plugs it in again:
-    Now you're controller is disconnected.
+  * Bandmate "helps" by unplugging a USB cord to untangle it and plugs it in again:
+    Now your controller is disconnected.
 
 ### The solution
 
@@ -15,21 +15,21 @@
 
   1. Reads a rules file of connections you'd like made.
 
-  2. When the MIDI devices & software - `amidimider` will
+  2. When the MIDI devices & software appear - `amidimider` will
      automatically connect them according to the rules.
 
-  3. It also Watches any connections you make with `aconnect` or that your
+  3. It also Watches any connections that you make with `aconnect` or that your
      software makes, and remembers them too.
 
   4. If any MIDI port goes away (power cycle, pulled USB cord, etc..), ALSA
-     will silentlly remove the connections...
+     will silently remove the connections...
      ... But when the MIDI port comes back - `amidimider`'s got your back and
-     will connect them right back up again just as they were.
+     will connect them right back up again, just as they were.
 
 ### A bonus
 
 `amidiview` provides an interactive terminal interface for looking at, and
-modifying the connections on your system.  Try it... you won't regret it!
+modifying the connections on your system. Try it... you won't regret it!
 
 ```sh
 & amidiview

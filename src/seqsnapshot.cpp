@@ -37,7 +37,7 @@ namespace {
     if (numericAddressLess(a.sender, b.sender)) return true;
     if (numericAddressLess(b.sender, a.sender)) return false;
     return numericAddressLess(a.dest, b.dest);
-  };
+  }
 }
 
 void SeqSnapshot::refresh() {

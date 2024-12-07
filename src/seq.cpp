@@ -47,7 +47,7 @@ Address::Address(
 }
 
 
-void Seq::begin() {
+void Seq::begin(const char* clientName) {
   if (seq) return;
 
   int serr;
@@ -59,7 +59,7 @@ void Seq::begin() {
   if (errFatal(ret, "client id")) return;
   seqClient = ret;
 
-  serr = snd_seq_set_client_name(seq, "amidiminder");
+  serr = snd_seq_set_client_name(seq, clientName);
   if (errFatal(serr, "name sequencer")) return;
 
   evtPort = snd_seq_create_simple_port(seq, "panopticon",

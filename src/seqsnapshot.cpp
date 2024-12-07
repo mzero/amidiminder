@@ -40,6 +40,9 @@ namespace {
   }
 }
 
+SeqSnapshot::SeqSnapshot()  { seq.begin("amidiview"); }
+SeqSnapshot::~SeqSnapshot() { seq.end(); }
+
 void SeqSnapshot::refresh() {
   clients.clear();
   ports.clear();

@@ -31,8 +31,8 @@ struct SeqSnapshot {
   std::string::size_type clientWidth = 0;
   std::string::size_type portWidth = 0;
 
-  SeqSnapshot()  { seq.begin(); }
-  ~SeqSnapshot() { seq.end(); }
+  SeqSnapshot();
+  ~SeqSnapshot();
 
   void refresh();
   bool checkIfNeedsRefresh();

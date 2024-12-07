@@ -53,7 +53,7 @@ class Seq {
   public:
     Seq() { }
 
-    void begin();
+    void begin(const char* clientName);
     void end();
     operator bool() const { return seq; }
 

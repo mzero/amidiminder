@@ -167,7 +167,7 @@ MidiMinder::MidiMinder() {
   std::signal(SIGHUP, signal_handler);
   std::signal(SIGINT, signal_handler);
   std::signal(SIGTERM, signal_handler);
-  seq.begin();
+  seq.begin("amidiminder");
 }
 
 MidiMinder::~MidiMinder() {

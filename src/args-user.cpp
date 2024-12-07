@@ -20,6 +20,7 @@ namespace Args {
   bool listDetails = false;
 
   bool listNumericSort = false;
+  bool listLongPortNames = false;
 
   std::string portSender;
   std::string portDest;
@@ -43,6 +44,7 @@ namespace Args {
     listApp->add_flag("-c,--connections", listConnections,  "Output a list of connections");
     listApp->add_flag("-a,--all",         listAll,          "Include system items");
     listApp->add_flag("-n,--numeric",     listNumericSort,  "Sort items by ALSA number");
+    listApp->add_flag("--long-port-names",listLongPortNames,"Display unshortened port names");
     auto plainFlag = listApp->add_flag("--plain", listPlain,
       "Output only the names of the items");
     auto detailFlag = listApp->add_flag("--details", listDetails,

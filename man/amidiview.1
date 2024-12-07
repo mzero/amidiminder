@@ -68,6 +68,16 @@ are for system level use are omitted.
 .in +7n
 .B -n, --numeric
 Sort items by ALSA id number, rather than by name.
+.TP +12n
+.in +7n
+.B --long-port-names
+Display the unshortened port names.
+
+ALSA port names have a nasty habit of
+including the client name, sometimes twice, as a prefix to the port name.
+This just makes ports hard to read, and provides no benefit, as port names are
+always scoped to a given client. \fBamidiview\fR normally shortens port names
+to the useful portion. This option displays the full name.
 .PP
 .TP
 \fBconnect \fIsender destination\fR

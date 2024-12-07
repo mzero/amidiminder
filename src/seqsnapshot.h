@@ -21,6 +21,7 @@ struct SeqSnapshot {
 
   bool includeAllItems = false;
   bool numericSort = false;
+  bool useLongPortNames = false;
 
   std::map<snd_seq_addr_t, Address> addrMap;
   std::vector<Client> clients;

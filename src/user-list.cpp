@@ -13,6 +13,7 @@ namespace User {
     SeqSnapshot s;
     s.includeAllItems = Args::listAll;
     s.numericSort = Args::listNumericSort;
+    s.useLongPortNames = Args::listLongPortNames;
     s.refresh();
 
     if (!Args::listClients && !Args::listPorts && !Args::listConnections)
@@ -39,9 +40,7 @@ namespace User {
     if (Args::listPorts) {
       if (Args::listPlain) {
         for (const auto& p : s.ports)
-          fmt::print("{}:{}\n",
-            p.client, Msg::detail() ? p.portLong : p.port);
-            // hidden use of -v in conjunction of --plain
+          fmt::print("{}:{}\n", p.client, p.port);
       }
       else {
         std::cout << "Ports:\n";

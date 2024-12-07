@@ -74,6 +74,9 @@ void SeqSnapshot::refresh() {
       address.primarySender = !foundPrimarySender && address.canBeSender();
       address.primaryDest   = !foundPrimaryDest   && address.canBeDest();
 
+      if (useLongPortNames)
+        address.port = address.portLong;
+
       addrMap[a] = address;
       ports.push_back(address);
     }

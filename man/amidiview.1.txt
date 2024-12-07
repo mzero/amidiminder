@@ -65,6 +65,16 @@ COMMANDS
               -n, --numeric
                    Sort items by ALSA id number, rather than by name.
 
+              --long-port-names
+                   Display the unshortened port names.
+
+                   ALSA port names have a nasty habit of including the  client
+                   name,  sometimes twice, as a prefix to the port name.  This
+                   just makes ports hard to read, and provides no benefit,  as
+                   port  names  are always scoped to a given client. amidiview
+                   normally shortens port names to the  useful  portion.  This
+                   option displays the full name.
+
        connect sender destination
 
        disconnect sender destination
@@ -80,31 +90,31 @@ COMMANDS
                            *                  *
                      (d)   id:id              128:0
 
-              (a) This is the most common way to specify  a  port,  with  with
+              (a)  This  is  the  most common way to specify a port, with with
               just the client name. In this case in matches the client's first
               sender or destination port as needed. The client name can be any
-              substring  of  the  full  client name. Put the name in quotes to
+              substring of the full client name. Put the  name  in  quotes  to
               match only the whole client name.
 
-              (b) The name of the port can be specified,  useful  for  devices
-              that  have multiple ports. Again, any substring of the port name
+              (b)  The  name  of the port can be specified, useful for devices
+              that have multiple ports. Again, any substring of the port  name
               will work. Use quotes for exact matches.
 
-              (c) Wildcards will match all ports on a client, or all ports  on
+              (c)  Wildcards will match all ports on a client, or all ports on
               all clients.  Using this form can make or break multiple connec‐
               tions.
 
-              (d) ALSA ID numbers can be used, but if so,  must  be  used  for
+              (d)  ALSA  ID  numbers  can be used, but if so, must be used for
               both client and port.
 
-              These  matching  rules  are the same as used by amidiminder pro‐
+              These matching rules are the same as used  by  amidiminder  pro‐
               files. See amidiminder-profile(5) for details.
 
        remove-all
               Removes all connections in the system.
 
-       Note:  The flags -l, -c, -d, and -x can be used as  aliases  for  list,
-              connect,  disconnect,  and  remove-all respectively. These match
+       Note:  The  flags  -l,  -c, -d, and -x can be used as aliases for list,
+              connect, disconnect, and remove-all  respectively.  These  match
               the usage of aconnect(1).
 
 

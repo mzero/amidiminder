@@ -24,6 +24,7 @@ namespace Args {
   extern bool listDetails;
 
   extern bool listNumericSort;
+  extern bool listLongPortNames;
 
   // Connect and Disconnect args
   extern std::string portSender;

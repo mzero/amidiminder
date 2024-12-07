@@ -33,7 +33,7 @@ NOTES
     [x] move verbose port details (-p) option to the list command
         [x] recode Seq::outputAddrDetails to use fmt... or???
     [x] man page update
-    [] --long-name flag (and remove dep on msg.h)
+    [x] --long-name flag (and remove dep on msg.h)
 
 [] view
     [x] refresh if ALSA Seq has updates

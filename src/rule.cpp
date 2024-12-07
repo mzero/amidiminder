@@ -108,6 +108,9 @@ bool PortSpec::isDefaulted() const
 bool PortSpec::isType() const
   { return kind == Type; }
 
+bool PortSpec::isWildcard() const
+  { return kind == Wildcard; }
+
 bool PortSpec::matchAsSender(const Address& a) const {
   return match(a, a.primarySender);
 }
@@ -162,6 +165,9 @@ bool AddressSpec::matchAsSender(const Address& a) const
 
 bool AddressSpec::matchAsDest(const Address& a) const
   { return client.match(a) && port.matchAsDest(a); }
+
+bool AddressSpec::isWildcard() const
+  { return client.isWildcard() || port.isWildcard(); }
 
 fmt::format_context::iterator
 AddressSpec::format(fmt::format_context& ctx) const {
@@ -255,7 +261,9 @@ namespace {
 
     ClientSpec cs = parseClientSpec(m.str(1));
     PortSpec ps =
-      m.str(2).empty() ? PortSpec::defaulted() : parsePortSpec(m.str(3));
+      m.str(2).empty()
+        ? (cs.isWildcard()? PortSpec::wildcard() : PortSpec::defaulted())
+        : parsePortSpec(m.str(3));
 
     return AddressSpec(cs, ps);
   }

@@ -46,6 +46,7 @@ class PortSpec {
 
     bool isDefaulted() const;
     bool isType() const;
+    bool isWildcard() const;
 
     fmt::format_context::iterator format(fmt::format_context&) const;
 
@@ -82,6 +83,8 @@ class AddressSpec {
 
     AddressSpec(const AddressSpec&) = default;
     AddressSpec& operator=(const AddressSpec&) = default;
+
+    bool isWildcard() const;
 
     fmt::format_context::iterator format(fmt::format_context&) const;
 

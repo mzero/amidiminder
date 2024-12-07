@@ -108,6 +108,9 @@ namespace {
 
     std::string message;
     void setMessage(const std::string&);
+    template <typename... T>
+    void setMessage(const char* format, const T&... args)
+      { setMessage(fmt::vformat(format, fmt::make_format_args(args...))); }
 
     bool dirtyPorts = false;
     bool dirtyConnections = false;
@@ -145,6 +148,10 @@ namespace {
     bool handleConfirmEvent(const Term::Event& ev);
 
     void debugMessage(const std::string&);
+    template <typename... T>
+    void debugMessage(const char* format, const T&... args)
+      { debugMessage(fmt::vformat(format, fmt::make_format_args(args...))); }
+
     void run();
   };
 
@@ -395,12 +402,12 @@ namespace {
       case Command::RedoConnect:
       case Command::UndoDisconnect: {
         if (!validateConnect(s, d)) {
-          setMessage(fmt::format("Already connected: {} --> {}", s, d));
+          setMessage("Already connected: {} --> {}", s, d);
           lastCommand = Command::None;
           break;
         }
         seqState.seq.connect(s.addr, d.addr);
-        setMessage(fmt::format("Connected {} --> {}", s, d));
+        setMessage("Connected {} --> {}", s, d);
         lastCommand = c;
         lastSender = s;
         lastDest = d;
@@ -411,12 +418,12 @@ namespace {
       case Command::RedoDisconnect:
       case Command::UndoConnect: {
         if (!validateDisconnect(s, d)) {
-          setMessage(fmt::format("Not connected: {} -x-> {}", s, d));
+          setMessage("Not connected: {} -x-> {}", s, d);
           lastCommand = Command::None;
           break;
         }
         seqState.seq.disconnect({s.addr, d.addr});
-        setMessage(fmt::format("Disconnected {} -x-> {}", s, d));
+        setMessage("Disconnected {} -x-> {}", s, d);
         lastCommand = c;
         lastSender = s;
         lastDest = d;
@@ -629,7 +636,7 @@ namespace {
             return true;
           }
           else {
-            setMessage(fmt::format("That port cannot be a {}", typeString));
+            setMessage("That port cannot be a {}", typeString);
           }
         }
 
@@ -766,19 +773,19 @@ namespace {
     if (false && !handled) {
       switch (ev.type) {
         case Term::EventType::Char:
-          debugMessage(fmt::format("Unassigned character {:?}", ev.character));
+          debugMessage("Unassigned character {:?}", ev.character);
           break;
 
         case Term::EventType::Key:
-          debugMessage(fmt::format("Unassigned key {}", static_cast<int>(ev.key)));
+          debugMessage("Unassigned key {}", static_cast<int>(ev.key));
           break;
 
         case Term::EventType::UnknownEscapeSequence:
-          debugMessage(fmt::format("Unknown escape sequence: {:?}", ev.unknown));
+          debugMessage("Unknown escape sequence: {:?}", ev.unknown);
           break;
 
         default:
-          debugMessage(fmt::format("Unknown event type {}", int(ev.type)));
+          debugMessage("Unknown event type {}", int(ev.type));
           break;
       }
     }
@@ -853,8 +860,8 @@ namespace {
       }
 
       if (false)
-        debugMessage(fmt::format("in mode {}, after fd={} fdsource={} ev.type={}",
-          int(mode), +evt.data.fd, +evt.data.u32, et));
+        debugMessage("in mode {}, after fd={} fdsource={} ev.type={}",
+          int(mode), +evt.data.fd, +evt.data.u32, et);
     }
   }
 }

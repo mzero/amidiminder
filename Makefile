@@ -115,6 +115,6 @@ tars: deb-clean
 
 # dependencies
 
-DEPS := $(OBJS:.o=.d)
+DEPS := $(OBJS_SERVER:.o=.d) $(OBJS_USER:.o=.d)
 
 -include $(DEPS)

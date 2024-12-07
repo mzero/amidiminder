@@ -97,7 +97,7 @@ test-shell: $(BUILD_DIR)/test-env
 # man files
 
 MANDIR ?= man
-MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8
+MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8 amidiview.1
 MANFILES ?= $(foreach page,$(MANPAGES),$(MANDIR)/$(page))
 MANFORMATED ?= $(foreach file,$(MANFILES),$(file).txt)
 

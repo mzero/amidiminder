@@ -11,10 +11,6 @@ amidiminder \- Utility to manage MIDI device connections
 .B amidiminder check \fIfile
 .br
 .B amidiminder status
-.PP
-.B amidiminder view
-.br
-.B amidiminder list \fR[options]\fB
 
 .SH DESCRIPTION
 The
@@ -89,64 +85,6 @@ and \fB1\fR if there are any syntax errors.
 .B status
 Connects to the daemon, retrieves some status information, and outputs it.
 This is a good way to check that the daemon is up and running.
-.SS Direct commands
-.TP
-\fBview\fR
-Interactive view of ports and connections in the system. Connections can be
-made and removed using the keyboard.
-
-The terminal must support xterm style control sequences, which pretty much
-all do these days.
-.TP
-\fBlist\fR [\fB-p\fR] [\fB-c\fR] [\fB--clients\fR] [\fB--plain\fR|\fB--details\fR] [\fB-a\fR] [\fB-n\fR]
-Output a textual list of ports, connections, and/or clients.
-
-.B Options
-.TP +12n
-.in +7n
-.B -p, --ports
-Output a list of ports
-.TP +12n
-.in +7n
-.B -c, --connections
-Output a list of connections
-.TP +12n
-.in +7n
-.B --clients
-Output a list of clients
-
-If none of the above three options are given, then ports and connections
-will be output.
-.TP +12n
-.in +7n
-.B --plain
-Output only the names, one per line. Useful for scripts
-.TP +12n
-.in +7n
-.B --details
-Include type and capability details for ports and clients.
-.TP +12n
-.in +7n
-.B -a, --all
-Include all ALSA Sequencer clients and ports. Normally clients and ports that
-are for system level use are omitted.
-.TP +12n
-.in +7n
-.B -n, --numeric
-Sort items by ALSA id number, rather than by name.
-.TP
-\fBconnect \fIsender destination\fR
-.TP
-\fBdisconnect \fIsender destination\fR
-Make or removes a connections between two ports.
-
-The ports are specified as they are in rules files. See
-.BR amidiminder-profile (5)
-for details. Typically you can just use the client name and it will use the
-first sender or destination port as appropriate.
-
-These commands will not affect multiple connections, unless the specification
-uses a wildcard ('\fB*\fR') for the client or port explicitly.
 
 .SH ENVIRONMENT
 .IP RUNTIME_DIRECTORY

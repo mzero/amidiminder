@@ -4,6 +4,9 @@ NOTES
 # TODO
 
 [] split into two commands
+    [x] amidiview.1 man page
+    [] amidiview should default to view command
+    [] amidiview -c, -d, & -x options to mirror aconnect
 
 [] new handling of numbers in rules
     - name:num is partial string match

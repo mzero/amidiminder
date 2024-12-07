@@ -13,9 +13,6 @@ SYNOPSIS
        amidiminder check file
        amidiminder status
 
-       amidiminder view
-       amidiminder list [options]
-
 
 DESCRIPTION
        The amidiminder daemon maintains a set of desired connections (the pro‐
@@ -87,58 +84,6 @@ COMMANDS
        status Connects  to  the daemon, retrieves some status information, and
               outputs it.  This is a good way to check that the daemon  is  up
               and running.
-
-   Direct commands
-       view   Interactive view of ports and connections in the system. Connec‐
-              tions can be made and removed using the keyboard.
-
-              The terminal must support xterm style control  sequences,  which
-              pretty much all do these days.
-
-       list [-p] [-c] [--clients] [--plain|--details] [-a] [-n]
-              Output a textual list of ports, connections, and/or clients.
-
-              Options
-
-              -p, --ports
-                   Output a list of ports
-
-              -c, --connections
-                   Output a list of connections
-
-              --clients
-                   Output a list of clients
-
-                   If  none  of  the above three options are given, then ports
-                   and connections will be output.
-
-              --plain
-                   Output only the names, one per line. Useful for scripts
-
-              --details
-                   Include type and capability details for ports and clients.
-
-              -a, --all
-                   Include all ALSA  Sequencer  clients  and  ports.  Normally
-                   clients  and  ports that are for system level use are omit‐
-                   ted.
-
-              -n, --numeric
-                   Sort items by ALSA id number, rather than by name.
-
-       connect sender destination
-
-       disconnect sender destination
-                   Make or removes a connections between two ports.
-
-                   The ports are specified as they are  in  rules  files.  See
-                   amidiminder-profile(5)  for details. Typically you can just
-                   use the client name and it will use  the  first  sender  or
-                   destination port as appropriate.
-
-                   These commands will not affect multiple connections, unless
-                   the specification uses a wildcard ('*') for the  client  or
-                   port explicitly.
 
 
 ENVIRONMENT

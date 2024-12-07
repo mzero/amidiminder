@@ -1,0 +1,109 @@
+.TH AMIDIMINDER 1
+.SH NAME
+amidiview \- MIDI connection tool
+.SH SYNOPSIS
+.B amidiview view
+.br
+.B amidiview list \fR[options]\fB
+.br
+.B amidiview connect \fR[options]\fB
+.br
+.B amidiview disconnect \fR[options]\fB
+
+.SH DESCRIPTION
+.B amidiview
+is a tool for easily viewing and managing ALSA Sequencer MIDI connections.  The
+main tool is interactive and provides a textual user interface for viewing all
+ports in the system, and the connections between them. The interface provides
+easy commands for making and breaking connections.
+.PP
+The additional commands offer command line interface to the same functionality.
+
+.SH COMMANDS
+.TP
+\fBview\fR
+Interactive view of ports and connections in the system. Connections can be
+made and removed using the keyboard.
+
+This is the default operation of \fBamidiview\fR if no subcommand is specified.
+
+The terminal must support xterm style control sequences, which pretty much
+all do these days.
+.TP
+\fBlist\fR [\fB-p\fR] [\fB-c\fR] [\fB--clients\fR] [\fB--plain\fR|\fB--details\fR] [\fB-a\fR] [\fB-n\fR]
+Output a textual list of ports, connections, and/or clients.
+
+.B Options
+.TP +12n
+.in +7n
+.B -p, --ports
+Output a list of ports
+.TP +12n
+.in +7n
+.B -c, --connections
+Output a list of connections
+.TP +12n
+.in +7n
+.B --clients
+Output a list of clients
+
+If none of the above three options are given, then ports and connections
+will be output.
+.TP +12n
+.in +7n
+.B --plain
+Output only the names, one per line. Useful for scripts
+.TP +12n
+.in +7n
+.B --details
+Include type and capability details for ports and clients.
+.TP +12n
+.in +7n
+.B -a, --all
+Include all ALSA Sequencer clients and ports. Normally clients and ports that
+are for system level use are omitted.
+.TP +12n
+.in +7n
+.B -n, --numeric
+Sort items by ALSA id number, rather than by name.
+.PP
+.TP
+\fBconnect \fIsender destination\fR
+.TP
+\fBdisconnect \fIsender destination\fR
+Make or removes a connections between two ports.
+
+The ports are specified in one of several ways:
+.in +7n
+.TS
+tab(|) nospaces;
+l l l x
+l lI lB x.
+     | Syntax                      | Example
+
+(a)  | client                      | Digitakt
+(b)  | client\fB:\fIport-name      | Launch Pad:DAW
+(c)  | client\fB:*                 | Launch Pad:*
+     | \fB*                        | *
+(d)  | id\fB:\fIid                 | 128:0
+.TE
+.IP (a)
+This is the most common way to specify a port, with with just the client name.
+In this case in matches the client's first sender or destination port as
+needed. The client name can be any substring of the full client name. Put
+the name in quotes to match only the whole client name.
+.IP (b)
+The name of the port can be specified, useful for devices that have multiple
+ports. Again, any substring of the port name will work. Use quotes for exact
+matches.
+.IP (c)
+Wildcards will match all ports on a client, or all ports on all clients. Using
+this form can make or break multiple connections.
+.IP (d)
+Alsa ID numbers can be used, but if so, must be used for both client and port.
+
+These matching rules are the same as used by \fBamidiminder\fR profiles. See
+.BR amidiminder-profile (5) for details.
+
+.SH SEE ALSO
+.BR amidiminder-profile (5)

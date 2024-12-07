@@ -3,24 +3,26 @@
 #include <iostream>
 #include <ostream>
 
-#include "args.h"
 
 
 namespace Msg {
+
+  int verbosity = 1;
+
   void voutput(const char* format, fmt::format_args args) {
-    if (Args::output()) {
+    if (output()) {
       std::cout << fmt::vformat(format, args) << std::endl;
     }
   }
 
   void vdetail(const char* format, fmt::format_args args) {
-    if (Args::detail()) {
+    if (detail()) {
       std::cout << fmt::vformat(format, args) << std::endl;
     }
   }
 
   void vdebug(const char* format, fmt::format_args args) {
-    if (Args::debug()) {
+    if (debug()) {
       std::cout << fmt::vformat(format, args) << std::endl;
     }
   }

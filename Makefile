@@ -1,4 +1,5 @@
-TARGET ?= amidiminder
+TARGET_SERVER ?= amidiminder
+TARGET_USER ?= amidiview
 PREFIX ?= /usr/local
 BINARY_DIR ?= $(PREFIX)/bin
 CONF_DIR ?= /etc
@@ -10,24 +11,34 @@ MKDIR_P ?= mkdir -p
 BUILD_DIR ?= ./build
 
 all: bin format-man-pages
-bin: $(BUILD_DIR)/$(TARGET)
+bin: $(BUILD_DIR)/$(TARGET_SERVER) $(BUILD_DIR)/$(TARGET_USER)
 
 deb:
 	dpkg-buildpackage -b --no-sign
 
 install:
 	$(MKDIR_P) $(DESTDIR)$(BINARY_DIR)
-	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET) $(DESTDIR)$(BINARY_DIR)/
+	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET_SERVER) $(DESTDIR)$(BINARY_DIR)/
+	$(INSTALL_PROGRAM) $(BUILD_DIR)/$(TARGET_USER) $(DESTDIR)$(BINARY_DIR)/
 
-SRCS := amidiminder.cpp amidiminder-commands.cpp amidiminder-tests.cpp
-SRCS +=	args.cpp
-SRCS += client-connect.cpp client-list.cpp client-view.cpp
-SRCS += files.cpp ipc.cpp main.cpp msg.cpp rule.cpp
-SRCS += seq.cpp seqsnapshot.cpp term.cpp
+SRCS_COMMON := msg.cpp rule.cpp seq.cpp
+
+SRCS_SERVER := service.cpp service-commands.cpp service-tests.cpp
+SRCS_SERVER +=	args-service.cpp main-service.cpp
+SRCS_SERVER += files.cpp ipc.cpp
+SRCS_SERVER += $(SRCS_COMMON)
+
+SRCS_USER += user-connect.cpp user-list.cpp user-view.cpp
+SRCS_USER += args-user.cpp main-user.cpp
+SRCS_USER += seqsnapshot.cpp term.cpp
+SRCS_USER += $(SRCS_COMMON)
+
+
 INCS := .
 LIBS := stdc++ asound fmt
 
-OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
+OBJS_SERVER := $(SRCS_SERVER:%=$(BUILD_DIR)/%.o)
+OBJS_USER := $(SRCS_USER:%=$(BUILD_DIR)/%.o)
 
 INC_FLAGS := $(addprefix -I,$(INCS))
 CPPFLAGS += $(INC_FLAGS)
@@ -42,12 +53,17 @@ LDFLAGS += $(addprefix -l,$(LIBS))
 
 
 # c++ source
+
 $(BUILD_DIR)/%.cpp.o: src/%.cpp
-	$(MKDIR_P) $(BUILD_DIR)
+	@$(MKDIR_P) $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@ $(LDFLAGS) 2>&1 | tee $(BUILD_DIR)/link_out
+$(BUILD_DIR)/$(TARGET_SERVER): $(OBJS_SERVER)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+$(BUILD_DIR)/$(TARGET_USER): $(OBJS_USER)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
 
 .PHONY: clean test deb deb-clean tars
 
@@ -57,8 +73,8 @@ clean:
 deb-clean:
 	dh clean
 
-test: $(BUILD_DIR)/$(TARGET)
-	$(BUILD_DIR)/$(TARGET) check rules/test.rules && echo PASS || echo FAIL
+test: $(BUILD_DIR)/$(TARGET_SERVER)
+	$(BUILD_DIR)/$(TARGET_SERVER) check rules/test.rules && echo PASS || echo FAIL
 
 
 # test shell with runtime and state directories in /tmp
@@ -81,7 +97,7 @@ test-shell: $(BUILD_DIR)/test-env
 # man files
 
 MANDIR ?= man
-MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8
+MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8 amidiview.1
 MANFILES ?= $(foreach page,$(MANPAGES),$(MANDIR)/$(page))
 MANFORMATED ?= $(foreach file,$(MANFILES),$(file).txt)
 

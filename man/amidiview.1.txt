@@ -1,0 +1,107 @@
+AMIDIMINDER(1)              General Commands Manual             AMIDIMINDER(1)
+
+
+
+NAME
+       amidiview - MIDI connection tool
+
+SYNOPSIS
+       amidiview view
+       amidiview list [options]
+       amidiview connect [options]
+       amidiview disconnect [options]
+
+
+DESCRIPTION
+       amidiview is a tool for easily viewing and managing ALSA Sequencer MIDI
+       connections.  The main tool is interactive and provides a textual  user
+       interface  for viewing all ports in the system, and the connections be‐
+       tween them. The interface provides easy commands for making and  break‐
+       ing connections.
+
+       The  additional commands offer command line interface to the same func‐
+       tionality.
+
+
+COMMANDS
+       view   Interactive view of ports and connections in the system. Connec‐
+              tions can be made and removed using the keyboard.
+
+              This  is  the default operation of amidiview if no subcommand is
+              specified.
+
+              The terminal must support xterm style control  sequences,  which
+              pretty much all do these days.
+
+       list [-p] [-c] [--clients] [--plain|--details] [-a] [-n]
+              Output a textual list of ports, connections, and/or clients.
+
+              Options
+
+              -p, --ports
+                   Output a list of ports
+
+              -c, --connections
+                   Output a list of connections
+
+              --clients
+                   Output a list of clients
+
+                   If  none  of  the above three options are given, then ports
+                   and connections will be output.
+
+              --plain
+                   Output only the names, one per line. Useful for scripts
+
+              --details
+                   Include type and capability details for ports and clients.
+
+              -a, --all
+                   Include all ALSA  Sequencer  clients  and  ports.  Normally
+                   clients  and  ports that are for system level use are omit‐
+                   ted.
+
+              -n, --numeric
+                   Sort items by ALSA id number, rather than by name.
+
+       connect sender destination
+
+       disconnect sender destination
+              Make or removes a connections between two ports.
+
+              The ports are specified in one of several ways:
+
+                           Syntax             Example
+
+                     (a)   client             Digitakt
+                     (b)   client:port-name   Launch Pad:DAW
+                     (c)   client:*           Launch Pad:*
+                           *                  *
+                     (d)   id:id              128:0
+
+       (a)    This is the most common way to specify a port,  with  with  just
+              the  client  name.   In  this case in matches the client's first
+              sender or destination port as needed. The client name can be any
+              substring  of  the  full  client name. Put the name in quotes to
+              match only the whole client name.
+
+       (b)    The name of the port can be specified, useful for  devices  that
+              have  multiple ports. Again, any substring of the port name will
+              work. Use quotes for exact matches.
+
+       (c)    Wildcards will match all ports on a client, or all ports on  all
+              clients. Using this form can make or break multiple connections.
+
+       (d)    Alsa  ID  numbers  can be used, but if so, must be used for both
+              client and port.
+
+              These matching rules are the same as used  by  amidiminder  pro‐
+              files. See amidiminder-profile(5)fordetails.
+
+
+SEE ALSO
+       amidiminder-profile(5)
+
+
+
+                                                                AMIDIMINDER(1)

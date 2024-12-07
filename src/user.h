@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace Client {
+namespace User {
 
   void listCommand();
   void viewCommand();

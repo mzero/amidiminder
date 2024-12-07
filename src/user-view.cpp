@@ -1,4 +1,4 @@
-#include "client.h"
+#include "user.h"
 
 #include <fmt/format.h>
 #include <sys/epoll.h>
@@ -714,7 +714,7 @@ namespace {
   }
 }
 
-namespace Client {
+namespace User {
 
   void viewCommand() {
     Term term;

@@ -1,13 +1,13 @@
-#include "client.h"
+#include "user.h"
 
 #include <vector>
 
-#include "args.h"
+#include "args-user.h"
 #include "msg.h"
 #include "rule.h"
 #include "seqsnapshot.h"
 
-namespace Client {
+namespace User {
 
   void connectCommand() {
     AddressSpec senderSpec = AddressSpec::parse(Args::portSender);

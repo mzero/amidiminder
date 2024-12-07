@@ -37,6 +37,7 @@ struct SeqSnapshot {
   void refresh();
   bool checkIfNeedsRefresh();
 
+  bool addressStillValid(const Address& a) const;
   bool hasConnectionBetween(const Address& sender, const Address& dest) const;
 
   static const char* dirStr(bool sender, bool dest);

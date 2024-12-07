@@ -125,6 +125,17 @@ bool SeqSnapshot::checkIfNeedsRefresh() {
   return needsRefresh;
 }
 
+bool SeqSnapshot::addressStillValid(const Address& priorA) const {
+  auto i = addrMap.find(priorA.addr);
+  if (i == addrMap.end()) return false;
+
+  auto& currA = i->second;
+  if (priorA.client != currA.client)  return false;
+  if (priorA.port != currA.port)      return false;
+  if (priorA.caps != currA.caps)      return false;
+  if (priorA.types != currA.types)    return false;
+  return true;
+}
 
 bool SeqSnapshot::hasConnectionBetween(
   const Address& sender, const Address& dest) const

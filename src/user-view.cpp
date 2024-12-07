@@ -64,6 +64,17 @@ namespace {
     Quit,
   };
 
+  enum class Command {
+    None,
+
+    Connect,
+    UndoConnect,
+    RedoConnect,
+    Disconnect,
+    UndoDisconnect,
+    RedoDisconnect,
+  };
+
   enum class FDSource : uint32_t {
     Signal,
     Seq,
@@ -91,9 +102,9 @@ namespace {
 
     void layout();
 
-    std::size_t selectedSender;
-    std::size_t selectedDest;
-    std::size_t selectedConnection;
+    std::size_t selectedSender = 0;
+    std::size_t selectedDest = 0;
+    std::size_t selectedConnection = 0;
 
     std::string message;
     void setMessage(const std::string&);
@@ -111,9 +122,20 @@ namespace {
     void render();
 
 
-    Mode mode;
+    Mode mode = Mode::Menu;
     Mode priorMode();
     void gotoMode(Mode);
+
+    Command lastCommand = Command::None;
+    Address lastSender;
+    Address lastDest;
+    bool validateConnect(const Address&, const Address&);
+    bool validateDisconnect(const Address&, const Address&);
+    void performCommand(Command, const Address&, const Address&);
+    void undoCommand();
+    void validateUndo();
+    bool canUndo() const;
+    bool canRedo() const;
 
     void handleEvent(const Term::Event& ev);
     bool handleGlobalEvent(const Term::Event& ev);
@@ -277,38 +299,41 @@ namespace {
   }
 
   void View::drawPrompt() {
-    const char* line1 = "";
+    const char* prompt = "";
+    const char* extra = "";
 
     switch (mode) {
       case Mode::Menu:
-        line1 = "Q)uit, C)onnect, D)isconnect";
+        prompt = "Q)uit, C)onnect, D)isconnect";
+        if (canUndo())        extra = ", U)ndo";
+        else if (canRedo())   extra = ", R)edo";
         break;
 
       case Mode::PickSender:
-        line1 = "Use arrows to pick a sender and hit return, or type a letter";
+        prompt = "Use arrows to pick a sender and hit return, or type a letter";
         break;
 
       case Mode::PickDest:
-        line1 = "Now pick a dest the same way";
+        prompt = "Now pick a dest the same way";
         break;
 
       case Mode::PickConnection: {
-        line1 = "Use arrows to pick a connection and hit return, or type a letter";
+        prompt = "Use arrows to pick a connection and hit return, or type a letter";
         break;
       }
 
       case Mode::ConfirmConnection:
       case Mode::ConfirmDisconnection: {
-        line1 = "Confirm with return, or cancel with ESC";
+        prompt = "Confirm with return, or cancel with ESC";
         break;
       }
 
       case Mode::Quit:
-        line1 = "Quitting...";
+        prompt = "Quitting...";
         break;
     }
     term.clearLine(topRowPrompt);
-    std::cout << "  >> " << line1;
+    std::cout << "  >> " << prompt << extra;
     term.clearLine(topRowPrompt + 1);
     if (message.length() > 0)
       std::cout << "  ** " << message;
@@ -348,6 +373,124 @@ namespace {
       case Mode::Quit:                    return Mode::Quit;
     }
     return mode; // never reached, appeases the compiler
+  }
+
+  bool View::validateConnect(const Address& s, const Address& d) {
+    return seqState.addressStillValid(s)
+      && seqState.addressStillValid(d)
+      && !seqState.hasConnectionBetween(s, d);
+  }
+  bool View::validateDisconnect(const Address& s, const Address& d) {
+    return seqState.addressStillValid(s)
+      && seqState.addressStillValid(d)
+      && seqState.hasConnectionBetween(s, d);
+  }
+
+  void View::performCommand(Command c, const Address& s, const Address& d) {
+    switch (c) {
+      case Command::None:
+        break;
+      
+      case Command::Connect:
+      case Command::RedoConnect:
+      case Command::UndoDisconnect: {
+        if (!validateConnect(s, d)) {
+          setMessage(fmt::format("Already connected: {} --> {}", s, d));
+          lastCommand = Command::None;
+          break;
+        }
+        seqState.seq.connect(s.addr, d.addr);
+        setMessage(fmt::format("Connected {} --> {}", s, d));
+        lastCommand = c;
+        lastSender = s;
+        lastDest = d;
+        break;
+      }
+
+      case Command::Disconnect:
+      case Command::RedoDisconnect:
+      case Command::UndoConnect: {
+        if (!validateDisconnect(s, d)) {
+          setMessage(fmt::format("Not connected: {} -x-> {}", s, d));
+          lastCommand = Command::None;
+          break;
+        }
+        seqState.seq.disconnect({s.addr, d.addr});
+        setMessage(fmt::format("Disconnected {} -x-> {}", s, d));
+        lastCommand = c;
+        lastSender = s;
+        lastDest = d;
+        break;
+      }
+    }
+  }
+
+  void View::validateUndo() {
+    switch (lastCommand) {
+      case Command::None:
+        break;
+      case Command::Connect:
+      case Command::RedoConnect:
+      case Command::UndoDisconnect:
+        // validating the potential disconnection a undo/redo would cause
+        if (!validateDisconnect(lastSender, lastDest)) {
+          lastCommand = Command::None;
+          setMessage("");
+        }
+        break;
+      case Command::Disconnect:
+      case Command::RedoDisconnect:
+      case Command::UndoConnect:
+        // validating the potential connection a undo/redo would cause
+        if (!validateConnect(lastSender, lastDest)) {
+          lastCommand = Command::None;
+          setMessage("");
+        }
+        break;
+    }
+  }
+
+  void View::undoCommand() {
+    switch (lastCommand) {
+      case Command::None:
+        break;
+      case Command::Connect:
+      case Command::RedoConnect:
+        performCommand(Command::UndoConnect, lastSender, lastDest);
+        break;
+      case Command::UndoConnect:
+        performCommand(Command::RedoConnect, lastSender, lastDest);
+        break;
+      case Command::Disconnect:
+      case Command::RedoDisconnect:
+        performCommand(Command::UndoDisconnect, lastSender, lastDest);
+        break;
+      case Command::UndoDisconnect:
+        performCommand(Command::RedoDisconnect, lastSender, lastDest);
+        break;
+    }
+  }
+
+  bool View::canUndo() const {
+    switch (lastCommand) {
+      case Command::Connect:
+      case Command::RedoConnect:
+      case Command::Disconnect:
+      case Command::RedoDisconnect:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  bool View::canRedo() const {
+    switch (lastCommand) {
+      case Command::UndoConnect:
+      case Command::UndoDisconnect:
+        return true;
+      default:
+        return false;
+    }
   }
 
   bool View::handleGlobalEvent(const Term::Event& ev) {
@@ -399,6 +542,7 @@ namespace {
       switch (ev.character) {
         case 'C':
         case 'c':
+          lastCommand = Command::None;
           if (seqState.ports.empty())
             setMessage("Connecting nothingness // Yields nothingness");
           else
@@ -407,8 +551,7 @@ namespace {
 
         case 'D':
         case 'd':
-        case 'X':
-        case 'x':
+          lastCommand = Command::None;
           if (seqState.connections.empty())
             setMessage("Everything is disconnected // Be at peace");
           else
@@ -421,10 +564,20 @@ namespace {
           return true;
 
         case 'R':
-        case 'r':     // hidden command, should never be needed
-          seqState.refresh();
-          layout();
-          return true;
+        case 'r':
+          if (canRedo()) {
+            undoCommand();
+            return true;
+          }
+          break;
+
+        case 'U':
+        case 'u':
+          if (canUndo()) {
+            undoCommand();
+            return true;
+          }
+          break;
       }
     }
     return false;
@@ -555,22 +708,13 @@ namespace {
           case Mode::ConfirmConnection: {
             auto& sender = seqState.ports[selectedSender];
             auto& dest   = seqState.ports[selectedDest];
-            if (seqState.hasConnectionBetween(sender, dest)) {
-              setMessage(fmt::format("Already connected: {} --> {}",
-                sender, dest));
-            }
-            else {
-              seqState.seq.connect(sender.addr, dest.addr);
-              setMessage(fmt::format("Connected {} --> {}", sender, dest));
-            }
+            performCommand(Command::Connect, sender, dest);
             break;
           }
 
           case Mode::ConfirmDisconnection: {
             auto& conn = seqState.connections[selectedConnection];
-            seqState.seq.disconnect({conn.sender.addr, conn.dest.addr});
-            setMessage(fmt::format("Disconnected {} -x-> {}",
-              conn.sender, conn.dest));
+            performCommand(Command::Disconnect, conn.sender, conn.dest);
             break;
           }
 
@@ -690,6 +834,7 @@ namespace {
         case FDSource::Seq:
           if (seqState.checkIfNeedsRefresh()) {
             seqState.refresh();
+            validateUndo();
             layout();
             gotoMode(Mode::Menu);
           }

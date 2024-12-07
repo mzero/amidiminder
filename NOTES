@@ -35,7 +35,7 @@ NOTES
     [x] man page update
     [x] --long-name flag (and remove dep on msg.h)
 
-[] view
+[x] view
     [x] refresh if ALSA Seq has updates
     [x] control-l to repaint
     [x] actually connect & disconnect
@@ -43,7 +43,7 @@ NOTES
     [x] turn off debugging
     [x] adjust selections on SeqSnapshot refresh
         [x] handle empty ports and connections
-    [] undo
+    [x] undo
     [x] man page
 
 

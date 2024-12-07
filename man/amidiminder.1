@@ -134,7 +134,19 @@ are for system level use are omitted.
 .in +7n
 .B -n, --numeric
 Sort items by ALSA id number, rather than by name.
+.TP
+\fBconnect \fIsender destination\fR
+.TP
+\fBdisconnect \fIsender destination\fR
+Make or removes a connections between two ports.
 
+The ports are specified as they are in rules files. See
+.BR amidiminder-profile (5)
+for details. Typically you can just use the client name and it will use the
+first sender or destination port as appropriate.
+
+These commands will not affect multiple connections, unless the specification
+uses a wildcard ('\fB*\fR') for the client or port explicitly.
 
 .SH ENVIRONMENT
 .IP RUNTIME_DIRECTORY

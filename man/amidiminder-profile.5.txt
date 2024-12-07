@@ -143,6 +143,7 @@ SYNTAX
                                   client:'port-name'   Launch Pad:'Live Port'
               (d) by number       client:number        Launch Pad:1
               (e) by wildcard     client:*             Launch Pad:*
+                                  *                    *
 
        (a)    This  is  the  most common way to specify a port, with with just
               the client name.  In this case in matches the first  in  or  out
@@ -158,10 +159,11 @@ SYNTAX
        (d)    Ports can be specified by number. Port numbers start at 0.
 
        (e)    This is a wildcard specification, and matches all ports  of  the
-              client.
+              client.   The  special  form of just a single wildcard character
+              (*) matches all ports on all clients. Use with caution.
 
        There are two special forms for a port specification. These specify all
-       ports on all clients that are tagged (by the device or software  creat‐
+       ports  on all clients that are tagged (by the device or software creat‐
        ing the ports) in a certain way.
 
                                           Syntax
@@ -169,21 +171,21 @@ SYNTAX
               (f) all hardware ports      .hw
               (g) all application ports   .app
 
-       Note  that there is no client specification, nor a colon (:) with these
+       Note that there is no client specification, nor a colon (:) with  these
        specifications.
 
 
    Note about port names
-       ALSA port names often have the client  name  repeated,  sometimes  more
+       ALSA  port  names  often  have the client name repeated, sometimes more
        than once.  Here are some examples:
 
               Pure Data:Pure Data Midi-In
               Midihub MH-1Z109TZ:Midihub MH-1Z109TZ MIDI 1
               nanoKONTROL:nanoKONTROL nanoKONTROL _ CTRL
 
-       These  long port names are difficult to read, and provide no useful ex‐
-       tra information since the client is always listed as  well.  Therefore,
-       amidiminder  shortens  these port names down by removing leading copies
+       These long port names are difficult to read, and provide no useful  ex‐
+       tra  information  since the client is always listed as well. Therefore,
+       amidiminder shortens these port names down by removing  leading  copies
        of the client name and whitespace.
 
        Client               Full Port Name                   Shortened Name
@@ -192,24 +194,24 @@ SYNTAX
        Midihub MH-1Z109TZ   Midihub MH-1Z109TZ MIDI 1        MIDI 1
        nanoKONTROL          nanoKONTROL nanoKONTROL _ CTRL   CTRL
 
-       In rules, names will be matched against this shortened port name.   Ex‐
+       In  rules, names will be matched against this shortened port name.  Ex‐
        act matches are matched against both the short, and original long name.
 
 
    Connection rules
-       A  connection  rule  consists of a port, a connector, and another port.
+       A connection rule consists of a port, a connector,  and  another  port.
        There are three types of connector:
 
        portA --> portB
               Specifies a connection from portA to portB.
 
        portA <-- portB
-              Specifies a connection in the other  direction,  from  portB  to
+              Specifies  a  connection  in  the other direction, from portB to
               portA
 
        portA <-> portB
-              This  is  just a short hand for specifying both rules above. As‐
-              suming both ports are in and out ports, the this will cause  two
+              This is just a short hand for specifying both rules  above.  As‐
+              suming  both ports are in and out ports, the this will cause two
               connections to be made, one in each direction.
 
        Note: In the forms above, any number of hyphens (-) are accepted in the
@@ -217,18 +219,18 @@ SYNTAX
 
 
    Disallow rules
-       A disallow rule has exactly the same form as a  connection  rule,  only
+       A  disallow  rule  has exactly the same form as a connection rule, only
        the connector has an x added in the arrow:
               portA -x-> portB
               portA <-x- portB
               portA <-x-> portB
 
-       These  rules  will  keep  a connection from being made when prior rules
+       These rules will keep a connection from being  made  when  prior  rules
        (including wildcard rules) would have made one.
 
 
 EXAMPLES
-       The directory /usr/share/amidiminder/examples/ contains several  useful
+       The  directory /usr/share/amidiminder/examples/ contains several useful
        examples of profile files.
 
        example.rules

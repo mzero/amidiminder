@@ -157,6 +157,7 @@ l lI lB x.
                   | client\fB:'\fIport-name\fI' | Launch Pad:'Live Port'
 (d) by number     | client\fB:\fInumber         | Launch Pad:1
 (e) by wildcard   | client\fB:*                 | Launch Pad:*
+                  | \fB*                        | *
 .TE
 .IP (a)
 This is the most common way to specify a port, with with just the client name.
@@ -171,6 +172,8 @@ A port can be specified by its exact, full name, by placing the name in quotes.
 Ports can be specified by number. Port numbers start at 0.
 .IP (e)
 This is a wildcard specification, and matches all ports of the client.
+The special form of just a single wildcard character (\fB*\fR) matches all
+ports on all clients. Use with caution.
 .PP
 There are two special forms for a port specification. These specify all
 ports on all clients that are tagged (by the device or software creating

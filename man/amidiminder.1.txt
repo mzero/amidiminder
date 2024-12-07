@@ -126,23 +126,36 @@ COMMANDS
               -n, --numeric
                    Sort items by ALSA id number, rather than by name.
 
+       connect sender destination
+
+       disconnect sender destination
+                   Make or removes a connections between two ports.
+
+                   The ports are specified as they are  in  rules  files.  See
+                   amidiminder-profile(5)  for details. Typically you can just
+                   use the client name and it will use  the  first  sender  or
+                   destination port as appropriate.
+
+                   These commands will not affect multiple connections, unless
+                   the specification uses a wildcard ('*') for the  client  or
+                   port explicitly.
 
 
 ENVIRONMENT
        RUNTIME_DIRECTORY
-              The path to the directory that has the UNIX-domain  socket  used
+              The  path  to the directory that has the UNIX-domain socket used
               to communicate between the control commands and the running dae‐
               mon.
 
-              Note: If the system configuration is changed such that the  dae‐
-              mon  is  launched with a non-default value for this variable, it
+              Note:  If the system configuration is changed such that the dae‐
+              mon is launched with a non-default value for this  variable,  it
               must also be set the same way when using any of the control com‐
               mands.
 
 
 FILES
        /run/amidiminder
-              The  default  location  of  the  runtime  directory. If the RUN‐
+              The default location of  the  runtime  directory.  If  the  RUN‐
               TIME_DIRECTORY environment variable is not set, this is the path
               used.
 

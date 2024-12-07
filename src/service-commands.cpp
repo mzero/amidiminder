@@ -1,9 +1,9 @@
-#include "amidiminder.h"
+#include "service.h"
 
 #include <iomanip>
 #include <sstream>
 
-#include "args.h"
+#include "args-service.h"
 #include "files.h"
 #include "msg.h"
 

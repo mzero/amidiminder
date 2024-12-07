@@ -1,8 +1,8 @@
-#include "client.h"
+#include "user.h"
 
 #include <vector>
 
-#include "args.h"
+#include "args-user.h"
 #include "msg.h"
 #include "rule.h"
 #include "seqsnapshot.h"

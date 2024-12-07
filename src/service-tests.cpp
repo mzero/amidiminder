@@ -1,4 +1,4 @@
-#include "amidiminder.h"
+#include "service.h"
 
 #include "msg.h"
 

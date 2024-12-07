@@ -3,16 +3,17 @@ NOTES
 
 # TODO
 
-[] split into two commands
+[x] split into two commands
     [x] amidiview.1 man page
-    [] amidiview should default to view command
-    [] amidiview -c, -d, & -x options to mirror aconnect
+    [x] amidiview should default to view command
 
 [] new handling of numbers in rules
     - name:num is partial string match
     - name:#num is ALSA id match
     - num:num is ALSA id match on both
     [] num:num should only be allowed on command line
+
+[] amidiview -c, -d, & -x options to mirror aconnect
 
 ## aconnect functionality
 

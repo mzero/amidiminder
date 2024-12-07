@@ -9,7 +9,7 @@ namespace {
 }
 
 namespace Args {
-  Command command = Command::Help; // the default command if none given
+  Command command = Command::View; // the default command if none given
 
   bool listClients = false;
   bool listPorts = false;
@@ -32,6 +32,9 @@ namespace Args {
     app.set_version_flag("--version", appVersion);
     app.require_subcommand(0, 1);
 
+    CLI::App *viewApp = app.add_subcommand("view", "Interactive viewer (default command)");
+    viewApp->parse_complete_callback([](){ command = Command::View; });
+
     CLI::App *listApp = app.add_subcommand("list", "List ports and connections");
     listApp->parse_complete_callback([](){ command = Command::List; });
     listApp->add_flag("--clients",        listClients,      "Output a list of clients");
@@ -47,9 +50,6 @@ namespace Args {
     plainFlag->option_text(" ");  // no need to spam the help with excludes info
     detailFlag->option_text(" ");
     listApp->footer("Ports and connections are listed if no output is explicitly specified.");
-
-    CLI::App *viewApp = app.add_subcommand("view", "Interactive viewer");
-    viewApp->parse_complete_callback([](){ command = Command::View; });
 
     CLI::App *connectApp = app.add_subcommand("connect", "Connect two ports");
     connectApp->parse_complete_callback([](){ command = Command::Connect; });

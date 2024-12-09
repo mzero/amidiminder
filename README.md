@@ -1,5 +1,5 @@
 # amidiminder & amidiview
-**amidiminder:** an ALSA utility to keep your MIDI devices connected
+**amidiminder:** an ALSA utility to keep your MIDI devices connected \
 **amidiview:** a tool for managing connections
 
 ### The problem
@@ -11,118 +11,72 @@
 
 ### The solution
 
-`amidiminder` is a program that runs as a service. It will:
+`amidiminder` takes care of this:
 
-  1. Reads a rules file of connections you'd like made.
-
-  2. When the MIDI devices & software appear - `amidimider` will
-     automatically connect them according to the rules.
-
-  3. It also Watches any connections that you make with `aconnect` or that your
-     software makes, and remembers them too.
-
-  4. If any MIDI port goes away (power cycle, pulled USB cord, etc..), ALSA
-     will silently remove the connections...
-     ... But when the MIDI port comes back - `amidimider`'s got your back and
-     will connect them right back up again, just as they were.
+* It tracks what connections were made between ports, and automatically
+  reestablishes those connections when ports reattach to the system.
+* You can specify a profile of things to connect and then tell `amidiminder` to
+  reconfigure your system to that profile in one command.
+* The whole desired connection state is persistent, even across system reboots,
+  so that the configuration is quickly restored once devices power back up and
+  applications are restarted.
 
 ### A bonus
 
 `amidiview` provides an interactive terminal interface for looking at, and
 modifying the connections on your system. Try it... you won't regret it!
 
-```sh
-& amidiview
-```
+  ```console
+  $ amidiview
+  ┌─ Ports ───────────────────────────────────────
+  │
+  │    MicroMonsta 2      : MIDI 1     [ 32:0] <->
+  │    Midi Through       : Port-0     [ 14:0] <->
+  │    Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
+  │    Midihub MH-1Z109TZ : MIDI 2     [ 36:1] <->
+  │    Midihub MH-1Z109TZ : MIDI 3     [ 36:2] <->
+  │    Midihub MH-1Z109TZ : MIDI 4     [ 36:3] <->
+  │    Pure Data          : Midi-In 1  [130:0] <--
+  │    Pure Data          : Midi-Out 1 [130:1] -->
 
-Further, it includes all the functionality of `aconnect` (list, connect,
-disconnect), but allowing you to use `amidiminder`'s easy syntax for
-specifying ports. Often you can just use a part of the device name:
+  ┌─ Connections ─────────────────────────────────────────────────────────────────────
+  │
+  │    Midihub MH-1Z109TZ:MIDI 1 [36:0]+ --> Pure Data:Midi-In 1 [130:0]+
+  │    Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
 
-```sh
-& amidiview list
-Ports:
-    MicroMonsta 2      : MIDI 1     [ 32:0] <->
-    Midi Through       : Port-0     [ 14:0] <->
-    Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
-    Midihub MH-1Z109TZ : MIDI 2     [ 36:1] <->
-    Midihub MH-1Z109TZ : MIDI 3     [ 36:2] <->
-    Midihub MH-1Z109TZ : MIDI 4     [ 36:3] <->
-    Pure Data          : Midi-In 1  [130:0] <--
-    Pure Data          : Midi-Out 1 [130:1] -->
-Connections:
+    >> Q)uit, C)onnect, D)isconnect, U)ndo
+  ```
 
-& amidiview connect Pure Monsta
-Connected Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+It also includes all the command line functionality of `aconnect` (list, connect,
+disconnect), but with very readable output, and improved syntax for specifying
+ports.
 
-& amidiview connect hub:2 Pure
-Connected Midihub MH-1Z109TZ:MIDI 2 [36:1] --> Pure Data:Midi-In 1 [130:0]+
+# Next Steps
 
-& amidiview list
-Ports:
-    MicroMonsta 2      : MIDI 1     [ 32:0] <->
-    Midi Through       : Port-0     [ 14:0] <->
-    Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
-    Midihub MH-1Z109TZ : MIDI 2     [ 36:1] <->
-    Midihub MH-1Z109TZ : MIDI 3     [ 36:2] <->
-    Midihub MH-1Z109TZ : MIDI 4     [ 36:3] <->
-    Pure Data          : Midi-In 1  [130:0] <--
-    Pure Data          : Midi-Out 1 [130:1] -->
-Connections:
-    Midihub MH-1Z109TZ:MIDI 2 [36:1] --> Pure Data:Midi-In 1 [130:0]+
-    Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
-```
+**Installing:**
+1. Go to the [Releases](https://github.com/mzero/amidiminder/releases) page
+2. Download the appropriate `.deb` file for your system
+3. Install it with `apt`:
+  ```console
+  $ sudo apt install ./amidiminder*.deb
+  ```
 
+**User Guide:** see `USER-GUIDE.md`
 
-## Building
-
-Prerequisites:
-  * g++, 8 or later
-  * make
-  * libasound2-dev
-  * libfmt-dev
-
-```sh
-sudo apt install g++ make libasound2-dev libfmt-dev
-```
-
-Clone this repo and run `make`:
-
-```sh
-git clone https://github.com/mzero/amidiminder.git
-cd amidiminder
-make
-make deb
-```
-
-Outputs:
-
- - build executables: `build/amidiminder` & `build/amidiview`.
- - deb package, which is placed in the directory above.
-
-
-## Install
-
-Installing the built deb package will install a systemd service that runs
-`amidiminder` at startup.
-
-```sh
-sudo apt install ../amidiminder_*.deb
-```
-
-That's it. — It's installed. — It's running — You're done!
-
-## Configuration
-
+**Building:** See `BUILDING.md`
 
 ---
 
+### Authors
 
-## Credits & Thanks
+Mark Lentczner - https://github.com/mzero \
+John Horigan - https://github.com/MtnViewJohn
 
-### Related work
+### Thanks
 
-[amidiauto](https://github.com/BlokasLabs/amidiauto) by Blokas Labs.
+Blokas Labs https://github.com/BlokasLabs \
+for their work on Patchbox OS, great HW, and pushing us to make this tool
+even better.
 
 ### Open source code used
 

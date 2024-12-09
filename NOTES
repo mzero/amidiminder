@@ -3,7 +3,7 @@ NOTES
 
 # TODO
 
-[] fix command prompt in shell examples in README
+[x] fix command prompt in shell examples in README
 [] instructions for migrating from older amidiminder
     /etc/amidiminder.rules
 [] examples about connecting

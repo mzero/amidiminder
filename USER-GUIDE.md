@@ -1,0 +1,251 @@
+# Using amidiminder & amidiview
+
+There are three components to this package:
+
+* `amidiminder.service` -  a systemd service
+  keeping track of connections and ports.
+* `amidiminder` command for managing profiles and the service
+* `amidiview` command for managing connections, similar to `aconnect`
+
+
+## Getting Started
+
+If you've just installed the package... you're ready to go! There is no
+configuration needed.
+
+Get a listing of what is going on in your system:
+
+  ```console
+  $ amidiview list
+  Ports:
+      MicroMonsta 2      : MIDI 1     [ 32:0] <->
+      Midi Through       : Port-0     [ 14:0] <->
+      Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
+      Midihub MH-1Z109TZ : MIDI 2     [ 36:1] <->
+      Midihub MH-1Z109TZ : MIDI 3     [ 36:2] <->
+      Midihub MH-1Z109TZ : MIDI 4     [ 36:3] <->
+      Pure Data          : Midi-In 1  [130:0] <--
+      Pure Data          : Midi-Out 1 [130:1] -->
+  Connections:
+      MicroMonsta 2:MIDI 1 [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
+      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+  ```
+
+You can get an interactive view of the same information, with the ability
+to make and break connections:
+
+  ```console
+  $ amidiview
+  ┌─ Ports ───────────────────────────────────────
+  │
+  │    MicroMonsta 2      : MIDI 1     [ 32:0] <->
+  │    Midi Through       : Port-0     [ 14:0] <->
+  │    Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
+  │    Midihub MH-1Z109TZ : MIDI 2     [ 36:1] <->
+  │    Midihub MH-1Z109TZ : MIDI 3     [ 36:2] <->
+  │    Midihub MH-1Z109TZ : MIDI 4     [ 36:3] <->
+  │    Pure Data          : Midi-In 1  [130:0] <--
+  │    Pure Data          : Midi-Out 1 [130:1] -->
+
+  ┌─ Connections ─────────────────────────────────────────────────────────────────────
+  │
+  │    MicroMonsta 2:MIDI 1 [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
+  │    Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+
+  >> Q)uit, C)onnect, D)isconnect
+  ```
+
+It's easy to use, just follow the prompts at the bottom of the screen.
+
+> *Note: You need to be using a terminal window that supports XTERM style controls.*
+> *Don't worry, pretty much everything these days does, so this should just work.*
+
+At this point, you can just connect and disconnect ports as you need with
+`amidiview`.
+
+## The Service
+First thing is to make sure the service is running. You can check with:
+
+  ```console
+  $ amidiminder status
+  Daemon is running.
+      1 profile rules.
+      1 observed rules.
+      8 active ports.
+      2 active connections
+  ```
+
+You can make connections as you need, and
+`amidiminder` will remember them. If the devices get unplugged, then later
+replugged, the service will reconnect them up for you.  This will even work
+across reboots.
+
+If it isn't running, then you should check with `systemctl` and possibly
+enable and start it if needed:
+
+  ```console
+  $ systemctl status amidiminder.service
+  amidiminder.service - ALSA MIDI minder daemon
+      Loaded: loaded (/lib/systemd/system/amidiminder.service; enabled; preset: enabled)
+      Active: inactive (dead) since Mon 2024-12-09 13:18:27 PST; 5s ago
+  ...
+
+  $ sudo systemctl enable amidiminder.service # if needed
+  $ sudo systemctl start amidiminder.service # if inactive
+  ```
+
+## Intermission
+
+You don't need to learn anything more to use `amidiview` and have the
+`amidiminder` service keep track of connections, and re-make them for you
+as your equipment gets plugged and unplugged, and on reboot.
+
+Read on to learn how you can set up whole configurations, and set them
+up in a single command.
+
+## Profiles
+
+The service remembers rules for what should be connected to what. It watches
+the system and stores what it sees connecting (and disconnecting) in the
+*observed rules*. You don't really have to think about these, but you can
+see them if you like:
+
+  ```console
+  $ amidiminder save -  # the dash means to save to stdout, not a file
+  # Profile rules:
+
+  # Observed rules:
+  "Pure Data":"Midi-Out 1" --> "MicroMonsta 2":"MIDI 1"
+  "MicroMonsta 2":"MIDI 1" --> "Pure Data":"Midi-In 1"
+  ```
+
+The service also follows a second set of rules that you can supply, called the
+*profile rules*.  You write a set of rules in a file, then load them into
+the service. Once loaded, they'll stay in force until you load another set,
+even across system reboots.
+
+### An example
+
+Say your system has a **Launchpad** controller, a synth call **MicroMonsta**,
+and you are running the software **Pure Data**:
+
+  ```console
+  $ amidiview list
+  Ports:
+      Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
+      Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
+      Launchpad Pro MK3 : LPProMK3 MIDI [ 32:0] <->
+      MicroMonsta 2     : MIDI 1        [ 24:0] <->
+      Midi Through      : Port-0        [ 14:0] <->
+      Pure Data         : Midi-In 1     [130:0] <--
+      Pure Data         : Midi-Out 1    [130:1] -->
+  Connections:
+      -- no connections --
+  ```
+Edit a file, say **live-pd-performance.rules**, to have:
+
+  ```
+  Pure Data <-- Launchpad
+  Pure Data --> Monsta
+  ```
+
+If you load this profile into `amidiminder`, then it will automatically
+connect your devices this way when they are present:
+
+  ```console
+  $ amidiminder load live-pd-performance.rules
+
+  $ amidiview list
+  Ports:
+      Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
+      Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
+      Launchpad Pro MK3 : LPProMK3 MIDI [ 32:0] <->
+      MicroMonsta 2     : MIDI 1        [ 24:0] <->
+      Midi Through      : Port-0        [ 14:0] <->
+      Pure Data         : Midi-In 1     [130:0] <--
+      Pure Data         : Midi-Out 1    [130:1] -->
+  Connections:
+      Launchpad Pro MK3:LPProMK3 MIDI [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
+      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [24:0]+
+  ```
+
+Notice that the rules are simple:
+
+- You can use any sensible portion of the device name you like
+- The rules can go in either direction, left to right or right to left
+- If you don't specify a port, the first sensible port on
+  a device will be used
+
+----
+
+If you want to also hook up the DIN port of the Launchpad, you could type
+
+  ```console
+  $ amidiview connect Launchpad:DIN Pure
+  Connected Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]+
+  ```
+
+Notice:
+
+  - On the command line, the connection is always left to right
+  - Any sensible part of the port name is fine
+  - Because it's a command line, we only typed `Pure`, if we wanted to use
+    the full name we'd have to have quoted it: `"Pure Data"`.
+  - It'll only be able to connect if the devices are present
+  - You could have used the interactive mode of `amidiview` and connected it
+    that way with even less typing.
+
+You can look at the server's rules now:
+
+  ```console
+  $ amidiminder save -
+  # Profile rules:
+  Pure Data <-- Launchpad
+  Pure Data --> Monsta
+
+  # Observed rules:
+  "Launchpad Pro MK3":"LPProMK3 DIN" --> "Pure Data":"Midi-In 1"
+  ```
+
+The connection made by hand (via `amidiview`) was observed and added to the
+rules.  This will work if even if you used other software (such as `aconnect`
+or a DAW) to make the connection.
+
+If you reload the profile, or tell `amidiminder` to reset, then
+the observed rules are dropped, and the rules of the loaded profile are used
+to make connections.
+
+We could add this rule to our file:
+
+  ```
+  Pure Data <-- Launchpad
+  Pure Data <-- Launchpad:DIN
+  Pure Data --> Monsta
+  ```
+
+And load the file again:
+
+  ```console
+  $ amidiminder load live-pd-performance.rules
+
+  $ amidiview list --connections
+  Connections:
+      Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]+
+      Launchpad Pro MK3:LPProMK3 MIDI [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
+      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [24:0]+
+
+  $ amidiminder save -
+  # Profile rules:
+  Pure Data <-- Launchpad
+  Pure Data <-- Launchpad:DIN
+  Pure Data --> Monsta
+  ```
+
+## More Info
+
+The man pages have more detailed information:
+
+* amidiview.1
+* amidiminder.1
+* amidiminder-profile.5
+* amidiminder-daemon.8

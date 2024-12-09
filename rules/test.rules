@@ -17,6 +17,13 @@
 'test client' --> test              # PASS
 test'client --> test                # PASS internal apostrophe
 'test client --> test               # FAIL no closing quote
+"test:ing" --> test                 # PASS colon inside quotes
+'test:ing' --> test                 # PASS colon inside quotes
+"test:ing":thing --> test           # PASS colon inside quotes
+'test:ing':thing --> test           # PASS colon inside quotes
+test:"abc:def" --> test             # PASS colon inside quotes
+test:'abc:def' --> test             # PASS colon inside quotes
+test:abc:def --> test               # FAIL extra colon
 test two --> test                   # PASS
   test three --> test               # PASS indented
 test:* --> thing                    # PASS
@@ -55,7 +62,7 @@ this -x-> *                         # PASS
 this <-x- *                         # PASS
 this <-x-> that                     # PASS
 this --x--> *                       # PASS
-test:3 --> that                     # PASS
-test:=3 --> that                    # PASS
+test:3 --> that                     # PASS partial name match against '3'
+test:=3 --> that                    # PASS ALSA id match against 3
 test:=three --> that                # FAIL bad number
 42:3 --> that                       # FAIL id matches not allowed in rules

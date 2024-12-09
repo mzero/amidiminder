@@ -3,6 +3,18 @@ NOTES
 
 # TODO
 
+[] fix command prompt in shell examples in README
+[] instructions for migrating from older amidiminder
+    /etc/amidiminder.rules
+[] examples about connecting
+    [] how to use the sample files
+    [] getting started
+
+[x] parse exact match port and client names with colons in them
+    - touchosc2midi & python-mido conspire to have port names like:
+      'RtMidiIn Client:Testing 129:0'
+[] don't die if state rules are unparseable, just move them aside
+
 
 ## future
 

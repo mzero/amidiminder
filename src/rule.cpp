@@ -223,7 +223,7 @@ namespace {
     std::smatch m;
 
     static const std::regex clientRE(
-      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|([^*\"'].*)");
+      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|([^*\"'=.].*)");
     if (!std::regex_match(s, m, clientRE))
       throw ParseError("malformed client '{}'", s);
 
@@ -240,7 +240,7 @@ namespace {
     std::smatch m;
 
     static const std::regex portRE(
-      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|=(\\d+)|([^*\"'=].*)");
+      "(\\*)|\"([^\"]+)\"|\'([^\']+)\'|=(\\d+)|([^*\"'=.].*)");
     if (!std::regex_match(s, m, portRE))
       throw ParseError("malformed port '{}'", s);
 
@@ -277,7 +277,9 @@ namespace {
       return AddressSpec(ClientSpec::wildcard(), PortSpec::type(type));
     }
 
-    static const std::regex addressRE("([^:.]*)(:([^:.]*))?");
+    static const std::regex addressRE(
+          "([^\"':][^:]*|\"[^\"]+\"|\'[^\']+\')"
+        "(:([^\"':][^:]*|\"[^\"]+\"|\'[^\']+\'))?");
     if (!std::regex_match(s, m, addressRE))
       throw ParseError("malformed address '{}'", s);
 

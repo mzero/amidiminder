@@ -96,7 +96,7 @@ namespace {
     ConnectionRules& rules)   // receives parsed rules
   {
     if (!Files::fileExists(filePath)) {
-      Msg::output("Rules file {} dosn't exist, no rules read.", filePath);
+      Msg::output("Rules file {} dosn't exist, no rules loaded.", filePath);
       contents.clear();
       rules.clear();
       return;
@@ -105,8 +105,33 @@ namespace {
     std::string newContents = Files::readFile(filePath);
 
     ConnectionRules newRules;
-    if (!parseRules(newContents, newRules))
-      throw Msg::runtime_error("Parse error reading rules file {}", filePath);
+    if (!parseRules(newContents, newRules)) {
+      Msg::error("Parse error reading rules file {}", filePath);
+
+      std::string brokenPath = filePath + ".broken";
+      std::ostringstream brokenContents;
+      brokenContents
+        << "# Below are the original contents of " << filePath << '\n'
+        << "# It did not parse on startup, so it was moved here\n"
+        << "# To see where the parse errors are, run:\n"
+        << "#       amidiminder check <this-file>\n"
+        << "\n"
+        << newContents;
+      Files::writeFile(brokenPath, brokenContents.str());
+
+      std::ostringstream replacementContents;
+      replacementContents
+        << "# Original contents had parse errors.\n"
+        << "# Contents moved to " << brokenPath << '\n';
+      Files::writeFile(filePath, replacementContents.str());
+
+      Msg::error("Moved contents to {}", brokenPath);
+      Msg::error("Reset {}, no rules loaded", filePath);
+
+      contents.clear();
+      rules.clear();
+      return;
+    }
 
     contents.swap(newContents);
     rules.swap(newRules);

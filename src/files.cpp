@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string.h>   // for ::stderror
 #include <sys/stat.h>
 
 #include "msg.h"

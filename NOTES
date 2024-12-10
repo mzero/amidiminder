@@ -4,11 +4,11 @@ NOTES
 # TODO
 
 [x] fix command prompt in shell examples in README
-[] instructions for migrating from older amidiminder
+[x] instructions for migrating from older amidiminder
     /etc/amidiminder.rules
-[] examples about connecting
+[x] examples about connecting
     [] how to use the sample files
-    [] getting started
+    [x] getting started
 
 [x] list command: no ports, no connections, no clients? say something
 

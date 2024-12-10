@@ -7,8 +7,17 @@ There are three components to this package:
 * `amidiminder` command for managing profiles and the service
 * `amidiview` command for managing connections, similar to `aconnect`
 
+**Contents**
+- [Getting started](#getting-started)
+- [The service](#the-service)
+- [Intermission](#intermission)
+- [Profiles](#profiles)
+  - [An example](#an-example)
+  - [Sample profiles](#sample-profiles)
+- [More Info](#more-info)
+- [Migrating from older versions](#migrating-from-older-versions)
 
-## Getting Started
+## Getting started
 
 If you've just installed the package... you're ready to go! There is no
 configuration needed.
@@ -63,7 +72,11 @@ It's easy to use, just follow the prompts at the bottom of the screen.
 At this point, you can just connect and disconnect ports as you need with
 `amidiview`.
 
-## The Service
+> **Pro tip:** *If you leave a terminal window open, running `amidiview`, it will*
+> *dynamically update as you plug in devices, start software, and make*
+> *connections.*
+
+## The service
 First thing is to make sure the service is running. You can check with:
 
   ```console
@@ -240,6 +253,17 @@ And load the file again:
   Pure Data <-- Launchpad:DIN
   Pure Data --> Monsta
   ```
+### Sample profiles
+
+There are a few sample profiles installed with the system that you look at,
+and start with to modify and make your own. The files reside in:
+
+     /usr/share/doc/amidiminder/examples/
+
+* **example.rules** - examples of different kinds of rules and their syntax
+* **generic.rules** - connects all hardware ports to all software ports
+* **looper.rules** - an example of a profile for a Mark's live performance setup
+
 
 ## More Info
 
@@ -249,3 +273,49 @@ The man pages have more detailed information:
 * amidiminder.1
 * amidiminder-profile.5
 * amidiminder-daemon.8
+
+
+## Migrating from older versions
+
+Prior to 0.80 release, `amidiminder` simply read the profile at the fixed
+location `/etc/amidiminder.rules`. If you have custom rules there, you should:
+
+1. Move that file someplace within your home directory.
+2. Edit it if needed (see below)
+3. Load it with `amidiminder load <your-file>`
+
+There is one breaking rule syntax change. Specifying a port by ALSA port id
+has changed:
+
+Consider this set of ports:
+
+  ```console
+  $ amidiview list --ports
+  Ports:
+      Midi Through       : Port-0     [ 14:0] <->
+      Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
+      Midihub MH-1Z109TZ : MIDI 2     [ 36:1] <->
+      Midihub MH-1Z109TZ : MIDI 3     [ 36:2] <->
+      Midihub MH-1Z109TZ : MIDI 4     [ 36:3] <->
+      Pure Data          : Midi-In 1  [130:0] <--
+      Pure Data          : Midi-Out 1 [130:1] -->
+  ```
+
+
+**Old syntax:** *(prior to 0.90)*
+
+> `Midihub:2` — meant the port with id 2, which is the *third* port
+
+**New syntax:** *(0.90 and later)*
+
+> `Midihub:2` - means the port with '2' in it's name, which for Midihub will be the second port \
+> `Midihub:=2` - means the port with id 2
+
+If you had rules based on id numbers, add the `=` between the `:` and the number.
+
+On the command line with `amidiview`, you can use id numbers for client and
+port, just like `aconnect`. In this case, you don't use `=`:
+
+    amidiview connect 36:1 130:0
+
+As ALSA client id numbers are not stable, they aren't allowed in rule files.

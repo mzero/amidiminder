@@ -68,6 +68,7 @@
 			"numbers": "cpp",
 			"csignal": "cpp"
 		},
-		"C_Cpp.default.cppStandard": "c++17"
+		"C_Cpp.default.cppStandard": "c++17",
+		"markdown.extension.toc.levels": "2..6"
 	}
 }

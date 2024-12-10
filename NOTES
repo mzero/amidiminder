@@ -10,6 +10,8 @@ NOTES
     [] how to use the sample files
     [] getting started
 
+[x] list command: no ports, no connections, no clients? say something
+
 [x] parse exact match port and client names with colons in them
     - touchosc2midi & python-mido conspire to have port names like:
       'RtMidiIn Client:Testing 129:0'

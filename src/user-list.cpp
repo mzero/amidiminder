@@ -34,6 +34,8 @@ namespace User {
             std::cout << " : " << c.details;
           std::cout << '\n';
         }
+        if (s.clients.empty())
+          std::cout << "    -- no clients --\n";
       }
     }
 
@@ -54,6 +56,8 @@ namespace User {
             fmt::print("        {}\n\n", p.capsString());
           }
         }
+        if (s.ports.empty())
+          std::cout << "    -- no ports --\n";
       }
     }
 
@@ -69,6 +73,8 @@ namespace User {
         for (const auto& c : s.connections) {
           fmt::print("    {} --> {}\n", c.sender, c.dest);
         }
+        if (s.connections.empty())
+          std::cout << "    -- no connections --\n";
       }
     }
 

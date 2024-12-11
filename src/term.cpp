@@ -140,7 +140,7 @@ Term::Event Term::getEvent() {
     return ev;
   }
 
-  if (s == "\x1b\1xb") {
+  if (s == "\x1b\x1b") {
     remainingInput(s, 2);
     ev.type = EventType::Char;
     ev.character = '\x1b';

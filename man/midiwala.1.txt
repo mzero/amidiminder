@@ -107,8 +107,8 @@ COMMANDS
               (d)  ALSA  ID  numbers  can be used, but if so, must be used for
               both client and port.
 
-              These matching rules are the same as used  by  amidiminder  pro‐
-              files. See amidiminder-profile(5) for details.
+              These matching rules are the same as  used  by  midiminder  pro‐
+              files. See midiminder-profile(5) for details.
 
        remove-all
               Removes all connections in the system.
@@ -119,7 +119,7 @@ COMMANDS
 
 
 SEE ALSO
-       amidiminder-profile(5)
+       midiminder-profile(5)
 
 
 

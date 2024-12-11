@@ -114,7 +114,7 @@ namespace {
         << "# Below are the original contents of " << filePath << '\n'
         << "# It did not parse on startup, so it was moved here\n"
         << "# To see where the parse errors are, run:\n"
-        << "#       amidiminder check <this-file>\n"
+        << "#       midiminder check <this-file>\n"
         << "\n"
         << newContents;
       Files::writeFile(brokenPath, brokenContents.str());
@@ -192,7 +192,7 @@ MidiMinder::MidiMinder() {
   std::signal(SIGHUP, signal_handler);
   std::signal(SIGINT, signal_handler);
   std::signal(SIGTERM, signal_handler);
-  seq.begin("amidiminder");
+  seq.begin("midiminder");
 }
 
 MidiMinder::~MidiMinder() {

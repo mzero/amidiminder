@@ -10,7 +10,7 @@
 
 # You can start with this profile, then connect or disconnect the ports as
 # you need, and then use this command to save out a new profile:
-#       amidiminder save my-profile.rules
+#       midiminder save my-profile.rules
 
 .hw <---> .app
   # Interconnect all hardware and application ports.

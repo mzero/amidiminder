@@ -3,15 +3,15 @@ AMIDIMINDER-DAEMON(8)       System Manager's Manual      AMIDIMINDER-DAEMON(8)
 
 
 NAME
-       amidiminder-daemon - MIDI device connection daemon
+       midiminder-daemon - MIDI device connection daemon
 
 
 SYNOPSIS
-       amidiminder [-v|-q] daemon [-p]
+       midiminder [-v|-q] daemon [-p]
 
 
 DESCRIPTION
-       The amidiminder daemon maintains a set of desired connections (the pro‐
+       The  midiminder daemon maintains a set of desired connections (the pro‐
        file) between ALSA sequencer MIDI ports.
 
        ALSA provides library calls, and a user tool aconnect(1) for connecting
@@ -22,7 +22,7 @@ DESCRIPTION
        plugged  and  replugged, or power cycled, losing these connections is a
        significant frustration.
 
-       The amidiminder daemon takes care of this: It tracks  what  connections
+       The midiminder daemon takes care of this: It  tracks  what  connections
        were  desired between ports, and automatically reestablishes those con‐
        nections when ports reattach to the system. Connections (and disconnec‐
        tions)  initiated  by the user (or applications) are tracked and remem‐
@@ -37,7 +37,7 @@ DESCRIPTION
               The profile is a list of rules for which ports to connect. It is
               written  in  a  simple  syntax that makes it possible to express
               these connections, even when the  devices  aren't  current  con‐
-              nected.  The  commands in amidiminder(1) are used by the user to
+              nected.  The  commands  in midiminder(1) are used by the user to
               load, save, and reset the profile. The user  can  have  multiple
               profile files prepared, and by loading them, reconfigure all the
               connections with one command.
@@ -49,7 +49,7 @@ DESCRIPTION
               file rules, should they conflict.  This allows a change from the
               current profile to be just as robust as the profile itself.  The
               user  can also easily drop the observed rules by loading another
-              profile, or using the amidiminder reset command.
+              profile, or using the midiminder reset command.
 
        Both parts of the connection state are persisted into the  file  system
        so that they survive restarts of the daemon, or the whole system.
@@ -89,18 +89,18 @@ ENVIRONMENT
               to communicate between the control commands and the running dae‐
               mon.
 
-              Note: If the system  configuration  is  changed  such  that  the
-              amidiminder daemon is launched with a non-default value for this
+              Note: If the system configuration is changed such that the midi‐
+              minder  daemon  is  launched  with  a non-default value for this
               variable, it must also be set the same way when using any of the
               control commands.
 
 
 FILES
-       /var/lib/amidiminder
+       /var/lib/midiminder
               The default location of the state directory.
 
 
-       /run/amidiminder
+       /run/midiminder
               The default location of the runtime directory.
 
 
@@ -119,7 +119,7 @@ FILES
 
 
 SEE ALSO
-       amidiminder(1), amidiminder-profile(5)
+       midiminder(1), midiminder-profile(5)
 
 
 

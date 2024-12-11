@@ -1,10 +1,10 @@
-# Using amidiminder & midiwala
+# Using midiminder & midiwala
 
 There are three components to this package:
 
-* `amidiminder.service` -  a systemd service
+* `midiminder.service` -  a systemd service
   keeping track of connections and ports.
-* `amidiminder` command for managing profiles and the service
+* `midiminder` command for managing profiles and the service
 * `midiwala` command for managing connections, similar to `aconnect`
 
 **Contents**
@@ -80,7 +80,7 @@ At this point, you can just connect and disconnect ports as you need with
 First thing is to make sure the service is running. You can check with:
 
   ```console
-  $ amidiminder status
+  $ midiminder status
   Daemon is running.
       1 profile rules.
       1 observed rules.
@@ -89,7 +89,7 @@ First thing is to make sure the service is running. You can check with:
   ```
 
 You can make connections as you need, and
-`amidiminder` will remember them. If the devices get unplugged, then later
+`midiminder` will remember them. If the devices get unplugged, then later
 replugged, the service will reconnect them up for you.  This will even work
 across reboots.
 
@@ -97,20 +97,20 @@ If it isn't running, then you should check with `systemctl` and possibly
 enable and start it if needed:
 
   ```console
-  $ systemctl status amidiminder.service
-  amidiminder.service - ALSA MIDI minder daemon
-      Loaded: loaded (/lib/systemd/system/amidiminder.service; enabled; preset: enabled)
+  $ systemctl status midiminder.service
+  midiminder.service - ALSA MIDI minder daemon
+      Loaded: loaded (/lib/systemd/system/midiminder.service; enabled; preset: enabled)
       Active: inactive (dead) since Mon 2024-12-09 13:18:27 PST; 5s ago
   ...
 
-  $ sudo systemctl enable amidiminder.service # if needed
-  $ sudo systemctl start amidiminder.service # if inactive
+  $ sudo systemctl enable midiminder.service # if needed
+  $ sudo systemctl start midiminder.service # if inactive
   ```
 
 ## Intermission
 
 You don't need to learn anything more to use `midiwala` and have the
-`amidiminder` service keep track of connections, and re-make them for you
+`midiminder` service keep track of connections, and re-make them for you
 as your equipment gets plugged and unplugged, and on reboot.
 
 Read on to learn how you can set up whole configurations, and set them
@@ -124,7 +124,7 @@ the system and stores what it sees connecting (and disconnecting) in the
 see them if you like:
 
   ```console
-  $ amidiminder save -  # the dash means to save to stdout, not a file
+  $ midiminder save -  # the dash means to save to stdout, not a file
   # Profile rules:
 
   # Observed rules:
@@ -162,11 +162,11 @@ Edit a file, say **live-pd-performance.rules**, to have:
   Pure Data --> Monsta
   ```
 
-If you load this profile into `amidiminder`, then it will automatically
+If you load this profile into `midiminder`, then it will automatically
 connect your devices this way when they are present:
 
   ```console
-  $ amidiminder load live-pd-performance.rules
+  $ midiminder load live-pd-performance.rules
 
   $ midiwala list
   Ports:
@@ -211,7 +211,7 @@ Notice:
 You can look at the server's rules now:
 
   ```console
-  $ amidiminder save -
+  $ midiminder save -
   # Profile rules:
   Pure Data <-- Launchpad
   Pure Data --> Monsta
@@ -224,7 +224,7 @@ The connection made by hand (via `midiwala`) was observed and added to the
 rules.  This will work if even if you used other software (such as `aconnect`
 or a DAW) to make the connection.
 
-If you reload the profile, or tell `amidiminder` to reset, then
+If you reload the profile, or tell `midiminder` to reset, then
 the observed rules are dropped, and the rules of the loaded profile are used
 to make connections.
 
@@ -239,7 +239,7 @@ We could add this rule to our file:
 And load the file again:
 
   ```console
-  $ amidiminder load live-pd-performance.rules
+  $ midiminder load live-pd-performance.rules
 
   $ midiwala list --connections
   Connections:
@@ -247,7 +247,7 @@ And load the file again:
       Launchpad Pro MK3:LPProMK3 MIDI [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
       Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [24:0]+
 
-  $ amidiminder save -
+  $ midiminder save -
   # Profile rules:
   Pure Data <-- Launchpad
   Pure Data <-- Launchpad:DIN
@@ -258,7 +258,7 @@ And load the file again:
 There are a few sample profiles installed with the system that you look at,
 and start with to modify and make your own. The files reside in:
 
-     /usr/share/doc/amidiminder/examples/
+     /usr/share/doc/midiminder/examples/
 
 * **example.rules** - examples of different kinds of rules and their syntax
 * **generic.rules** - connects all hardware ports to all software ports
@@ -270,19 +270,19 @@ and start with to modify and make your own. The files reside in:
 The man pages have more detailed information:
 
 * midiwala.1
-* amidiminder.1
-* amidiminder-profile.5
-* amidiminder-daemon.8
+* midiminder.1
+* midiminder-profile.5
+* midiminder-daemon.8
 
 
 ## Migrating from older versions
 
-Prior to 0.80 release, `amidiminder` simply read the profile at the fixed
-location `/etc/amidiminder.rules`. If you have custom rules there, you should:
+Prior to 0.80 release, `midiminder` simply read the profile at the fixed
+location `/etc/midiminder.rules`. If you have custom rules there, you should:
 
 1. Move that file someplace within your home directory.
 2. Edit it if needed (see below)
-3. Load it with `amidiminder load <your-file>`
+3. Load it with `midiminder load <your-file>`
 
 There is one breaking rule syntax change. Specifying a port by ALSA port id
 has changed:

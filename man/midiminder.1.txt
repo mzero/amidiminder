@@ -3,20 +3,20 @@ AMIDIMINDER(1)              General Commands Manual             AMIDIMINDER(1)
 
 
 NAME
-       amidiminder - Utility to manage MIDI device connections
+       midiminder - Utility to manage MIDI device connections
 
 SYNOPSIS
-       amidiminder load file
-       amidiminder save file
-       amidiminder reset [--keep] [--hard]
+       midiminder load file
+       midiminder save file
+       midiminder reset [--keep] [--hard]
 
-       amidiminder check file
-       amidiminder status
+       midiminder check file
+       midiminder status
 
 
 DESCRIPTION
-       The amidiminder daemon maintains a set of desired connections (the pro‐
-       file) between ALSA sequencer MIDI ports. See amidiminder-daemon(8)  for
+       The  midiminder daemon maintains a set of desired connections (the pro‐
+       file) between ALSA sequencer MIDI ports. See  midiminder-daemon(8)  for
        more information.
 
        A  profile  is a set of rules for connecting MIDI ports between devices
@@ -24,7 +24,7 @@ DESCRIPTION
        connections  automatically  as the devices are connected to the system,
        and software is started.
 
-       Profiles are written in a simple  rules  syntax.  See  amidiminder-pro‐
+       Profiles are written in a  simple  rules  syntax.  See  midiminder-pro‐
        file(5) for the rules format.
 
        The  daemon  also  observes  connections made by the user (via commands
@@ -99,7 +99,7 @@ ENVIRONMENT
 
 
 FILES
-       /run/amidiminder
+       /run/midiminder
               The default location of  the  runtime  directory.  If  the  RUN‐
               TIME_DIRECTORY environment variable is not set, this is the path
               used.
@@ -112,7 +112,7 @@ FILES
 
 
 SEE ALSO
-       amidiminder-profile(5), amidiminder-daemon(8)
+       midiminder-profile(5), midiminder-daemon(8)
 
 
 

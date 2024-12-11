@@ -1,5 +1,5 @@
-# amidiminder & midiwala
-**amidiminder:** an ALSA utility to keep your MIDI devices connected \
+# midiminder & midiwala
+**midiminder:** an ALSA utility to keep your MIDI devices connected \
 **midiwala:** a tool for managing connections
 
 ### The problem
@@ -11,11 +11,11 @@
 
 ### The solution
 
-`amidiminder` takes care of this:
+`midiminder` takes care of this:
 
 * It tracks what connections were made between ports, and automatically
   reestablishes those connections when ports reattach to the system.
-* You can specify a profile of things to connect and then tell `amidiminder` to
+* You can specify a profile of things to connect and then tell `midiminder` to
   reconfigure your system to that profile in one command.
 * The whole desired connection state is persistent, even across system reboots,
   so that the configuration is quickly restored once devices power back up and

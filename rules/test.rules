@@ -4,7 +4,7 @@
 # It is a test of the rules parser.
 
 # Run this test with:
-#     amidiminder check test.rules
+#     midiminder check test.rules
 
 # The comments on each line tell the check command for what to expect.
 

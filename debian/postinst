@@ -4,9 +4,9 @@ set -e
 
 # create a user to run as
 if [ "$1" = "configure" ]; then
-  adduser --system  --home /run/amidiminder --gecos "amidiminder daemon" \
+  adduser --system  --home /run/midiminder --gecos "midiminder daemon" \
           --no-create-home --disabled-password --ingroup audio \
-          --quiet amidiminder || true
+          --quiet midiminder || true
 
 fi
 

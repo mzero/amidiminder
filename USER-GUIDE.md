@@ -1,11 +1,11 @@
-# Using amidiminder & amidiview
+# Using amidiminder & midiwala
 
 There are three components to this package:
 
 * `amidiminder.service` -  a systemd service
   keeping track of connections and ports.
 * `amidiminder` command for managing profiles and the service
-* `amidiview` command for managing connections, similar to `aconnect`
+* `midiwala` command for managing connections, similar to `aconnect`
 
 **Contents**
 - [Getting started](#getting-started)
@@ -25,7 +25,7 @@ configuration needed.
 Get a listing of what is going on in your system:
 
   ```console
-  $ amidiview list
+  $ midiwala list
   Ports:
       MicroMonsta 2      : MIDI 1     [ 32:0] <->
       Midi Through       : Port-0     [ 14:0] <->
@@ -44,7 +44,7 @@ You can get an interactive view of the same information, with the ability
 to make and break connections:
 
   ```console
-  $ amidiview
+  $ midiwala
   ┌─ Ports ───────────────────────────────────────
   │
   │    MicroMonsta 2      : MIDI 1     [ 32:0] <->
@@ -70,9 +70,9 @@ It's easy to use, just follow the prompts at the bottom of the screen.
 > *Don't worry, pretty much everything these days does, so this should just work.*
 
 At this point, you can just connect and disconnect ports as you need with
-`amidiview`.
+`midiwala`.
 
-> **Pro tip:** *If you leave a terminal window open, running `amidiview`, it will*
+> **Pro tip:** *If you leave a terminal window open, running `midiwala`, it will*
 > *dynamically update as you plug in devices, start software, and make*
 > *connections.*
 
@@ -109,7 +109,7 @@ enable and start it if needed:
 
 ## Intermission
 
-You don't need to learn anything more to use `amidiview` and have the
+You don't need to learn anything more to use `midiwala` and have the
 `amidiminder` service keep track of connections, and re-make them for you
 as your equipment gets plugged and unplugged, and on reboot.
 
@@ -143,7 +143,7 @@ Say your system has a **Launchpad** controller, a synth call **MicroMonsta**,
 and you are running the software **Pure Data**:
 
   ```console
-  $ amidiview list
+  $ midiwala list
   Ports:
       Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
       Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
@@ -168,7 +168,7 @@ connect your devices this way when they are present:
   ```console
   $ amidiminder load live-pd-performance.rules
 
-  $ amidiview list
+  $ midiwala list
   Ports:
       Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
       Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
@@ -194,7 +194,7 @@ Notice that the rules are simple:
 If you want to also hook up the DIN port of the Launchpad, you could type
 
   ```console
-  $ amidiview connect Launchpad:DIN Pure
+  $ midiwala connect Launchpad:DIN Pure
   Connected Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]+
   ```
 
@@ -205,7 +205,7 @@ Notice:
   - Because it's a command line, we only typed `Pure`, if we wanted to use
     the full name we'd have to have quoted it: `"Pure Data"`.
   - It'll only be able to connect if the devices are present
-  - You could have used the interactive mode of `amidiview` and connected it
+  - You could have used the interactive mode of `midiwala` and connected it
     that way with even less typing.
 
 You can look at the server's rules now:
@@ -220,7 +220,7 @@ You can look at the server's rules now:
   "Launchpad Pro MK3":"LPProMK3 DIN" --> "Pure Data":"Midi-In 1"
   ```
 
-The connection made by hand (via `amidiview`) was observed and added to the
+The connection made by hand (via `midiwala`) was observed and added to the
 rules.  This will work if even if you used other software (such as `aconnect`
 or a DAW) to make the connection.
 
@@ -241,7 +241,7 @@ And load the file again:
   ```console
   $ amidiminder load live-pd-performance.rules
 
-  $ amidiview list --connections
+  $ midiwala list --connections
   Connections:
       Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]+
       Launchpad Pro MK3:LPProMK3 MIDI [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
@@ -269,7 +269,7 @@ and start with to modify and make your own. The files reside in:
 
 The man pages have more detailed information:
 
-* amidiview.1
+* midiwala.1
 * amidiminder.1
 * amidiminder-profile.5
 * amidiminder-daemon.8
@@ -290,7 +290,7 @@ has changed:
 Consider this set of ports:
 
   ```console
-  $ amidiview list --ports
+  $ midiwala list --ports
   Ports:
       Midi Through       : Port-0     [ 14:0] <->
       Midihub MH-1Z109TZ : MIDI 1     [ 36:0] <->
@@ -313,9 +313,9 @@ Consider this set of ports:
 
 If you had rules based on id numbers, add the `=` between the `:` and the number.
 
-On the command line with `amidiview`, you can use id numbers for client and
+On the command line with `midiwala`, you can use id numbers for client and
 port, just like `aconnect`. In this case, you don't use `=`:
 
-    amidiview connect 36:1 130:0
+    midiwala connect 36:1 130:0
 
 As ALSA client id numbers are not stable, they aren't allowed in rule files.

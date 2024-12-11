@@ -1,4 +1,4 @@
-# Building amidiminder & amidiview
+# Building amidiminder & midiwala
 
 Prerequisites:
   * g++, 8 or later
@@ -22,7 +22,7 @@ Clone this repo and run `make`:
 
 Outputs:
 
- - build executables: `build/amidiminder` & `build/amidiview`.
+ - build executables: `build/amidiminder` & `build/midiwala`.
  - deb package, which is placed in the directory above.
 
 
@@ -129,7 +129,7 @@ Then, in a different shell, you can try the commands to control it:
 
   (amidiminder test): ./build/amidiminder load rules/generic.rules
 
-  (amidiminder test): ./build/amidiview list
+  (amidiminder test): ./build/midiwala list
   Ports:
       MicroMonsta 2      : MIDI 1     [ 32:0] <->
       Midi Through       : Port-0     [ 14:0] <->

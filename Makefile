@@ -1,5 +1,5 @@
 TARGET_SERVER ?= amidiminder
-TARGET_USER ?= amidiview
+TARGET_USER ?= midiwala
 PREFIX ?= /usr/local
 BINARY_DIR ?= $(PREFIX)/bin
 CONF_DIR ?= /etc
@@ -97,7 +97,7 @@ test-shell: $(BUILD_DIR)/test-env
 # man files
 
 MANDIR ?= man
-MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8 amidiview.1
+MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8 midiwala.1
 MANFILES ?= $(foreach page,$(MANPAGES),$(MANDIR)/$(page))
 MANFORMATED ?= $(foreach file,$(MANFILES),$(file).txt)
 

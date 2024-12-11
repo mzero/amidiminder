@@ -1,6 +1,6 @@
-# amidiminder & amidiview
+# amidiminder & midiwala
 **amidiminder:** an ALSA utility to keep your MIDI devices connected \
-**amidiview:** a tool for managing connections
+**midiwala:** a tool for managing connections
 
 ### The problem
 
@@ -23,11 +23,11 @@
 
 ### A bonus
 
-`amidiview` provides an interactive terminal interface for looking at, and
+`midiwala` provides an interactive terminal interface for looking at, and
 modifying the connections on your system. Try it... you won't regret it!
 
   ```console
-  $ amidiview
+  $ midiwala
   ┌─ Ports ───────────────────────────────────────
   │
   │    MicroMonsta 2      : MIDI 1     [ 32:0] <->

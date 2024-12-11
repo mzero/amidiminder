@@ -3,18 +3,18 @@ AMIDIMINDER(1)              General Commands Manual             AMIDIMINDER(1)
 
 
 NAME
-       amidiview - MIDI connection tool
+       midiwala - MIDI connection tool
 
 SYNOPSIS
-       amidiview view
-       amidiview list [options]
-       amidiview connect sender destination
-       amidiview disconnect sender destination
-       amidiview remove-all
+       midiwala view
+       midiwala list [options]
+       midiwala connect sender destination
+       midiwala disconnect sender destination
+       midiwala remove-all
 
 
 DESCRIPTION
-       amidiview is a tool for easily viewing and managing ALSA Sequencer MIDI
+       midiwala  is a tool for easily viewing and managing ALSA Sequencer MIDI
        connections.  The main tool is interactive and provides a textual  user
        interface  for viewing all ports in the system, and the connections be‐
        tween them. The interface provides easy commands for making and  break‐
@@ -28,7 +28,7 @@ COMMANDS
        view   Interactive view of ports and connections in the system. Connec‐
               tions can be made and removed using the keyboard.
 
-              This  is  the default operation of amidiview if no subcommand is
+              This  is  the  default operation of midiwala if no subcommand is
               specified.
 
               The terminal must support xterm style control  sequences,  which
@@ -71,7 +71,7 @@ COMMANDS
                    ALSA port names have a nasty habit of including the  client
                    name,  sometimes twice, as a prefix to the port name.  This
                    just makes ports hard to read, and provides no benefit,  as
-                   port  names  are always scoped to a given client. amidiview
+                   port  names  are  always scoped to a given client. midiwala
                    normally shortens port names to the  useful  portion.  This
                    option displays the full name.
 

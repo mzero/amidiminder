@@ -1,19 +1,19 @@
 .TH AMIDIMINDER 1
 .SH NAME
-amidiview \- MIDI connection tool
+midiwala \- MIDI connection tool
 .SH SYNOPSIS
-.B amidiview view
+.B midiwala view
 .br
-.B amidiview list \fR[\fIoptions\fR]\fB
+.B midiwala list \fR[\fIoptions\fR]\fB
 .br
-.B amidiview connect \fIsender destination\fR
+.B midiwala connect \fIsender destination\fR
 .br
-.B amidiview disconnect \fIsender destination\fR
+.B midiwala disconnect \fIsender destination\fR
 .br
-.B amidiview remove-all
+.B midiwala remove-all
 
 .SH DESCRIPTION
-.B amidiview
+.B midiwala
 is a tool for easily viewing and managing ALSA Sequencer MIDI connections.  The
 main tool is interactive and provides a textual user interface for viewing all
 ports in the system, and the connections between them. The interface provides
@@ -27,7 +27,7 @@ The additional commands offer command line interface to the same functionality.
 Interactive view of ports and connections in the system. Connections can be
 made and removed using the keyboard.
 
-This is the default operation of \fBamidiview\fR if no subcommand is specified.
+This is the default operation of \fBmidiwala\fR if no subcommand is specified.
 
 The terminal must support xterm style control sequences, which pretty much
 all do these days.
@@ -76,7 +76,7 @@ Display the unshortened port names.
 ALSA port names have a nasty habit of
 including the client name, sometimes twice, as a prefix to the port name.
 This just makes ports hard to read, and provides no benefit, as port names are
-always scoped to a given client. \fBamidiview\fR normally shortens port names
+always scoped to a given client. \fBmidiwala\fR normally shortens port names
 to the useful portion. This option displays the full name.
 .PP
 .TP

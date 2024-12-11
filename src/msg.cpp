@@ -1,34 +1,33 @@
 #include "msg.h"
 
-#include <iostream>
-#include <ostream>
+#include <fmt/format.h>
 
 
-
+namespace {
+  void vprint_msg(FILE* f, const char* format, fmt::format_args args) {
+    fmt::vprint(f, format, args);
+    fputc('\n', f);
+    fflush(f);
+  }
+}
 namespace Msg {
 
   int verbosity = 1;
 
   void voutput(const char* format, fmt::format_args args) {
-    if (output()) {
-      std::cout << fmt::vformat(format, args) << std::endl;
-    }
+    if (output()) vprint_msg(stdout, format, args);
   }
 
   void vdetail(const char* format, fmt::format_args args) {
-    if (detail()) {
-      std::cout << fmt::vformat(format, args) << std::endl;
-    }
+    if (detail()) vprint_msg(stdout, format, args);
   }
 
   void vdebug(const char* format, fmt::format_args args) {
-    if (debug()) {
-      std::cout << fmt::vformat(format, args) << std::endl;
-    }
+    if (debug()) vprint_msg(stdout, format, args);
   }
 
   void verror(const char* format, fmt::format_args args) {
-      std::cerr << fmt::vformat(format, args) << std::endl;
+    vprint_msg(stderr, format, args);
   }
 
 

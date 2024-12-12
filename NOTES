@@ -32,10 +32,11 @@ NOTES
       'RtMidiIn Client:Testing 129:0'
 [x] don't die if state rules are unparseable, just move them aside
 
+[x] always sort ports numerically
+  [x] remove the + from the string display of primary ports 
 
 ## future
 
-[] plus sign for primary ports in midiwala view
 [] periodically check clients and ports for name and capability changes
     (since, due to kernel bugs, the change events are never sent), and if there
     are changes, remove and re-add the relevant ports

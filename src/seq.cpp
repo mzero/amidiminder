@@ -281,8 +281,7 @@ bool Seq::errFatal(int serr, const char* op) {
 fmt::format_context::iterator
 Address::format(fmt::format_context& ctx) const {
   if (valid)
-    return fmt::format_to(ctx.out(), "{}:{} [{}]{}", client, port, addr,
-      ((primarySender || primaryDest) ? "+" : ""));
+    return fmt::format_to(ctx.out(), "{}:{} [{}]", client, port, addr);
   else
     return fmt::format_to(ctx.out(), "--:--");
 }

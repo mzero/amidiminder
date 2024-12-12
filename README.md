@@ -41,8 +41,8 @@ modifying the connections on your system. Try it... you won't regret it!
 
   ┌─ Connections ─────────────────────────────────────────────────────────────────────
   │
-  │    Midihub MH-1Z109TZ:MIDI 1 [36:0]+ --> Pure Data:Midi-In 1 [130:0]+
-  │    Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+  │    Midihub MH-1Z109TZ:MIDI 1 [36:0] --> Pure Data:Midi-In 1 [130:0]
+  │    Pure Data:Midi-Out 1 [130:1] --> MicroMonsta 2:MIDI 1 [32:0]
 
     >> Q)uit, C)onnect, D)isconnect, U)ndo
   ```

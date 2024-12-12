@@ -15,7 +15,7 @@ namespace {
       // in this case, a < b iff a is invalid, and b is valid.
 
     if (a.client != b.client) return a.client < b.client;
-    return a.port < b.port;
+    return a.addr.port < b.addr.port;  // always sort the port numerically!
   }
 
   bool lexicalConnectionLess(const Connection& a, const Connection& b) {

@@ -397,7 +397,7 @@ namespace {
     switch (c) {
       case Command::None:
         break;
-      
+
       case Command::Connect:
       case Command::RedoConnect:
       case Command::UndoDisconnect: {

@@ -74,7 +74,7 @@ environment for you:
   # observed rules
       --- empty ---
   ** simulating connection 150:0 --> 200:0
-  Observed connection: Controller:out [150:0]+ --> Synthesizer:in [200:0]+
+  Observed connection: Controller:out [150:0] --> Synthesizer:in [200:0]
       adding observed rule "Controller":"out" --> "Synthesizer":"in"
   # profile rules
       --- empty ---
@@ -105,10 +105,10 @@ both stop any system running version, and run it in a separate environment:
   RUNTIME_DIRECTORY=/tmp/midiminder-test/runtime
   Rules file /tmp/midiminder-test/state/profile.rules read, 0 rules.
   Rules file /tmp/midiminder-test/state/observed.rules read, 0 rules.
-  Reviewing port: Midi Through:Port-0 [14:0]+
-  Reviewing port: MicroMonsta 2:MIDI 1 [32:0]+
-  Reviewing port: Pure Data:Midi-In 1 [130:0]+
-  Reviewing port: Pure Data:Midi-Out 1 [130:1]+
+  Reviewing port: Midi Through:Port-0 [14:0]
+  Reviewing port: MicroMonsta 2:MIDI 1 [32:0]
+  Reviewing port: Pure Data:Midi-In 1 [130:0]
+  Reviewing port: Pure Data:Midi-Out 1 [130:1]
   ...
   ```
 
@@ -136,8 +136,8 @@ Then, in a different shell, you can try the commands to control it:
       Pure Data          : Midi-In 1  [130:0] <--
       Pure Data          : Midi-Out 1 [130:1] -->
   Connections:
-      MicroMonsta 2:MIDI 1 [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
-      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+      MicroMonsta 2:MIDI 1 [32:0] --> Pure Data:Midi-In 1 [130:0]
+      Pure Data:Midi-Out 1 [130:1] --> MicroMonsta 2:MIDI 1 [32:0]
 
   (midiminder test):
   ```

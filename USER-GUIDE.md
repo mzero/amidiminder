@@ -36,8 +36,8 @@ Get a listing of what is going on in your system:
       Pure Data          : Midi-In 1  [130:0] <--
       Pure Data          : Midi-Out 1 [130:1] -->
   Connections:
-      MicroMonsta 2:MIDI 1 [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
-      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+      MicroMonsta 2:MIDI 1 [32:0] --> Pure Data:Midi-In 1 [130:0]
+      Pure Data:Midi-Out 1 [130:1] --> MicroMonsta 2:MIDI 1 [32:0]
   ```
 
 You can get an interactive view of the same information, with the ability
@@ -58,8 +58,8 @@ to make and break connections:
 
   ┌─ Connections ─────────────────────────────────────────────────────────────────────
   │
-  │    MicroMonsta 2:MIDI 1 [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
-  │    Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
+  │    MicroMonsta 2:MIDI 1 [32:0] --> Pure Data:Midi-In 1 [130:0]
+  │    Pure Data:Midi-Out 1 [130:1] --> MicroMonsta 2:MIDI 1 [32:0]
 
   >> Q)uit, C)onnect, D)isconnect
   ```
@@ -145,9 +145,9 @@ and you are running the software **Pure Data**:
   ```console
   $ midiwala list
   Ports:
-      Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
-      Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
       Launchpad Pro MK3 : LPProMK3 MIDI [ 32:0] <->
+      Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
+      Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
       MicroMonsta 2     : MIDI 1        [ 24:0] <->
       Midi Through      : Port-0        [ 14:0] <->
       Pure Data         : Midi-In 1     [130:0] <--
@@ -170,24 +170,24 @@ connect your devices this way when they are present:
 
   $ midiwala list
   Ports:
-      Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
-      Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
       Launchpad Pro MK3 : LPProMK3 MIDI [ 32:0] <->
+      Launchpad Pro MK3 : LPProMK3 DIN  [ 32:1] <->
+      Launchpad Pro MK3 : LPProMK3 DAW  [ 32:2] <->
       MicroMonsta 2     : MIDI 1        [ 24:0] <->
       Midi Through      : Port-0        [ 14:0] <->
       Pure Data         : Midi-In 1     [130:0] <--
       Pure Data         : Midi-Out 1    [130:1] -->
   Connections:
-      Launchpad Pro MK3:LPProMK3 MIDI [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
-      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [24:0]+
+      Launchpad Pro MK3:LPProMK3 MIDI [32:0] --> Pure Data:Midi-In 1 [130:0]
+      Pure Data:Midi-Out 1 [130:1] --> MicroMonsta 2:MIDI 1 [24:0]
   ```
 
 Notice that the rules are simple:
 
-- You can use any sensible portion of the device name you like
-- The rules can go in either direction, left to right or right to left
+- You can use any sensible portion of the device name you like.
+- The rules can go in either direction, left to right or right to left.
 - If you don't specify a port, the first sensible port on
-  a device will be used
+  a device will be used.
 
 ----
 
@@ -195,7 +195,7 @@ If you want to also hook up the DIN port of the Launchpad, you could type
 
   ```console
   $ midiwala connect Launchpad:DIN Pure
-  Connected Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]+
+  Connected Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]
   ```
 
 Notice:
@@ -243,9 +243,9 @@ And load the file again:
 
   $ midiwala list --connections
   Connections:
-      Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]+
-      Launchpad Pro MK3:LPProMK3 MIDI [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
-      Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [24:0]+
+      Launchpad Pro MK3:LPProMK3 DIN [32:1] --> Pure Data:Midi-In 1 [130:0]
+      Launchpad Pro MK3:LPProMK3 MIDI [32:0] --> Pure Data:Midi-In 1 [130:0]
+      Pure Data:Midi-Out 1 [130:1] --> MicroMonsta 2:MIDI 1 [24:0]
 
   $ midiminder save -
   # Profile rules:

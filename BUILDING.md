@@ -14,8 +14,8 @@ Prerequisites:
 Clone this repo and run `make`:
 
   ```sh
-  git clone https://github.com/mzero/amidiminder.git
-  cd amidiminder
+  git clone https://github.com/mzero/midiminder.git
+  cd midiminder
   make      # to build executables
   make deb  # to build the .deb file
   ```

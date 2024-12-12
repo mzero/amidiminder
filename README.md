@@ -54,7 +54,7 @@ ports.
 # Next Steps
 
 **Installing:**
-1. Go to the [Releases](https://github.com/mzero/amidiminder/releases) page
+1. Go to the [Releases](https://github.com/mzero/midiminder/releases) page
 2. Download the appropriate `.deb` file for your system
 3. Install it with `apt`:
   ```console

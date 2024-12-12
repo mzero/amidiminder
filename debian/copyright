@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: amidiminder
+Upstream-Name: midiminder
 Upstream-Contact: Mark Lentczner <mark@glyphic.com>
-Source: https://github.com/mzero/amidiminder
+Source: https://github.com/mzero/midiminder
 #
 # Please double check copyright with the licensecheck(1) command.
 

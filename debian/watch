@@ -1,2 +1,2 @@
 version=4
-https://github.com/mzero/amidiminder/tags .*/v?(\d.*)@ARCHIVE_EXT@
+https://github.com/mzero/midiminder/tags .*/v?(\d.*)@ARCHIVE_EXT@

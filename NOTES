@@ -6,12 +6,12 @@ NOTES
 [x] rename amidiview -> midiwala
 [x] rename amidiminder -> midiminder, program & service & service user
 [x] rename package to midiminder
-[ ] rename repo
+[x] rename repo
 
-[ ] add docs to package
-    [ ] fix Documentation= in the .service file to use man: links
-[ ] review package description (in control)
-[ ] review service description (in .service)
+[x] add docs to package
+    [x] fix Documentation= in the .service file to use man: links
+[x] review package description (in control)
+[x] review service description (in .service)
 
 [ ] ? deprecate the older amidiminder package?
     [] at least stop and disable amidiminder.service
@@ -35,6 +35,7 @@ NOTES
 
 ## future
 
+[] plus sign for primary ports in midiwala view
 [] periodically check clients and ports for name and capability changes
     (since, due to kernel bugs, the change events are never sent), and if there
     are changes, remove and re-add the relevant ports

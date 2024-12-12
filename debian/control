@@ -11,8 +11,15 @@ Package: midiminder
 Architecture: any
 Multi-Arch: foreign
 Depends: ${misc:Depends}, ${shlibs:Depends}, adduser
-Description: ALSA MIDI connection minder
- Watches for new MIDI ports (both from hardware devices and from applications),
- and uses a rules configuration file to automatically make connections.
- Will also handle reconnecting if a port is removed and later added back, like
- when a device is unplugged and then re-plugged.
+Description: MIDI connection minder & viewer
+ Keeps track of connections between MIDI ports (hardware & software alike).
+ If those connections are lost because the hardware disconnects, or the
+ software exits, this service will re-make the connections once the ports
+ return to the system.
+ .
+ A configuration of connections can also be stored in a file, and loaded
+ at any time, causing the ports to be reconnected according to easy to write
+ rules.
+ .
+ Includes the utility command, midiwala, which provides a clear view of the
+ ports and connections, and can make and break connections easily.

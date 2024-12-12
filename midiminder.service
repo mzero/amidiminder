@@ -1,6 +1,7 @@
 [Unit]
-Description=ALSA MIDI minder daemon
-Documentation=https://github.com/mzero/midiminder/blob/master/README.md
+Description=MIDI connection daemon
+Documentation=man:midiminder-daemon(8)
+Documentation=man:midiminder-profile(5)
 After=sound.target
 
 [Service]

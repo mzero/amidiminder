@@ -32,7 +32,7 @@ Installing the built deb package will install a systemd service that runs
 `midiminder` at startup.
 
   ```sh
-  sudo apt install ../amidiminder_*.deb
+  sudo apt install ../midiminder_*.deb
   ```
 
 That's it. — It's installed. — It's running — You're done!

@@ -1,4 +1,4 @@
-Source: amidiminder
+Source: midiminder
 Section: sound
 Priority: optional
 Maintainer: John Horigan <john@glyphic.com>
@@ -7,7 +7,7 @@ Standards-Version: 4.7.0
 Homepage: https://github.com/mzero/amidiminder
 Rules-Requires-Root: no
 
-Package: amidiminder
+Package: midiminder
 Architecture: any
 Multi-Arch: foreign
 Depends: ${misc:Depends}, ${shlibs:Depends}, adduser

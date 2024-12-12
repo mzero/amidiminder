@@ -58,7 +58,7 @@ ports.
 2. Download the appropriate `.deb` file for your system
 3. Install it with `apt`:
   ```console
-  $ sudo apt install ./amidiminder*.deb
+  $ sudo apt install ./midiminder*.deb
   ```
 
 **User Guide:** see `USER-GUIDE.md`

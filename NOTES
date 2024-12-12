@@ -3,6 +3,21 @@ NOTES
 
 # TODO
 
+[x] rename amidiview -> midiwala
+[x] rename amidiminder -> midiminder, program & service & service user
+[x] rename package to midiminder
+[ ] rename repo
+
+[ ] add docs to package
+    [ ] fix Documentation= in the .service file to use man: links
+[ ] review package description (in control)
+[ ] review service description (in .service)
+
+[ ] ? deprecate the older amidiminder package?
+    [] at least stop and disable amidiminder.service
+
+
+
 [x] fix command prompt in shell examples in README
 [x] instructions for migrating from older amidiminder
     /etc/amidiminder.rules

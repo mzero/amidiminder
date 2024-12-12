@@ -1,18 +1,18 @@
 ### Examples of profile rules
 
-# amidiminder watches ALSA MIDI system. When a port is added, the rules in this
+# midiminder watches ALSA MIDI system. When a port is added, the rules in this
 # file are scanned to automatically connect it up if possible.
 
-# amidiminder also watches for connections made by other tools like aconnect
+# midiminder also watches for connections made by other tools like aconnect
 # or aconnectgui.  If those ports are disconnected (accidentally unplug a
-# USB MIDI device, say) then amidiminder will remember that it had been
+# USB MIDI device, say) then midiminder will remember that it had been
 # manually connected before. When the port returns (plug it back in), then
 # the previously made connection will be restored.
 
 # See man pages for more details:
-#     amidiminder(1)            -- user commands to load & save profiles
-#     amidiminder-profile(5)    -- syntax of rules & profiles
-#     amidiminder-daemon(8)     -- how the daemon works
+#     midiminder(1)            -- user commands to load & save profiles
+#     midiminder-profile(5)    -- syntax of rules & profiles
+#     midiminder-daemon(8)     -- how the daemon works
 
 ###
 ### Example Rules

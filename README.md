@@ -1,6 +1,6 @@
-# amidiminder & amidiview
-**amidiminder:** an ALSA utility to keep your MIDI devices connected \
-**amidiview:** a tool for managing connections
+# midiminder & midiwala
+**midiminder:** an ALSA utility to keep your MIDI devices connected \
+**midiwala:** a tool for managing connections
 
 ### The problem
 
@@ -11,11 +11,11 @@
 
 ### The solution
 
-`amidiminder` takes care of this:
+`midiminder` takes care of this:
 
 * It tracks what connections were made between ports, and automatically
   reestablishes those connections when ports reattach to the system.
-* You can specify a profile of things to connect and then tell `amidiminder` to
+* You can specify a profile of things to connect and then tell `midiminder` to
   reconfigure your system to that profile in one command.
 * The whole desired connection state is persistent, even across system reboots,
   so that the configuration is quickly restored once devices power back up and
@@ -23,11 +23,11 @@
 
 ### A bonus
 
-`amidiview` provides an interactive terminal interface for looking at, and
+`midiwala` provides an interactive terminal interface for looking at, and
 modifying the connections on your system. Try it... you won't regret it!
 
   ```console
-  $ amidiview
+  $ midiwala
   ┌─ Ports ───────────────────────────────────────
   │
   │    MicroMonsta 2      : MIDI 1     [ 32:0] <->
@@ -54,11 +54,11 @@ ports.
 # Next Steps
 
 **Installing:**
-1. Go to the [Releases](https://github.com/mzero/amidiminder/releases) page
+1. Go to the [Releases](https://github.com/mzero/midiminder/releases) page
 2. Download the appropriate `.deb` file for your system
 3. Install it with `apt`:
   ```console
-  $ sudo apt install ./amidiminder*.deb
+  $ sudo apt install ./midiminder*.deb
   ```
 
 **User Guide:** see `USER-GUIDE.md`

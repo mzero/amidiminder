@@ -1,8 +1,8 @@
 build/
 debian/.debhelper/
-debian/amidiminder.debhelper.log
-debian/amidiminder.postrm.debhelper
-debian/amidiminder.substvars
-debian/amidiminder/
+debian/midiminder.debhelper.log
+debian/midiminder.postrm.debhelper
+debian/midiminder.substvars
+debian/midiminder/
 debian/debhelper-build-stamp
 debian/files

@@ -51,13 +51,13 @@ namespace {
     std::string stateDirPath =
       directory(
         "STATE_DIRECTORY",
-        "/var/lib/amidiminder",
+        "/var/lib/midiminder",
         checkForPresence);
 
     std::string runtimeDirPath =
       directory(
         "RUNTIME_DIRECTORY",
-        "/run/amidiminder",
+        "/run/midiminder",
         checkForPresence);
 
     profileFilePath   = stateDirPath + "/profile.rules";

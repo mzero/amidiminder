@@ -40,7 +40,7 @@ namespace {
   }
 }
 
-SeqSnapshot::SeqSnapshot()  { seq.begin("amidiview"); }
+SeqSnapshot::SeqSnapshot()  { seq.begin("midiwala"); }
 SeqSnapshot::~SeqSnapshot() { seq.end(); }
 
 void SeqSnapshot::refresh() {
@@ -61,7 +61,7 @@ void SeqSnapshot::refresh() {
   seq.scanPorts([&](const snd_seq_addr_t& a) {
     auto address = seq.address(a);
     if (includeAllItems || address.mindable) {
-      // Compute primary port status. See comment in amidiminder.cpp for
+      // Compute primary port status. See comment in service.cpp for
       // details and caveats about this computation.
 
       bool foundPrimarySender = false;

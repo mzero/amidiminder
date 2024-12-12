@@ -1,4 +1,4 @@
-# Building amidiminder & amidiview
+# Building midiminder & midiwala
 
 Prerequisites:
   * g++, 8 or later
@@ -14,25 +14,25 @@ Prerequisites:
 Clone this repo and run `make`:
 
   ```sh
-  git clone https://github.com/mzero/amidiminder.git
-  cd amidiminder
+  git clone https://github.com/mzero/midiminder.git
+  cd midiminder
   make      # to build executables
   make deb  # to build the .deb file
   ```
 
 Outputs:
 
- - build executables: `build/amidiminder` & `build/amidiview`.
+ - build executables: `build/midiminder` & `build/midiwala`.
  - deb package, which is placed in the directory above.
 
 
 ## Install
 
 Installing the built deb package will install a systemd service that runs
-`amidiminder` at startup.
+`midiminder` at startup.
 
   ```sh
-  sudo apt install ../amidiminder_*.deb
+  sudo apt install ../midiminder_*.deb
   ```
 
 That's it. — It's installed. — It's running — You're done!
@@ -48,7 +48,7 @@ None!
   ```console
   $ make
   ...
-  $ ./build/amidiminder check rules/test.rules
+  $ ./build/midiminder check rules/test.rules
   Parsed 36 rule(s).
   ```
 
@@ -62,12 +62,12 @@ environment for you:
 
   ```console
   $ make test-shell
-  mkdir -p /tmp/amidiminder-test/runtime
-  mkdir -p /tmp/amidiminder-test/state
+  mkdir -p /tmp/midiminder-test/runtime
+  mkdir -p /tmp/midiminder-test/state
   $SHELL --rcfile ./build/test-env || true
-  $ ./build/amidiminder connection-logic-test # hidden command!
-  STATE_DIRECTORY=/tmp/amidiminder-test/state
-  RUNTIME_DIRECTORY=/tmp/amidiminder-test/runtime
+  $ ./build/midiminder connection-logic-test # hidden command!
+  STATE_DIRECTORY=/tmp/midiminder-test/state
+  RUNTIME_DIRECTORY=/tmp/midiminder-test/runtime
   --1-- connect empty/empty
   # profile rules
       --- empty ---
@@ -94,17 +94,17 @@ If you are working on the daemon and want to try out your code, you need to
 both stop any system running version, and run it in a separate environment:
 
   ```console
-  $ sudo systemctl stop amidiminder.service
+  $ sudo systemctl stop midiminder.service
   $ make test-shell
-  mkdir -p /tmp/amidiminder-test/runtime
-  mkdir -p /tmp/amidiminder-test/state
+  mkdir -p /tmp/midiminder-test/runtime
+  mkdir -p /tmp/midiminder-test/state
   $SHELL --rcfile ./build/test-env || true
 
-  (amidiminder test): ./build/amidiminder daemon
-  STATE_DIRECTORY=/tmp/amidiminder-test/state
-  RUNTIME_DIRECTORY=/tmp/amidiminder-test/runtime
-  Rules file /tmp/amidiminder-test/state/profile.rules read, 0 rules.
-  Rules file /tmp/amidiminder-test/state/observed.rules read, 0 rules.
+  (midiminder test): ./build/midiminder daemon
+  STATE_DIRECTORY=/tmp/midiminder-test/state
+  RUNTIME_DIRECTORY=/tmp/midiminder-test/runtime
+  Rules file /tmp/midiminder-test/state/profile.rules read, 0 rules.
+  Rules file /tmp/midiminder-test/state/observed.rules read, 0 rules.
   Reviewing port: Midi Through:Port-0 [14:0]+
   Reviewing port: MicroMonsta 2:MIDI 1 [32:0]+
   Reviewing port: Pure Data:Midi-In 1 [130:0]+
@@ -116,20 +116,20 @@ Then, in a different shell, you can try the commands to control it:
 
   ```console
   $ make test-shell
-  mkdir -p /tmp/amidiminder-test/runtime
-  mkdir -p /tmp/amidiminder-test/state
+  mkdir -p /tmp/midiminder-test/runtime
+  mkdir -p /tmp/midiminder-test/state
   $SHELL --rcfile ./build/test-env || true
 
-  (amidiminder test): ./build/amidiminder status
+  (midiminder test): ./build/midiminder status
   Daemon is running.
     0 profile rules.
     0 observed rules.
     4 active ports.
     0 active connections
 
-  (amidiminder test): ./build/amidiminder load rules/generic.rules
+  (midiminder test): ./build/midiminder load rules/generic.rules
 
-  (amidiminder test): ./build/amidiview list
+  (midiminder test): ./build/midiwala list
   Ports:
       MicroMonsta 2      : MIDI 1     [ 32:0] <->
       Midi Through       : Port-0     [ 14:0] <->
@@ -139,5 +139,5 @@ Then, in a different shell, you can try the commands to control it:
       MicroMonsta 2:MIDI 1 [32:0]+ --> Pure Data:Midi-In 1 [130:0]+
       Pure Data:Midi-Out 1 [130:1]+ --> MicroMonsta 2:MIDI 1 [32:0]+
 
-  (amidiminder test):
+  (midiminder test):
   ```

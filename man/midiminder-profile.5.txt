@@ -3,20 +3,20 @@ AMIDIMINDER-PROFILE(5)        File Formats Manual       AMIDIMINDER-PROFILE(5)
 
 
 NAME
-       amidiminder-profile - Format for MIDI connection rules
+       midiminder-profile - Format for MIDI connection rules
 
 
 DESCRIPTION
        Profiles  describe  a list of rules for making connections between ALSA
        sequencer MIDI ports. Users can create a profile rules file to describe
-       how they want their MIDI environment connected, then use amidiminder(1)
+       how  they want their MIDI environment connected, then use midiminder(1)
        to load it into the system. Connections will be made according  to  the
        rules, and if some of the devices or software are not yet on-line, con‐
        nections for those ports will be made when they later come on-line.
 
-       The amidiminder-daemon(8) will then continue to  ensure  these  connec‐
-       tions  are made if devices are unplugged and re-plugged, or even if the
-       whole system restarts.
+       The midiminder-daemon(8) will then continue to ensure these connections
+       are  made if devices are unplugged and re-plugged, or even if the whole
+       system restarts.
 
 
 CONCEPTS
@@ -48,12 +48,12 @@ CONCEPTS
        Rules can also be disallow rules, specifying ports that should  not  be
        connected.  This can be useful to restrict a wildcard rule to not apply
        in some circumstances. Disallow rules can also be  generated  when  the
-       amidiminder-daemon(8)  observes  the  user  expressly disconnecting two
+       midiminder-daemon(8)  observes  the  user  expressly  disconnecting two
        ports that the profile rules connected. Such a disallow rule acts as an
        override.
 
        A  profile  consists of a sequence of rules. The order matters, and the
-       last rule matching a pair of ports governs what happens.   amidiminder-
+       last rule matching a pair of ports governs what  happens.   midiminder-
        daemon(8) also maintains a list of observed rules. These logically fol‐
        low the profile rules.
 
@@ -95,7 +95,7 @@ EXAMPLE
        Placing the above text in a file, say bicycle-profile.rules, these con‐
        nections could be quickly established by running this command:
 
-           & amidiminder load bicycle-profile.rules
+           & midiminder load bicycle-profile.rules
 
 
 SYNTAX
@@ -185,8 +185,8 @@ SYNTAX
 
        These long port names are difficult to read, and provide no useful  ex‐
        tra  information  since the client is always listed as well. Therefore,
-       amidiminder shortens these port names down by removing  leading  copies
-       of the client name and whitespace.
+       midiminder shortens these port names down by removing leading copies of
+       the client name and whitespace.
 
        Client               Full Port Name                   Shortened Name
 
@@ -230,7 +230,7 @@ SYNTAX
 
 
 EXAMPLES
-       The  directory /usr/share/amidiminder/examples/ contains several useful
+       The  directory  /usr/share/midiminder/examples/ contains several useful
        examples of profile files.
 
        example.rules
@@ -244,7 +244,7 @@ EXAMPLES
 
 
 SEE ALSO
-       amidiminder(1), amidiminder-daemon(8)
+       midiminder(1), midiminder-daemon(8)
 
 
 

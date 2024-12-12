@@ -1,19 +1,19 @@
 .TH AMIDIMINDER-PROFILE 5
 
 .SH NAME
-amidiminder-profile \- Format for MIDI connection rules
+midiminder-profile \- Format for MIDI connection rules
 
 .SH DESCRIPTION
 Profiles describe a list of rules for making connections between ALSA sequencer
 MIDI ports. Users can create a profile rules file to describe how they want
 their MIDI environment connected, then use
-.BR amidiminder (1)
+.BR midiminder (1)
 to load it into the system. Connections will be made according to the rules,
 and if some of the devices or software are not yet on-line, connections for
 those ports will be made when they later come on-line.
 .PP
 The
-.BR amidiminder-daemon (8)
+.BR midiminder-daemon (8)
 will then continue to ensure these connections are made if devices are
 unplugged and re-plugged, or even if the whole system restarts.
 
@@ -45,13 +45,13 @@ to be made.
 Rules can also be \fIdisallow\fR rules, specifying ports that should not be
 connected. This can be useful to restrict a wildcard rule to not apply in some
 circumstances. Disallow rules can also be generated when the
-.BR amidiminder-daemon (8)
+.BR midiminder-daemon (8)
 observes the user expressly disconnecting two ports that the profile rules
 connected. Such a disallow rule acts as an override.
 .PP
 A profile consists of a sequence of rules. The order matters, and the last
 rule matching a pair of ports governs what happens.
-.BR amidiminder-daemon (8)
+.BR midiminder-daemon (8)
 also maintains a list of observed rules. These logically follow the profile
 rules.
 
@@ -99,7 +99,7 @@ command:
 .PP
 .in +4n
 .EX
-& \fBamidiminder load bicycle-profile.rules\fR
+& \fBmidiminder load bicycle-profile.rules\fR
 .EE
 .in
 
@@ -204,7 +204,7 @@ nanoKONTROL:nanoKONTROL nanoKONTROL _ CTRL
 .PP
 These long port names are difficult to read, and provide no useful extra
 information since the client is always listed as well. Therefore,
-\fBamidiminder\fR shortens these port names down by removing leading copies of
+\fBmidiminder\fR shortens these port names down by removing leading copies of
 the client name and whitespace.
 .TS
 tab(|) nospaces;
@@ -253,7 +253,7 @@ These rules will keep a connection from being made when prior rules (including
 wildcard rules) would have made one.
 
 .SH EXAMPLES
-The directory \fB/usr/share/amidiminder/examples/\fR contains several useful
+The directory \fB/usr/share/midiminder/examples/\fR contains several useful
 examples of profile files.
 .TP
 .B example.rules
@@ -266,5 +266,5 @@ examples of profile files.
 \(em an example for a live performance with software and hardware
 
 .SH SEE ALSO
-.BR amidiminder (1),
-.BR amidiminder-daemon (8)
+.BR midiminder (1),
+.BR midiminder-daemon (8)

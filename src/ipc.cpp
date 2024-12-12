@@ -55,11 +55,11 @@ namespace {
     else {
       if (connect(sockFD, (const struct sockaddr*)&addr, sizeof(addr)) != 0) {
         auto errStr = strerror(errno);
-        std::cerr << "Couldn't connect to the amidiminder daemon.\n"
+        std::cerr << "Couldn't connect to the midiminder daemon.\n"
           "\n"
           "Use systemctl to check or start it:\n"
-          "    systemctl status amidiminder.service\n"
-          "    systemctl start amidiminder.service\n"
+          "    systemctl status midiminder.service\n"
+          "    systemctl start midiminder.service\n"
           "\n"
           "(While trying to connect to the socket path:\n"
           "    " << path << "\n"

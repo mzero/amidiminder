@@ -1,5 +1,5 @@
-TARGET_SERVER ?= amidiminder
-TARGET_USER ?= amidiview
+TARGET_SERVER ?= midiminder
+TARGET_USER ?= midiwala
 PREFIX ?= /usr/local
 BINARY_DIR ?= $(PREFIX)/bin
 CONF_DIR ?= /etc
@@ -79,12 +79,12 @@ test: $(BUILD_DIR)/$(TARGET_SERVER)
 
 # test shell with runtime and state directories in /tmp
 
-TEST_DIR=/tmp/amidiminder-test
+TEST_DIR=/tmp/midiminder-test
 TEST_RUNTIME_DIR=$(TEST_DIR)/runtime
 TEST_STATE_DIR=$(TEST_DIR)/state
 
 $(BUILD_DIR)/test-env:
-	echo PS1="'(amidiminder test): '" > $@
+	echo PS1="'(midiminder test): '" > $@
 	echo export STATE_DIRECTORY=$(TEST_STATE_DIR) >> $@
 	echo export RUNTIME_DIRECTORY=$(TEST_RUNTIME_DIR) >> $@
 
@@ -97,7 +97,7 @@ test-shell: $(BUILD_DIR)/test-env
 # man files
 
 MANDIR ?= man
-MANPAGES ?= amidiminder.1 amidiminder-profile.5 amidiminder-daemon.8 amidiview.1
+MANPAGES ?= midiminder.1 midiminder-profile.5 midiminder-daemon.8 midiwala.1
 MANFILES ?= $(foreach page,$(MANPAGES),$(MANDIR)/$(page))
 MANFORMATED ?= $(foreach file,$(MANFILES),$(file).txt)
 
@@ -110,8 +110,8 @@ format-man-pages: $(MANFORMATED)
 # tar files for Debian package
 
 tars: deb-clean
-	cd .. && tar -cJvf amidiminder_0.90.orig.tar.xz --exclude=debian amidiminder_0.90
-	tar -cJvf ../amidiminder_0.90-1.debian.tar.xz debian/
+	cd .. && tar -cJvf midiminder_0.90.orig.tar.xz --exclude=debian midiminder_0.90
+	tar -cJvf ../midiminder_0.90-1.debian.tar.xz debian/
 
 # dependencies
 

@@ -1,18 +1,19 @@
 [Unit]
-Description=ALSA MIDI minder daemon
-Documentation=https://github.com/mzero/amidiminder/blob/master/README.md
+Description=MIDI connection daemon
+Documentation=man:midiminder-daemon(8)
+Documentation=man:midiminder-profile(5)
 After=sound.target
 
 [Service]
-ExecStart=/usr/bin/amidiminder daemon
-ExecReload=/usr/bin/amidiminder reset --keep --hard
+ExecStart=/usr/bin/midiminder daemon
+ExecReload=/usr/bin/midiminder reset --keep --hard
 EnvironmentFile=/etc/environment
-RuntimeDirectory=amidiminder
-StateDirectory=amidiminder
+RuntimeDirectory=midiminder
+StateDirectory=midiminder
 Restart=always
 RestartSec=1
 
-User=amidiminder
+User=midiminder
 Group=audio
 
 NoNewPrivileges=yes

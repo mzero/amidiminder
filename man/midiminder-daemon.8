@@ -1,15 +1,15 @@
 .TH AMIDIMINDER-DAEMON 8
 
 .SH NAME
-amidiminder-daemon \- MIDI device connection daemon
+midiminder-daemon \- MIDI device connection daemon
 
 .SH SYNOPSIS
-.B amidiminder [\fB-v\fR|\fB-q\fR] daemon
+.B midiminder [\fB-v\fR|\fB-q\fR] daemon
 .RB [ -p ]
 
 .SH DESCRIPTION
 The
-.B amidiminder daemon
+.B midiminder daemon
 maintains a set of desired connections (the \fIprofile\fR) between ALSA
 sequencer MIDI ports.
 .PP
@@ -22,7 +22,7 @@ connections it had. As MIDI gear is often inadvertently unplugged and replugged,
 or power cycled, losing these connections is a significant frustration.
 .PP
 The
-.B amidiminder daemon
+.B midiminder daemon
 takes care of this: It tracks what connections were desired between ports, and
 automatically reestablishes those connections when ports reattach to the
 system. Connections (and disconnections) initiated by the user (or applications)
@@ -36,7 +36,7 @@ The desired connection state is composed of two parts:
 The profile is a list of rules for which ports to connect. It is written
 in a simple syntax that makes it possible to express these connections, even
 when the devices aren't current connected. The commands in
-.BR amidiminder (1)
+.BR midiminder (1)
 are used by the user to load, save, and reset the profile. The user can
 have multiple profile files prepared, and by loading them, reconfigure all the
 connections with one command.
@@ -49,7 +49,7 @@ and by other software. These rules are considered to override any profile
 rules, should they conflict.  This allows a change from the current profile
 to be just as robust as the profile itself. The user can also easily drop the
 observed rules by loading another profile, or using the
-.B amidiminder reset
+.B midiminder reset
 command.
 .PP
 Both parts of the connection state are persisted into the file system so that
@@ -85,15 +85,15 @@ temporary file system so that the desired connection state survives reboots.
 The path to the directory that has the UNIX-domain socket used to communicate
 between the control commands and the running daemon.
 
-Note: If the system configuration is changed such that the \fBamidiminder\fR
+Note: If the system configuration is changed such that the \fBmidiminder\fR
 daemon is launched with a non-default value for this variable, it must also
 be set the same way when using any of the control commands.
 
 .SH FILES
-.IP /var/lib/amidiminder
+.IP /var/lib/midiminder
 The default location of the state directory.
 
-.IP /run/amidiminder
+.IP /run/midiminder
 The default location of the runtime directory.
 
 .IP profile.rules
@@ -107,6 +107,6 @@ A UNIX-domain socket, located in the runtime directory. It is used to
 communicate between the control commands and the daemon.
 
 .SH SEE ALSO
-.BR amidiminder (1),
-.BR amidiminder-profile (5)
+.BR midiminder (1),
+.BR midiminder-profile (5)
 

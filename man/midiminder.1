@@ -1,23 +1,23 @@
 .TH AMIDIMINDER 1
 .SH NAME
-amidiminder \- Utility to manage MIDI device connections
+midiminder \- Utility to manage MIDI device connections
 .SH SYNOPSIS
-.B amidiminder load \fIfile
+.B midiminder load \fIfile
 .br
-.B amidiminder save \fIfile
+.B midiminder save \fIfile
 .br
-.B amidiminder reset \fR[\fB--keep\fR] [\fB--hard\fR]
+.B midiminder reset \fR[\fB--keep\fR] [\fB--hard\fR]
 .PP
-.B amidiminder check \fIfile
+.B midiminder check \fIfile
 .br
-.B amidiminder status
+.B midiminder status
 
 .SH DESCRIPTION
 The
-.B amidiminder daemon
+.B midiminder daemon
 maintains a set of desired connections (the \fIprofile\fR) between ALSA
 sequencer MIDI ports. See
-.BR amidiminder-daemon (8)
+.BR midiminder-daemon (8)
 for more information.
 .PP
 A profile is a set of rules for connecting MIDI ports between devices and/or
@@ -26,7 +26,7 @@ automatically as the devices are connected to the system, and software is
 started.
 .PP
 Profiles are written in a simple rules syntax. See
-.BR amidiminder-profile (5)
+.BR midiminder-profile (5)
 for the rules format.
 .PP
 The daemon also observes connections made by the user (via commands such as
@@ -96,7 +96,7 @@ with a non-default value for this variable, it must also
 be set the same way when using any of the control commands.
 
 .SH FILES
-.IP /run/amidiminder
+.IP /run/midiminder
 The default location of the runtime directory. If the \fBRUNTIME_DIRECTORY\fR
 environment variable is not set, this is the path used.
 
@@ -105,5 +105,5 @@ This UNIX-domain socket is located in the runtime directory, and is used to
 communicate between the control commands and the daemon.
 
 .SH SEE ALSO
-.BR amidiminder-profile (5),
-.BR amidiminder-daemon (8)
+.BR midiminder-profile (5),
+.BR midiminder-daemon (8)

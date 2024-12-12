@@ -277,8 +277,9 @@ The man pages have more detailed information:
 
 ## Migrating from older versions
 
-Prior to 0.80 release, `midiminder` simply read the profile at the fixed
-location `/etc/midiminder.rules`. If you have custom rules there, you should:
+Prior to 0.80 release, `amidiminder` (as the service was named then) simply
+read the profile at the fixed location `/etc/amidiminder.rules`. If you have
+custom rules there, you should:
 
 1. Move that file someplace within your home directory.
 2. Edit it if needed (see below)

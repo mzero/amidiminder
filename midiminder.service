@@ -3,6 +3,8 @@ Description=MIDI connection daemon
 Documentation=man:midiminder-daemon(8)
 Documentation=man:midiminder-profile(5)
 After=sound.target
+Conflicts=amidiauto.service amidiminder.service
+After=amidiauto.service amidiminder.service
 
 [Service]
 ExecStart=/usr/bin/midiminder daemon

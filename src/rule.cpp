@@ -125,11 +125,11 @@ bool PortSpec::isWildcard() const
   { return kind == Wildcard; }
 
 bool PortSpec::matchAsSender(const Address& a) const {
-  return match(a, a.primarySender);
+  return a.canBeSender() && match(a, a.primarySender);
 }
 
 bool PortSpec::matchAsDest(const Address& a) const {
-  return match(a, a.primaryDest);
+  return a.canBeDest() && match(a, a.primaryDest);
 }
 
 bool PortSpec::match(const Address& a, bool primaryFlag) const {

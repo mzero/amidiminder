@@ -7,9 +7,28 @@
 #include "rule.h"
 #include "seqsnapshot.h"
 
+namespace {
+  void checkNotEmpty() {
+    bool proceed = true;
+
+    if (Args::portSender.empty()) {
+      Msg::error("No sender port given.");
+      proceed = false;
+    }
+    if (Args::portDest.empty()) {
+      Msg::error("No destination port given.");
+      proceed = false;
+    }
+
+    if (!proceed)
+      throw Msg::runtime_error("");
+  }
+}
 namespace User {
 
   void connectCommand() {
+    checkNotEmpty();
+
     AddressSpec senderSpec = AddressSpec::parse(Args::portSender, true);
     AddressSpec destSpec = AddressSpec::parse(Args::portDest, true);
 
@@ -27,7 +46,7 @@ namespace User {
 
     if (possibleSenders.empty()) {
       proceed = false;
-      Msg::error("No ports match the sender: {}", senderSpec);
+      Msg::error("No sending ports match the sender: {}", senderSpec);
     }
     else if (possibleSenders.size() > 1 && !senderSpec.isWildcard()) {
       proceed = false;
@@ -38,7 +57,7 @@ namespace User {
 
     if (possibleDests.empty()) {
       proceed = false;
-      Msg::error("No ports match the destination: {}", destSpec);
+      Msg::error("No receiving ports match the destination: {}", destSpec);
     }
     else if (possibleDests.size() > 1 && !destSpec.isWildcard()) {
       proceed = false;
@@ -59,6 +78,8 @@ namespace User {
   }
 
   void disconnectCommand() {
+    checkNotEmpty();
+
     AddressSpec senderSpec = AddressSpec::parse(Args::portSender, true);
     AddressSpec destSpec = AddressSpec::parse(Args::portDest, true);
     bool wildcarded = senderSpec.isWildcard() || destSpec.isWildcard();

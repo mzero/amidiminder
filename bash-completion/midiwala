@@ -1,0 +1,149 @@
+# bash completion for midiminder(1) & midiminder(8)        -*- shell-script -*-
+
+# see apt's completion functions for the general structure followed here
+# see bash-completion's _usergroup() function for handling client:port
+
+# fixme: Doesn't handle port names with colons in all cases
+# fixme: Doesn't handle client names with colons in them at all
+
+
+_midiwala_complete_clients()
+{
+  local items
+  readarray -t items < <( \
+    midiwala list --ports --plain \
+    | sed -e 's/:.*//' \
+    | sort -u
+  )
+
+  local i item
+  COMPREPLY=()
+  for (( i=0; i < ${#items[@]}; i++ )); do
+    item="${items[i]}"
+    item="$(printf "%q" "$item")"
+    if [[ "$item" =~ ^"$cur" ]]; then
+      COMPREPLY+=("$item")
+    fi
+  done
+}
+
+_midiwala_complete_ports()
+{
+  local prefix
+  prefix="$1"
+
+  local items
+  readarray -t items < <(midiwala list --ports --plain)
+
+  local i item
+  COMPREPLY=()
+  for (( i=0; i < ${#items[@]}; i++ )); do
+    item="${items[i]}"
+    item="$(printf "%q" "$item")"
+    if [[ "$item" == "$client:"* ]]; then
+      item="${item#"$client:"}"
+      if [[ $item == *:* ]]; then
+        item="\\'$item\\'"
+      fi
+      if [[ $item == "$port"* ]]; then
+        COMPREPLY+=("$prefix$item")
+      fi
+    fi
+  done
+}
+
+_midiwala_ports()
+{
+  local client port
+  if [[ $cur == *\\\\* || $cur == *:*:* ]]; then
+    # Give up early on if something seems horribly wrong.
+    return
+  elif [[ $cur == *\\:* ]]; then
+    # Completing port after 'client\:po<TAB>'.
+    # Reply w/list of ports that include 'client\\:'
+    client="${cur%%\\:*}"
+    port="${cur#*\\:}"
+    _midiwala_complete_ports "$client\\:"
+  elif [[ $cur == *:* ]]; then
+    # Completing port after 'client:po<TAB>'
+    # Replly w/list of ports w/o 'client:'
+    local client
+    client="${cur%%:*}"
+    port="${cur#*:}"
+    _midiwala_complete_ports ""
+  else
+    # Completing client after 'cli<TAB>'
+    # Do NOT suffix with :, as readline will escape it. Instead, the user
+    # gets 'client<SPACE>'. They can backspace and add the : if they want.
+    _midiwala_complete_clients "$cur"
+  fi
+}
+
+_midiwala()
+{
+  local cur prev words cword;
+  _init_completion -s -n : || return
+
+  local GLOBAL_OPTIONS='
+    -v --verbose
+    -h --help
+  '
+
+  local COMMANDS=(
+    "view"
+    "list"        # [options]
+    "connect"     # sender dest
+    "disconnect"  # sender dest
+    "remove-all"
+    "help"
+  )
+
+  local ALT_COMMANDS=( "-l" "-c" "-d" "-x" )
+
+  local LIST_OPTIONS='
+    --clients
+    -p --ports
+    -c --connections
+    -a --all
+    -n --numeric
+    --long-port-names
+    --plain
+    --details
+  '
+
+  # see if the user selected a command already
+  local command i
+  for (( i=1; i < ${#words[@]}; i++ )); do
+      if [[ " ${COMMANDS[*]} ${ALT_COMMANDS[*]} " == *" ${words[i]} "* ]]; then
+          command=${words[i]}
+          break
+      fi
+  done
+
+  # When the cursor (cword) is before the command word (i), only suggest
+  # global options:
+  if [[ ( $cur == -* && ( -z command || $cword -le $i ) ) ]]; then
+    COMPREPLY=( $(compgen -W "$GLOBAL_OPTIONS" -- "$cur") )
+    return 0;
+  fi
+
+  # arguments for a specific command
+  if [[ -v command && $cword -gt $i ]]; then
+    case ${command:-} in
+      list|-l)
+        COMPREPLY=( $(compgen -W "$LIST_OPTIONS" -- "$cur") )
+        return 0;
+        ;;
+      connect|disconnect|-c|-d)
+        _midiwala_ports
+        ;;
+      view|remove-all|-x|help)
+        return 0;
+        ;;
+    esac
+  else
+    COMPREPLY=( $( compgen -W '${COMMANDS[@]}' -- "$cur") )
+    return 0;
+  fi
+} &&
+complete -F _midiwala midiwala

@@ -1,0 +1,67 @@
+# bash completion for midiminder(1) & midiminder(8)        -*- shell-script -*-
+
+_midiminder()
+{
+  local cur prev words cword;
+  _init_completion || return
+
+  local GLOBAL_OPTIONS='
+    -v --verbose
+    -q --quiet
+    --version
+    -h --help
+  '
+
+  local COMMANDS=(
+    "check"   # FILE or -
+    "load"    # FILE or -
+    "save"    # FILE or -
+    "reset"   # [--keep] [--hard]
+    "status"
+    "help"
+    "daemon"
+  )
+
+  local RESET_OPTIONS='
+    --keep
+    --hard
+  '
+
+  # see if the user selected a command already
+  local command i
+  for (( i=1; i < ${#words[@]}; i++ )); do
+      if [[ " ${COMMANDS[*]} " == *" ${words[i]} "* ]]; then
+          command=${words[i]}
+          break
+      fi
+  done
+
+  # When the cursor (cword) is before the command word (i), only suggest
+  # global options:
+  if [[ ( $cur == -* && ( -z command || $cword -le $i ) ) ]]; then
+    COMPREPLY=( $(compgen -W "$GLOBAL_OPTIONS" -- "$cur") )
+    return 0;
+  fi
+
+  # arguments for a specific command
+  if [[ -v command && $cword -gt $i ]]; then
+    case ${command:-} in
+      check|load|save)
+        compopt -o filenames
+        COMPREPLY=($(compgen -f -W '-' -- "$cur")
+        $(compgen -d -- "$cur"))
+        ;;
+      reset)
+        COMPREPLY=( $(compgen -W "$RESET_OPTIONS" -- "$cur") )
+        return 0;
+        ;;
+      status|help|daemon)
+        return 0;
+        ;;
+    esac
+  else
+    COMPREPLY=( $( compgen -W '${COMMANDS[@]}' -- "$cur") )
+    return 0;
+  fi
+} &&
+complete -F _midiminder midiminder

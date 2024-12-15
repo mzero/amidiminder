@@ -2,12 +2,56 @@
 set -e
 
 
-# create a user to run as
-if [ "$1" = "configure" ]; then
+create_service_user() {
   adduser --system  --home /run/midiminder --gecos "midiminder daemon" \
           --no-create-home --disabled-password --ingroup audio \
           --quiet midiminder || true
+}
 
+suggest_package_removal() {
+  if [ \
+    "$(dpkg-query  --showformat='${db:Status-Status}' -W $1 2>/dev/null)" \
+      = "installed" \
+  ]; then
+    echo "The older package $1 is installed. It provides a limited form"
+    echo "of the functionality that midiminder provides. Consider removing it:"
+    echo "    sudo apt uninstall $1"
+  fi
+}
+
+stop_and_disable_service() {
+  eval "was_${1}_active=0"
+  if systemctl is-active --quiet $1.service 2>/dev/null; then
+    eval "was_${1}_active=1"
+    deb-systemd-invoke stop $1.service 2>/dev/null
+    echo "$1.service was stopped"
+  fi
+  if deb-systemd-helper is-enabled --quiet $1.service 2>/dev/null; then
+    deb-systemd-helper disable $1.service 2>/dev/null
+    echo "$1.service was disabled"
+  fi
+}
+
+advise_old_rules() {
+  local oldrules
+  oldrules=/etc/amidiminder.rules
+  if [ $was_amidiminder_active -eq 1 ] && [ -f $oldrules ]; then
+    echo "amidiminder's rules, $oldrules, can be loaded into midiminder."
+    echo "If you wish to continue using those rules, run:"
+    echo "    midiminder load $oldrules"
+  fi
+}
+
+if [ "$1" = "configure" ]; then
+  create_service_user
+
+  suggest_package_removal amidiauto
+  stop_and_disable_service amidiauto
+
+  suggest_package_removal amidiminder
+  stop_and_disable_service amidiminder
+
+  advise_old_rules
 fi
 
 #DEBHELPER#

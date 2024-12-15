@@ -1,8 +1,22 @@
-# amidiminder Changes by Release
+# midiminder Changes by Release
 
 This file summarizes the changes made with each release of the code.
 
 -----------
+
+# 1.0 - 2024-12-15
+
+* New names:
+  * **midiminder**
+  * **midiwala**
+
+* Fixes:
+  * Documentation improvements
+  * Small improvemetns in display ports, and empty lists
+  * Can now parse exact match rules for ports that have colons in them
+  * Handle unparseable state files gracefully
+
+
 
 # 0.90 - 2024-12-07
 

@@ -5,7 +5,7 @@
 
 namespace {
   const auto appDescription = "Maintain MIDI device connections";
-  const auto appVersion = "0.90";
+  const auto appVersion = "1.0";
 }
 
 namespace Args {

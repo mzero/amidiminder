@@ -3,37 +3,6 @@ NOTES
 
 # TODO
 
-[x] rename amidiview -> midiwala
-[x] rename amidiminder -> midiminder, program & service & service user
-[x] rename package to midiminder
-[x] rename repo
-
-[x] add docs to package
-    [x] fix Documentation= in the .service file to use man: links
-[x] review package description (in control)
-[x] review service description (in .service)
-
-[ ] ? deprecate the older amidiminder package?
-    [] at least stop and disable amidiminder.service
-
-
-
-[x] fix command prompt in shell examples in README
-[x] instructions for migrating from older amidiminder
-    /etc/amidiminder.rules
-[x] examples about connecting
-    [] how to use the sample files
-    [x] getting started
-
-[x] list command: no ports, no connections, no clients? say something
-
-[x] parse exact match port and client names with colons in them
-    - touchosc2midi & python-mido conspire to have port names like:
-      'RtMidiIn Client:Testing 129:0'
-[x] don't die if state rules are unparseable, just move them aside
-
-[x] always sort ports numerically
-  [x] remove the + from the string display of primary ports 
 
 ## future
 
@@ -43,13 +12,16 @@ NOTES
     N.B.: Not clear this is really needed, since we don't see any applications
     that really change port names or capabilities after being created. See the
     code in MidiMinder::handleSeqEvent for details about client name changes.
+
 [] figure out how to fsync in Files::writeFile()
+
 [] ? on soft reset, we could just scan activeConnections and only disconnect
     those that the rules wouldn't put back; and then, when adding back the
     ports, be careful to not try to reconnect connections that remainded
     (or just ignore the ALSA Seq connection error) - this would ensure no
     disruption of connections when switching profiles where a connection is
     in both the old and new profile. Really may not be worth the effort!
+
 [] make connection-logic-test something that could be used during packaging
     - needs to not write files, nor use ALSA
 
@@ -69,60 +41,6 @@ NOTES
 [] ? in list command and view command, group ports by type??
 
 
-# MAJOR THEMES
-
-## aconnect functionality
-    - using the better syntax and naming for making, listing
-    - and breaking connections
-    - clear all connections
-
-## connection state
-    - keep what is intended even across reboot
-    - create provisional rules when connections are made
-    - (and delete them when broken)
-    - save those in a live file (in /etc?)
-    - on load use the user written set & the saved set
-
-## connection setups
-    - named setups - one is active
-    - merge setups?
-    - save current state as a setup
-    - files in standard places
-
-## maturty
-    - man page
-    - bash completion
-    - SIGHUP for reload
-    - handle daemon running or not
-
-
-# DESIGN
-
-Two rules files:
-    Profile
-        come from user
-        symlink from /etc/amidiminder.rules to ???
-        how to recognize chances in rules?
-            - observe file change?
-            - command to switch the symlink?
-            - signal to reload?
-    Observed
-        from observations of connects and disconnects
-        relative to the Profile rules
-            a connect that the Profile rules would make won't be recorded
-            has to be able to record overrides of the Profile rules
-
-    Static & Dynamic?
-
-Modes:
-    daemon          - like the current operation
-    connect         - make a connection, the minder will see it
-    disconnect      - break a connection, the minder will see it
-    reset           - clear the live rules, reset to only connections from Profile
-    load            - set new Profile rules & reset
-    save            - save the current Profile & Observed rules as new single rules file
-    check           - check rule set file
-    list            - show devices, ports, and connections
 
 
 # DAW NOTES

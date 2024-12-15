@@ -58,6 +58,11 @@ this > that                         # FAIL no arrow
 thing:.app <-> test                 # FAIL bad port, not a category
 *:.app <-> test                     # FAIL bad wildcard, not a categroy
 .app:moo <-> test                   # FAIL bad category, no port allowed
+this 2.0 --> that	            # PASS internal period
+this 2.0:out --> that               # PASS period in client with port
+"this 2.0":out --> that		    # PASS period in quotes
+this:p3.3 --> that		    # PASS period in port
+this:"p3.3" --> that                # PASS period in port in quotes
 this -x-> *                         # PASS
 this <-x- *                         # PASS
 this <-x-> that                     # PASS

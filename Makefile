@@ -15,6 +15,8 @@ bin: $(BUILD_DIR)/$(TARGET_SERVER) $(BUILD_DIR)/$(TARGET_USER)
 
 deb:
 	dpkg-buildpackage -b --no-sign
+deb-nc:
+	dpkg-buildpackage -nc -b --no-sign
 
 install:
 	$(MKDIR_P) $(DESTDIR)$(BINARY_DIR)
